@@ -19,7 +19,7 @@ httpx==0.25.2
 aiofiles==23.2.1
 
 # Voice processing & AI
-openai==1.3.7
+openai==1.106.1
 azure-cognitiveservices-speech==1.34.0
 google-cloud-speech==2.21.0
 
