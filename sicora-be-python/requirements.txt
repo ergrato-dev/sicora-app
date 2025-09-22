@@ -41,7 +41,7 @@ click==8.1.8
 typer==0.15.1
 
 # IA y ML (sin ChromaDB por incompatibilidad con Python 3.13)
-openai==1.58.1
+openai==1.108.1
 # chromadb - Temporalmente excluido por problemas de compilación con Python 3.13
 # Alternativas: pinecone-client, weaviate-client, qdrant-client
 
