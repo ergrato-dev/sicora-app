@@ -28,7 +28,7 @@ sphinx-rtd-theme==3.0.2
 
 # Jupyter para prototipado
 jupyter==1.1.1
-ipykernel==6.29.5
+ipykernel==7.0.1
 
 # CLI y utilidades
 httpie==3.2.4
