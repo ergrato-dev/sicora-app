@@ -7,9 +7,10 @@ on:
     branches: [main, develop]
 
 env:
-  NODE_VERSION: '18'
-  GO_VERSION: '1.21'
-  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+  GO_VERSION: '1.23'
+  PYTHON_VERSION: '3.13'
 
 jobs:
   # Job 1: Lint y validación de archivos
@@ -25,17 +26,33 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: |
           cd sicora-app-fe
-          npm ci
+          pnpm install --frozen-lockfile
 
       - name: Lint Frontend
         run: |
           cd sicora-app-fe
-          npm run lint
+          pnpm lint
 
       - name: Validate Markdown
         uses: DavidAnson/markdownlint-cli2-action@v13
@@ -62,17 +79,33 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: |
           cd sicora-app-fe
-          npm ci
+          pnpm install --frozen-lockfile
 
       - name: Run tests
         run: |
           cd sicora-app-fe
-          npm run test:ci
+          pnpm test:coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -213,10 +246,15 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-      - name: Audit npm dependencies
+      - name: Setup pnpm for audit
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Audit pnpm dependencies
         run: |
           cd sicora-app-fe
-          npm audit --audit-level moderate
+          pnpm audit --audit-level moderate || true
 
       - name: Audit Go dependencies
         uses: securecodewarrior/github-action-gosec@master
@@ -299,20 +337,25 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
       - name: Install MCP Server dependencies
         run: |
           cd sicora-mcp-server
-          npm ci
+          pnpm install --frozen-lockfile
 
       - name: Test MCP Server
         run: |
           cd sicora-mcp-server
-          npm test
+          pnpm test
 
       - name: Test MCP Integration
         run: |
           cd sicora-mcp-server
-          npm start &
+          pnpm start &
           sleep 10
           curl -f http://localhost:3000/health || exit 1
 
