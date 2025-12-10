@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1584 396" width="1584" height="396">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#001a1a"/>
+      <stop offset="50%" style="stop-color:#002626"/>
+      <stop offset="100%" style="stop-color:#001a1a"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ff88"/>
+      <stop offset="50%" style="stop-color:#00d9ff"/>
+      <stop offset="100%" style="stop-color:#00ff88"/>
+    </linearGradient>
+    <filter id="neon">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1584" height="396" fill="url(#bg2)"/>
+  
+  <!-- Grid pattern -->
+  <g stroke="#004d4d" stroke-width="0.5" opacity="0.3">
+    <line x1="0" y1="0" x2="0" y2="396"/>
+    <line x1="80" y1="0" x2="80" y2="396"/>
+    <line x1="160" y1="0" x2="160" y2="396"/>
+    <line x1="240" y1="0" x2="240" y2="396"/>
+    <line x1="320" y1="0" x2="320" y2="396"/>
+    <line x1="400" y1="0" x2="400" y2="396"/>
+    <line x1="480" y1="0" x2="480" y2="396"/>
+    <line x1="560" y1="0" x2="560" y2="396"/>
+    <line x1="640" y1="0" x2="640" y2="396"/>
+    <line x1="720" y1="0" x2="720" y2="396"/>
+    <line x1="800" y1="0" x2="800" y2="396"/>
+    <line x1="880" y1="0" x2="880" y2="396"/>
+    <line x1="960" y1="0" x2="960" y2="396"/>
+    <line x1="1040" y1="0" x2="1040" y2="396"/>
+    <line x1="1120" y1="0" x2="1120" y2="396"/>
+    <line x1="1200" y1="0" x2="1200" y2="396"/>
+    <line x1="1280" y1="0" x2="1280" y2="396"/>
+    <line x1="1360" y1="0" x2="1360" y2="396"/>
+    <line x1="1440" y1="0" x2="1440" y2="396"/>
+    <line x1="1520" y1="0" x2="1520" y2="396"/>
+    <line x1="0" y1="66" x2="1584" y2="66"/>
+    <line x1="0" y1="132" x2="1584" y2="132"/>
+    <line x1="0" y1="198" x2="1584" y2="198"/>
+    <line x1="0" y1="264" x2="1584" y2="264"/>
+    <line x1="0" y1="330" x2="1584" y2="330"/>
+  </g>
+  
+  <!-- Terminal window effect -->
+  <rect x="100" y="40" width="1384" height="316" rx="8" fill="#0d1117" stroke="#00ff88" stroke-width="2" opacity="0.7"/>
+  <circle cx="130" cy="60" r="6" fill="#ff5f56"/>
+  <circle cx="155" cy="60" r="6" fill="#ffbd2e"/>
+  <circle cx="180" cy="60" r="6" fill="#27ca3f"/>
+  
+  <!-- Terminal content -->
+  <g font-family="Consolas, Monaco, monospace" font-size="16" fill="#8892b0">
+    <text x="130" y="100">
+      <tspan fill="#00ff88">$</tspan>
+      <tspan fill="#ccd6f6"> whoami</tspan>
+    </text>
+  </g>
+  
+  <!-- Main name with neon effect -->
+  <text x="792" y="160" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="bold" fill="url(#glow)" filter="url(#neon)">EL PARCHE DEV</text>
+  
+  <!-- Role with terminal style -->
+  <g font-family="Consolas, Monaco, monospace" font-size="24">
+    <text x="130" y="210" fill="#00d9ff">→</text>
+    <text x="160" y="210" fill="#ffffff">Full Stack Developer</text>
+    <text x="430" y="210" fill="#00ff88">|</text>
+    <text x="460" y="210" fill="#8892b0" font-style="italic">"Construyendo el futuro"</text>
+  </g>
+  
+  <!-- Tech stack as terminal output -->
+  <g font-family="Consolas, Monaco, monospace" font-size="18">
+    <text x="130" y="260" fill="#00ff88">$</text>
+    <text x="155" y="260" fill="#ccd6f6"> skills --list</text>
+    
+    <text x="130" y="295" fill="#00d9ff">[</text>
+    <text x="145" y="295" fill="#64ffda">"React"</text>
+    <text x="230" y="295" fill="#8892b0">,</text>
+    <text x="250" y="295" fill="#64ffda">"Go"</text>
+    <text x="305" y="295" fill="#8892b0">,</text>
+    <text x="325" y="295" fill="#64ffda">"Python"</text>
+    <text x="425" y="295" fill="#8892b0">,</text>
+    <text x="445" y="295" fill="#64ffda">"Java"</text>
+    <text x="525" y="295" fill="#8892b0">,</text>
+    <text x="545" y="295" fill="#64ffda">"TypeScript"</text>
+    <text x="685" y="295" fill="#8892b0">,</text>
+    <text x="705" y="295" fill="#64ffda">"SQL"</text>
+    <text x="770" y="295" fill="#8892b0">,</text>
+    <text x="790" y="295" fill="#00d9ff">"AI"</text>
+    <text x="840" y="295" fill="#8892b0">,</text>
+    <text x="860" y="295" fill="#64ffda">"Docker"</text>
+    <text x="970" y="295" fill="#8892b0">,</text>
+    <text x="990" y="295" fill="#64ffda">"AWS"</text>
+    <text x="1060" y="295" fill="#8892b0">,</text>
+    <text x="1080" y="295" fill="#64ffda">"Linux"</text>
+    <text x="1170" y="295" fill="#00d9ff">]</text>
+  </g>
+  
+  <!-- Cursor blink -->
+  <rect x="130" y="315" width="12" height="20" fill="#00ff88" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0;0.8" dur="1.2s" repeatCount="indefinite"/>
+  </rect>
+  
+  <!-- Decorative nodes -->
+  <g fill="#00ff88" opacity="0.6">
+    <circle cx="50" cy="198" r="4"/>
+    <circle cx="1534" cy="198" r="4"/>
+  </g>
+</svg>
