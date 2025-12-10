@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: [1.21, 1.22]
+        go-version: ['1.22', '1.23']
 
     steps:
       - name: Checkout code
@@ -156,7 +156,7 @@ jobs:
         run: go test -v -race -coverprofile=coverage.out ./...
 
       - name: Upload coverage to Codecov
-        if: matrix.go-version == '1.22'
+        if: matrix.go-version == '1.23'
         uses: codecov/codecov-action@v3
         with:
           file: ./sicora-be-go/coverage.out
@@ -169,7 +169,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ['3.12', '3.13']
 
     steps:
       - name: Checkout code
@@ -214,7 +214,7 @@ jobs:
           pytest --cov=app --cov-report=xml --cov-report=html
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.13'
         uses: codecov/codecov-action@v3
         with:
           file: ./sicora-be-python/coverage.xml
