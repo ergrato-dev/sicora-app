@@ -130,5 +130,5 @@ coverage/
 # SICORA specific exclusions
 # Nota: sicora-docs ahora es editable para trabajar con RF's e historias
 # sicora-docs/
-sicora-be-go/
+# sicora-be-go/ # Reincluido - contiene microservicios core
 
