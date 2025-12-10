@@ -1,4 +1,4 @@
-import { ApiResponse } from '../types/auth.types';
+import type { ApiResponse } from '../types/auth.types';
 
 // Configuración de la API
 export const API_CONFIG = {

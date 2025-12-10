@@ -1,6 +1,5 @@
 import { useUserStore } from '../stores/userStore';
 import { Button } from '../components/Button';
-import { DiagnosticComponent } from '../components/DiagnosticComponent';
 import { BRAND_CONFIG, IS_SENA_BUILD } from '../config/brand';
 import {
   UserGroupIcon,
@@ -113,13 +112,6 @@ export function Dashboard() {
 
   return (
     <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8'>
-      {/* Componente de diagnóstico */}
-      <div className='bg-white rounded-lg shadow-md border border-gray-100 p-6 mb-8'>
-        <h2 className='text-xl font-semibold text-gray-900 mb-4'>Estado del Sistema</h2>
-
-        <DiagnosticComponent />
-      </div>
-
       {/* Header de bienvenida */}
       <div className='bg-gradient-to-r from-sena-primary-600 to-sena-primary-700 rounded-lg p-8 text-white'>
         <h1 className='text-3xl font-bold mb-2'>{getWelcomeMessage()}</h1>

@@ -103,8 +103,10 @@ export interface ApiError {
 }
 
 export interface ApiResponse<T = unknown> {
-  success: boolean;
+  success?: boolean;
   data?: T;
   error?: ApiError;
-  timestamp: string;
+  timestamp?: string;
+  status?: number;
+  message?: string;
 }

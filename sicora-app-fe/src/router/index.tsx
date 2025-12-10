@@ -13,7 +13,6 @@ import { FormComponentsDemoPage } from '../components/examples/FormComponentsDem
 import { SelectBadgeAlertDemoPage } from '../components/examples/SelectBadgeAlertDemoPage';
 import ModalSkeletonToastDemoPage from '../components/examples/ModalSkeletonToastDemoPage';
 import SpinnerTooltipDropdownDemoPage from '../components/examples/SpinnerTooltipDropdownDemoPage';
-import BackendTestComponent from '../components/BackendTestComponent'; // ← Esta línea está correcta ahora
 // Páginas legales
 import { PoliticaPrivacidad, TerminosUso, MapaSitio, Accesibilidad } from '../pages/legal';
 
@@ -35,7 +34,6 @@ export function AppRouter() {
         <Route path='select-badge-alert' element={<SelectBadgeAlertDemoPage />} />
         <Route path='modal-skeleton-toast' element={<ModalSkeletonToastDemoPage />} />
         <Route path='spinner-tooltip-dropdown' element={<SpinnerTooltipDropdownDemoPage />} />
-        <Route path='test-backend' element={<BackendTestComponent />} />
 
         {/* Rutas de Usuarios */}
         <Route path='usuarios'>
