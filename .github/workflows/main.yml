@@ -97,7 +97,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: matrix.node-version == '20'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           file: ./sicora-app-fe/coverage/coverage-final.json
           flags: frontend
@@ -157,7 +157,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: matrix.go-version == '1.22'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           file: ./sicora-be-go/coverage.out
           flags: backend-go
@@ -215,7 +215,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.11'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           file: ./sicora-be-python/coverage.xml
           flags: backend-python
