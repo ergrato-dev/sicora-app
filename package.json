@@ -1,0 +1,25 @@
+{
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  },
+  "scripts": {
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "sicora-app-fe/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "sicora-app-fe/**/*.{css,json,md}": [
+      "prettier --write"
+    ],
+    "sicora-be-python/**/*.py": [
+      "ruff check --fix",
+      "ruff format"
+    ],
+    "sicora-be-go/**/*.go": [
+      "gofmt -w"
+    ]
+  }
+}
