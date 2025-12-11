@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
+	"evalinservice/internal/domain/exceptions"
+	"evalinservice/internal/domain/valueobjects"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/domain/exceptions"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
 )
 
 // Question representa una pregunta en el sistema de evaluación

@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"evalinservice/internal/domain/entities"
+	"evalinservice/internal/domain/repositories"
+	"evalinservice/internal/infrastructure/database/mappers"
+	"evalinservice/internal/infrastructure/database/models"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/domain/entities"
-	"github.com/sicora-dev/evalinservice/internal/domain/repositories"
-	"github.com/sicora-dev/evalinservice/internal/infrastructure/database/mappers"
-	"github.com/sicora-dev/evalinservice/internal/infrastructure/database/models"
 	"gorm.io/gorm"
 )
 

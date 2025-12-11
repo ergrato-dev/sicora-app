@@ -3,7 +3,7 @@ package repositories
 import (
 	"gorm.io/gorm"
 
-	"github.com/sicora-dev/evalinservice/internal/domain/repositories"
+	"evalinservice/internal/domain/repositories"
 )
 
 // RepositoryContainer contiene todas las implementaciones de repositorios

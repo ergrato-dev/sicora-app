@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
+	"evalinservice/internal/domain/exceptions"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/domain/exceptions"
 )
 
 // Questionnaire representa un cuestionario que agrupa preguntas

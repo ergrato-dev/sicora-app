@@ -4,7 +4,7 @@
 # =============================================================================
 
 # Stage 1: Build
-FROM golang:1.23-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache git ca-certificates tzdata
@@ -27,14 +27,14 @@ COPY userservice/ ./userservice/
 # Download dependencies
 RUN go work sync && go mod download
 
-# Build all services
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/attendanceservice ./attendanceservice/cmd/server/
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/evalinservice ./evalinservice/cmd/server/
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/kbservice ./kbservice/cmd/server/
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/mevalservice ./mevalservice/cmd/server/
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/projectevalservice ./projectevalservice/cmd/server/
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/scheduleservice ./scheduleservice/cmd/server/
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/userservice ./userservice/cmd/server/
+# Build all services - each from its own directory context
+RUN cd attendanceservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/attendanceservice ./cmd/server/
+# evalinservice excluido temporalmente - requiere swag docs
+RUN cd kbservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/kbservice ./cmd/server/
+RUN cd mevalservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/mevalservice ./cmd/server/
+RUN cd projectevalservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/projectevalservice ./cmd/server/
+RUN cd scheduleservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/scheduleservice ./cmd/server/
+RUN cd userservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/userservice ./cmd/server/
 
 # Stage 2: Production
 FROM alpine:3.19 AS production
@@ -50,7 +50,7 @@ WORKDIR /app
 
 # Copy binaries from builder
 COPY --from=builder /bin/attendanceservice /app/
-COPY --from=builder /bin/evalinservice /app/
+# evalinservice excluido temporalmente
 COPY --from=builder /bin/kbservice /app/
 COPY --from=builder /bin/mevalservice /app/
 COPY --from=builder /bin/projectevalservice /app/

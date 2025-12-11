@@ -1,4 +1,4 @@
-module sicora-be-go/userservice
+module userservice
 
 go 1.23.0
 

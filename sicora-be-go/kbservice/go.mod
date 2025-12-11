@@ -1,4 +1,4 @@
-module sicora-be-go/kbservice
+module kbservice
 
 go 1.23.0
 

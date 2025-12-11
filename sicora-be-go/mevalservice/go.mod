@@ -1,4 +1,4 @@
-module sicora-be-go/mevalservice
+module mevalservice
 
 go 1.23.0
 

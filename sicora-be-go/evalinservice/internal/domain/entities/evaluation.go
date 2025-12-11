@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"evalinservice/internal/domain/exceptions"
+	"evalinservice/internal/domain/valueobjects"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/domain/exceptions"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
 )
 
 // EvaluationResponse representa una respuesta individual a una pregunta

@@ -2,16 +2,14 @@ package main
 
 import (
 	_ "evalinservice/docs"
-	_ "evalinservice/docs"
-	_ "evalinservice/docs"
 	"log"
 	"os"
 
+	"evalinservice/configs"
+	"evalinservice/internal/infrastructure/database"
+	"evalinservice/internal/presentation/handlers"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/sicora-dev/evalinservice/configs"
-	"github.com/sicora-dev/evalinservice/internal/infrastructure/database"
-	"github.com/sicora-dev/evalinservice/internal/presentation/handlers"
 	"github.com/sirupsen/logrus"
 )
 

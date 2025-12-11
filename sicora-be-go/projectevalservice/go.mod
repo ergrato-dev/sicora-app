@@ -1,4 +1,4 @@
-module sicora-be-go/projectevalservice
+module projectevalservice
 
 go 1.23.0
 

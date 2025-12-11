@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	"github.com/sicora-dev/evalinservice/internal/infrastructure/database/models"
+	"evalinservice/internal/infrastructure/database/models"
 )
 
 // DB es la instancia global de la base de datos

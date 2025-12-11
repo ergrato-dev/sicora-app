@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
+	"evalinservice/internal/domain/entities"
+	"evalinservice/internal/domain/valueobjects"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/domain/entities"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
 )
 
 // EvaluationPeriodRepository define las operaciones para la gestión de períodos de evaluación

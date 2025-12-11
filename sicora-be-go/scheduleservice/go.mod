@@ -1,4 +1,4 @@
-module sicora-be-go/scheduleservice
+module scheduleservice
 
 go 1.23.0
 

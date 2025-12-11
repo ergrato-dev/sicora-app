@@ -1,10 +1,10 @@
 package mappers
 
 import (
-	"github.com/sicora-dev/evalinservice/internal/application/dtos"
-	"github.com/sicora-dev/evalinservice/internal/domain/entities"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
-	"github.com/sicora-dev/evalinservice/internal/infrastructure/database/models"
+	"evalinservice/internal/application/dtos"
+	"evalinservice/internal/domain/entities"
+	"evalinservice/internal/domain/valueobjects"
+	"evalinservice/internal/infrastructure/database/models"
 )
 
 // EvaluationPeriodMapper maneja la conversión entre entidades EvaluationPeriod y DTOs

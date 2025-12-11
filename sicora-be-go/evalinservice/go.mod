@@ -1,4 +1,4 @@
-module sicora-be-go/evalinservice
+module evalinservice
 
 go 1.23.0
 

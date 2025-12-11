@@ -1,4 +1,4 @@
-module sicora-be-go/attendanceservice
+module attendanceservice
 
 go 1.23.0
 

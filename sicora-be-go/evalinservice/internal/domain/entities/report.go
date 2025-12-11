@@ -3,8 +3,8 @@ package entities
 import (
 	"time"
 
+	"evalinservice/internal/domain/valueobjects"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
 )
 
 type Report struct {

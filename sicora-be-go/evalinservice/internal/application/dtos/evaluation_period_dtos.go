@@ -3,8 +3,8 @@ package dtos
 import (
 	"time"
 
+	"evalinservice/internal/domain/valueobjects"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
 )
 
 // EvaluationPeriodCreateDTO representa los datos para crear un período de evaluación

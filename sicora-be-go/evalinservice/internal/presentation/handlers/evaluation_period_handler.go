@@ -8,9 +8,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 
-	"github.com/sicora-dev/evalinservice/internal/application/dtos"
-	"github.com/sicora-dev/evalinservice/internal/application/usecases"
-	"github.com/sicora-dev/evalinservice/internal/presentation/middleware"
+	"evalinservice/internal/application/dtos"
+	"evalinservice/internal/application/usecases"
+	"evalinservice/internal/presentation/middleware"
 )
 
 const (

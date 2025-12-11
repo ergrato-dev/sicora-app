@@ -8,11 +8,11 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"github.com/sicora-dev/evalinservice/internal/domain/entities"
-	"github.com/sicora-dev/evalinservice/internal/domain/repositories"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
-	"github.com/sicora-dev/evalinservice/internal/infrastructure/database/mappers"
-	"github.com/sicora-dev/evalinservice/internal/infrastructure/database/models"
+	"evalinservice/internal/domain/entities"
+	"evalinservice/internal/domain/repositories"
+	"evalinservice/internal/domain/valueobjects"
+	"evalinservice/internal/infrastructure/database/mappers"
+	"evalinservice/internal/infrastructure/database/models"
 )
 
 type reportRepositoryImpl struct {

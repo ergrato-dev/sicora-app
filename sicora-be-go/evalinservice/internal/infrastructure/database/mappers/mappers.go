@@ -3,9 +3,9 @@ package mappers
 import (
 	"encoding/json"
 
-	"github.com/sicora-dev/evalinservice/internal/domain/entities"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
-	"github.com/sicora-dev/evalinservice/internal/infrastructure/database/models"
+	"evalinservice/internal/domain/entities"
+	"evalinservice/internal/domain/valueobjects"
+	"evalinservice/internal/infrastructure/database/models"
 )
 
 // QuestionMapper convierte entre entidades Question y modelos GORM

@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 
-	"github.com/sicora-dev/evalinservice/internal/application/usecases"
-	"github.com/sicora-dev/evalinservice/internal/presentation/middleware"
+	"evalinservice/internal/application/usecases"
+	"evalinservice/internal/presentation/middleware"
 )
 
 // RouterConfig contiene la configuración para el router

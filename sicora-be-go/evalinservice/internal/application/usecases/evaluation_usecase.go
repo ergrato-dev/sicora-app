@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"evalinservice/internal/application/dtos"
+	"evalinservice/internal/domain/entities"
+	"evalinservice/internal/domain/exceptions"
+	"evalinservice/internal/domain/repositories"
+	"evalinservice/internal/domain/valueobjects"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/application/dtos"
-	"github.com/sicora-dev/evalinservice/internal/domain/entities"
-	"github.com/sicora-dev/evalinservice/internal/domain/exceptions"
-	"github.com/sicora-dev/evalinservice/internal/domain/repositories"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
 )
 
 const (

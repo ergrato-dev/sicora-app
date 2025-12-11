@@ -5,8 +5,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 
-	"github.com/sicora-dev/evalinservice/internal/application/dtos"
-	"github.com/sicora-dev/evalinservice/internal/application/usecases"
+	"evalinservice/internal/application/dtos"
+	"evalinservice/internal/application/usecases"
 )
 
 // QuestionnaireHandler maneja las solicitudes HTTP relacionadas con cuestionarios

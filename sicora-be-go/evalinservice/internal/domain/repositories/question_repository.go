@@ -3,9 +3,9 @@ package repositories
 import (
 	"context"
 
+	"evalinservice/internal/domain/entities"
+	"evalinservice/internal/domain/valueobjects"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/domain/entities"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
 )
 
 // QuestionRepository define las operaciones para la gestión de preguntas

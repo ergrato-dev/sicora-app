@@ -3,8 +3,8 @@ package dtos
 import (
 	"time"
 
+	"evalinservice/internal/domain/valueobjects"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/domain/valueobjects"
 )
 
 // QuestionCreateDTO representa los datos para crear una pregunta

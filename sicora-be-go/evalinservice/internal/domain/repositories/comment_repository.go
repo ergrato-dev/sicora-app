@@ -3,8 +3,8 @@ package repositories
 import (
 	"context"
 
+	"evalinservice/internal/domain/entities"
 	"github.com/google/uuid"
-	"github.com/sicora-dev/evalinservice/internal/domain/entities"
 )
 
 type CommentRepository interface {
