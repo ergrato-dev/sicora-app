@@ -1,0 +1,1406 @@
+basePath: /api/v1
+definitions:
+  mevalservice_internal_application_dto.AppealResponse:
+    properties:
+      appeal_number:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      evidence:
+        type: string
+      final_resolution:
+        type: string
+      id:
+        type: string
+      justification:
+        type: string
+      priority:
+        type: string
+      requested_resolution:
+        type: string
+      resolution_date:
+        type: string
+      review_date:
+        type: string
+      reviewer_notes:
+        type: string
+      status:
+        type: string
+      student_case_id:
+        type: string
+      student_id:
+        type: string
+      subject:
+        type: string
+      submission_date:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  mevalservice_internal_application_dto.CommitteeDecisionResponse:
+    properties:
+      attendees_list:
+        type: string
+      committee_id:
+        type: string
+      created_at:
+        type: string
+      decision_date:
+        type: string
+      decision_number:
+        type: string
+      description:
+        type: string
+      execution_date:
+        type: string
+      id:
+        type: string
+      justification:
+        type: string
+      president_signature:
+        type: boolean
+      resolution:
+        type: string
+      secretary_signature:
+        type: boolean
+      status:
+        type: string
+      student_case_id:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      voting_result:
+        type: string
+    type: object
+  mevalservice_internal_application_dto.CommitteeMemberResponse:
+    properties:
+      appointment_date:
+        type: string
+      committee_id:
+        type: string
+      created_at:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      role:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  mevalservice_internal_application_dto.CommitteeResponse:
+    properties:
+      center:
+        type: string
+      coordinator:
+        type: string
+      created_at:
+        type: string
+      current_members:
+        type: integer
+      id:
+        type: string
+      max_members:
+        type: integer
+      members:
+        items:
+          $ref: '#/definitions/mevalservice_internal_application_dto.CommitteeMemberResponse'
+        type: array
+      name:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  mevalservice_internal_application_dto.CreateAppealRequest:
+    properties:
+      description:
+        minLength: 10
+        type: string
+      evidence:
+        type: string
+      justification:
+        minLength: 10
+        type: string
+      priority:
+        enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - URGENT
+        type: string
+      requested_resolution:
+        minLength: 10
+        type: string
+      student_case_id:
+        type: string
+      student_id:
+        type: string
+      subject:
+        maxLength: 200
+        minLength: 5
+        type: string
+      type:
+        enum:
+        - SANCTION_APPEAL
+        - DECISION_APPEAL
+        - PROCESS_APPEAL
+        type: string
+    required:
+    - description
+    - justification
+    - requested_resolution
+    - student_case_id
+    - student_id
+    - subject
+    - type
+    type: object
+  mevalservice_internal_application_dto.CreateCommitteeRequest:
+    properties:
+      center:
+        maxLength: 50
+        minLength: 3
+        type: string
+      coordinator:
+        maxLength: 100
+        minLength: 3
+        type: string
+      max_members:
+        maximum: 15
+        minimum: 3
+        type: integer
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      type:
+        enum:
+        - DISCIPLINARY
+        - ACADEMIC
+        type: string
+    required:
+    - center
+    - coordinator
+    - max_members
+    - name
+    - type
+    type: object
+  mevalservice_internal_application_dto.CreateImprovementPlanRequest:
+    properties:
+      activities:
+        minLength: 10
+        type: string
+      description:
+        minLength: 10
+        type: string
+      end_date:
+        type: string
+      objectives:
+        minLength: 10
+        type: string
+      resources:
+        type: string
+      start_date:
+        type: string
+      student_case_id:
+        type: string
+      student_id:
+        type: string
+      supervisor_id:
+        type: string
+      timeline:
+        minLength: 10
+        type: string
+      title:
+        maxLength: 200
+        minLength: 5
+        type: string
+    required:
+    - activities
+    - description
+    - end_date
+    - objectives
+    - start_date
+    - student_case_id
+    - student_id
+    - supervisor_id
+    - timeline
+    - title
+    type: object
+  mevalservice_internal_application_dto.CreateSanctionRequest:
+    properties:
+      appeal_deadline:
+        type: string
+      description:
+        minLength: 10
+        type: string
+      end_date:
+        type: string
+      is_appealable:
+        type: boolean
+      justification:
+        minLength: 10
+        type: string
+      severity:
+        enum:
+        - MINOR
+        - MODERATE
+        - SEVERE
+        - CRITICAL
+        type: string
+      start_date:
+        type: string
+      student_case_id:
+        type: string
+      student_id:
+        type: string
+      title:
+        maxLength: 200
+        minLength: 5
+        type: string
+      type:
+        enum:
+        - WARNING
+        - CONDITIONAL_ENROLLMENT
+        - ENROLLMENT_CANCELLATION
+        type: string
+    required:
+    - description
+    - justification
+    - severity
+    - start_date
+    - student_case_id
+    - student_id
+    - title
+    - type
+    type: object
+  mevalservice_internal_application_dto.CreateStudentCaseRequest:
+    properties:
+      committee_id:
+        type: string
+      description:
+        minLength: 10
+        type: string
+      due_date:
+        type: string
+      evidence:
+        type: string
+      priority:
+        enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - URGENT
+        type: string
+      reported_by:
+        maxLength: 100
+        minLength: 3
+        type: string
+      severity:
+        enum:
+        - MINOR
+        - MODERATE
+        - SEVERE
+        - CRITICAL
+        type: string
+      student_id:
+        type: string
+      title:
+        maxLength: 200
+        minLength: 5
+        type: string
+      type:
+        enum:
+        - DISCIPLINARY
+        - ACADEMIC
+        type: string
+    required:
+    - committee_id
+    - description
+    - reported_by
+    - severity
+    - student_id
+    - title
+    - type
+    type: object
+  mevalservice_internal_application_dto.ErrorResponse:
+    properties:
+      details:
+        additionalProperties:
+          type: string
+        type: object
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  mevalservice_internal_application_dto.ImprovementPlanResponse:
+    properties:
+      activities:
+        type: string
+      completion_date:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      objectives:
+        type: string
+      progress:
+        type: integer
+      resources:
+        type: string
+      start_date:
+        type: string
+      status:
+        type: string
+      student_case_id:
+        type: string
+      student_id:
+        type: string
+      supervisor_id:
+        type: string
+      supervisor_notes:
+        type: string
+      timeline:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  mevalservice_internal_application_dto.SanctionResponse:
+    properties:
+      appeal_deadline:
+        type: string
+      completion_date:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      is_appealable:
+        type: boolean
+      justification:
+        type: string
+      severity:
+        type: string
+      start_date:
+        type: string
+      status:
+        type: string
+      student_case_id:
+        type: string
+      student_id:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  mevalservice_internal_application_dto.StudentCaseResponse:
+    properties:
+      appeals:
+        items:
+          $ref: '#/definitions/mevalservice_internal_application_dto.AppealResponse'
+        type: array
+      case_number:
+        type: string
+      committee:
+        $ref: '#/definitions/mevalservice_internal_application_dto.CommitteeResponse'
+      committee_id:
+        type: string
+      created_at:
+        type: string
+      decisions:
+        items:
+          $ref: '#/definitions/mevalservice_internal_application_dto.CommitteeDecisionResponse'
+        type: array
+      description:
+        type: string
+      due_date:
+        type: string
+      evidence:
+        type: string
+      id:
+        type: string
+      improvement_plans:
+        items:
+          $ref: '#/definitions/mevalservice_internal_application_dto.ImprovementPlanResponse'
+        type: array
+      priority:
+        type: string
+      report_date:
+        type: string
+      reported_by:
+        type: string
+      resolution_date:
+        type: string
+      sanctions:
+        items:
+          $ref: '#/definitions/mevalservice_internal_application_dto.SanctionResponse'
+        type: array
+      severity:
+        type: string
+      status:
+        type: string
+      student_id:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  mevalservice_internal_application_dto.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  mevalservice_internal_application_dto.UpdateCommitteeRequest:
+    properties:
+      coordinator:
+        maxLength: 100
+        minLength: 3
+        type: string
+      max_members:
+        maximum: 15
+        minimum: 3
+        type: integer
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      status:
+        enum:
+        - ACTIVE
+        - INACTIVE
+        type: string
+    type: object
+  mevalservice_internal_application_dto.UpdateImprovementPlanRequest:
+    properties:
+      completion_date:
+        type: string
+      progress:
+        maximum: 100
+        minimum: 0
+        type: integer
+      status:
+        enum:
+        - PENDING
+        - IN_PROGRESS
+        - COMPLETED
+        - FAILED
+        type: string
+      supervisor_notes:
+        type: string
+    type: object
+  mevalservice_internal_application_dto.UpdateStudentCaseRequest:
+    properties:
+      description:
+        minLength: 10
+        type: string
+      due_date:
+        type: string
+      evidence:
+        type: string
+      priority:
+        enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - URGENT
+        type: string
+      resolution_date:
+        type: string
+      status:
+        enum:
+        - PENDING
+        - IN_PROGRESS
+        - RESOLVED
+        - APPEALED
+        - CLOSED
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: dev@sicora.sena.edu.co
+    name: Equipo de Desarrollo SICORA
+  description: Microservicio mevalservice del Sistema de Información de Coordinación
+    Académica (SICORA) - SENA
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: SICORA mevalservice API
+  version: "1.0"
+paths:
+  /appeals:
+    post:
+      consumes:
+      - application/json
+      description: Create a new appeal for a student case
+      parameters:
+      - description: Appeal information
+        in: body
+        name: appeal
+        required: true
+        schema:
+          $ref: '#/definitions/mevalservice_internal_application_dto.CreateAppealRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.AppealResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Create a new appeal
+      tags:
+      - appeals
+  /appeals/{id}:
+    get:
+      description: Get an appeal by its ID
+      parameters:
+      - description: Appeal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.AppealResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get appeal by ID
+      tags:
+      - appeals
+  /appeals/{id}/process:
+    patch:
+      consumes:
+      - application/json
+      description: Process an appeal with decision
+      parameters:
+      - description: Appeal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Appeal decision
+        in: body
+        name: decision
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Process appeal
+      tags:
+      - appeals
+  /appeals/student/{student_id}:
+    get:
+      description: Get all appeals for a specific student
+      parameters:
+      - description: Student ID
+        in: path
+        name: student_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/mevalservice_internal_application_dto.AppealResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get appeals by student ID
+      tags:
+      - appeals
+  /committees:
+    get:
+      description: Get all committees
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/mevalservice_internal_application_dto.CommitteeResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get all committees
+      tags:
+      - committees
+    post:
+      consumes:
+      - application/json
+      description: Create a new committee with the provided information
+      parameters:
+      - description: Committee information
+        in: body
+        name: committee
+        required: true
+        schema:
+          $ref: '#/definitions/mevalservice_internal_application_dto.CreateCommitteeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.CommitteeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Create a new committee
+      tags:
+      - committees
+  /committees/{id}:
+    delete:
+      description: Delete a committee by its ID
+      parameters:
+      - description: Committee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Delete committee
+      tags:
+      - committees
+    get:
+      description: Get a committee by its ID
+      parameters:
+      - description: Committee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.CommitteeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get committee by ID
+      tags:
+      - committees
+    put:
+      consumes:
+      - application/json
+      description: Update a committee by its ID
+      parameters:
+      - description: Committee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Committee update information
+        in: body
+        name: committee
+        required: true
+        schema:
+          $ref: '#/definitions/mevalservice_internal_application_dto.UpdateCommitteeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.CommitteeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Update committee
+      tags:
+      - committees
+  /committees/by-center:
+    get:
+      description: Get committees by center
+      parameters:
+      - description: Center name
+        in: query
+        name: center
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/mevalservice_internal_application_dto.CommitteeResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get committees by center
+      tags:
+      - committees
+  /committees/by-type:
+    get:
+      description: Get committees by type
+      parameters:
+      - description: Committee type
+        enum:
+        - DISCIPLINARY
+        - ACADEMIC
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/mevalservice_internal_application_dto.CommitteeResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get committees by type
+      tags:
+      - committees
+  /health:
+    get:
+      description: Check if the service is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - health
+  /improvement-plans:
+    post:
+      consumes:
+      - application/json
+      description: Create a new improvement plan for a student case
+      parameters:
+      - description: Improvement plan information
+        in: body
+        name: plan
+        required: true
+        schema:
+          $ref: '#/definitions/mevalservice_internal_application_dto.CreateImprovementPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ImprovementPlanResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Create a new improvement plan
+      tags:
+      - improvement-plans
+  /improvement-plans/{id}:
+    get:
+      description: Get an improvement plan by its ID
+      parameters:
+      - description: Improvement Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ImprovementPlanResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get improvement plan by ID
+      tags:
+      - improvement-plans
+    put:
+      consumes:
+      - application/json
+      description: Update an improvement plan by ID
+      parameters:
+      - description: Improvement Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Improvement plan updates
+        in: body
+        name: plan
+        required: true
+        schema:
+          $ref: '#/definitions/mevalservice_internal_application_dto.UpdateImprovementPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ImprovementPlanResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Update improvement plan
+      tags:
+      - improvement-plans
+  /improvement-plans/{id}/progress:
+    patch:
+      consumes:
+      - application/json
+      description: Update progress and notes of an improvement plan
+      parameters:
+      - description: Improvement Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Progress information
+        in: body
+        name: progress
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Update improvement plan progress
+      tags:
+      - improvement-plans
+  /improvement-plans/student-case/{student_case_id}:
+    get:
+      description: Get all improvement plans for a specific student case
+      parameters:
+      - description: Student Case ID
+        in: path
+        name: student_case_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/mevalservice_internal_application_dto.ImprovementPlanResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get improvement plans by student case ID
+      tags:
+      - improvement-plans
+  /sanctions:
+    post:
+      consumes:
+      - application/json
+      description: Create a new sanction for a student case
+      parameters:
+      - description: Sanction information
+        in: body
+        name: sanction
+        required: true
+        schema:
+          $ref: '#/definitions/mevalservice_internal_application_dto.CreateSanctionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.SanctionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Create a new sanction
+      tags:
+      - sanctions
+  /sanctions/{id}:
+    get:
+      description: Get a sanction by its ID
+      parameters:
+      - description: Sanction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.SanctionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get sanction by ID
+      tags:
+      - sanctions
+  /sanctions/{id}/activate:
+    patch:
+      description: Activate a specific sanction
+      parameters:
+      - description: Sanction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Activate sanction
+      tags:
+      - sanctions
+  /sanctions/{id}/complete:
+    patch:
+      description: Mark a sanction as completed
+      parameters:
+      - description: Sanction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Complete sanction
+      tags:
+      - sanctions
+  /sanctions/student/{student_id}:
+    get:
+      description: Get all sanctions for a specific student
+      parameters:
+      - description: Student ID
+        in: path
+        name: student_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/mevalservice_internal_application_dto.SanctionResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get sanctions by student ID
+      tags:
+      - sanctions
+  /student-cases:
+    post:
+      consumes:
+      - application/json
+      description: Create a new student case with the provided information
+      parameters:
+      - description: Student case information
+        in: body
+        name: case
+        required: true
+        schema:
+          $ref: '#/definitions/mevalservice_internal_application_dto.CreateStudentCaseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.StudentCaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Create a new student case
+      tags:
+      - student-cases
+  /student-cases/{id}:
+    get:
+      description: Get a student case by its ID
+      parameters:
+      - description: Student case ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.StudentCaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get student case by ID
+      tags:
+      - student-cases
+    put:
+      consumes:
+      - application/json
+      description: Update a student case by its ID
+      parameters:
+      - description: Student case ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Student case update information
+        in: body
+        name: case
+        required: true
+        schema:
+          $ref: '#/definitions/mevalservice_internal_application_dto.UpdateStudentCaseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.StudentCaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Update student case
+      tags:
+      - student-cases
+  /student-cases/by-student:
+    get:
+      description: Get student cases by student ID
+      parameters:
+      - description: Student ID
+        in: query
+        name: student_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/mevalservice_internal_application_dto.StudentCaseResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get student cases by student ID
+      tags:
+      - student-cases
+  /student-cases/overdue:
+    get:
+      description: Get all overdue student cases
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/mevalservice_internal_application_dto.StudentCaseResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get overdue student cases
+      tags:
+      - student-cases
+  /student-cases/pending:
+    get:
+      description: Get all pending student cases
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/mevalservice_internal_application_dto.StudentCaseResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/mevalservice_internal_application_dto.ErrorResponse'
+      summary: Get pending student cases
+      tags:
+      - student-cases
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

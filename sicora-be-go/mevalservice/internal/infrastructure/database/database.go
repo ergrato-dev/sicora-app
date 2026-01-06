@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -11,20 +12,13 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type Data	return &Database{
-		DB: gormDB,
-	}, nil
+// Database holds the database connection
+type Database struct {
+	DB    *gorm.DB
+	sqlDB *sql.DB
 }
 
-func getEnvOrDefaultTest(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
-}{
-	DB *gorm.DB
-}
-
+// NewDatabase creates a new database connection
 func NewDatabase() (*Database, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
 		getEnv("DB_HOST", "localhost"),
@@ -38,12 +32,12 @@ func NewDatabase() (*Database, error) {
 
 	// Configure GORM logger
 	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
-			SlowThreshold:             time.Second,   // Slow SQL threshold
-			LogLevel:                  logger.Silent, // Log level
-			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
-			Colorful:                  false,         // Disable color
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Silent,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  false,
 		},
 	)
 
@@ -73,18 +67,14 @@ func NewDatabase() (*Database, error) {
 		return nil, fmt.Errorf("failed to get underlying sql.DB: %w", err)
 	}
 
-	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
 	sqlDB.SetMaxIdleConns(10)
-
-	// SetMaxOpenConns sets the maximum number of open connections to the database.
 	sqlDB.SetMaxOpenConns(100)
-
-	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	return &Database{DB: db}, nil
+	return &Database{DB: db, sqlDB: sqlDB}, nil
 }
 
+// AutoMigrate runs database migrations
 func (d *Database) AutoMigrate() error {
 	return d.DB.AutoMigrate(
 		&CommitteeModel{},
@@ -97,7 +87,11 @@ func (d *Database) AutoMigrate() error {
 	)
 }
 
+// Close closes the database connection
 func (d *Database) Close() error {
+	if d.sqlDB != nil {
+		return d.sqlDB.Close()
+	}
 	sqlDB, err := d.DB.DB()
 	if err != nil {
 		return err
@@ -105,13 +99,8 @@ func (d *Database) Close() error {
 	return sqlDB.Close()
 }
 
-// NewTestDatabase creates a new test database connection (in-memory SQLite)
-// This is used for testing to avoid interfering with actual data
+// NewTestDatabase creates a new test database connection
 func NewTestDatabase() (*Database, error) {
-	// For testing, we'll use the same PostgreSQL setup but with a test database
-	// In a real scenario, you might want to use SQLite in-memory for faster tests
-
-	// Use test environment variables or defaults
 	host := getEnvOrDefault("TEST_DB_HOST", "localhost")
 	port := getEnvOrDefault("TEST_DB_PORT", "5432")
 	user := getEnvOrDefault("TEST_DB_USER", "postgres")
@@ -123,7 +112,7 @@ func NewTestDatabase() (*Database, error) {
 		host, port, user, password, dbname, sslmode)
 
 	gormDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent), // Silent for tests
+		Logger: logger.Default.LogMode(logger.Silent),
 		NowFunc: func() time.Time {
 			return time.Now().UTC()
 		},
@@ -137,7 +126,6 @@ func NewTestDatabase() (*Database, error) {
 		return nil, fmt.Errorf("failed to get underlying sql.DB: %w", err)
 	}
 
-	// Configure connection pool for testing
 	sqlDB.SetMaxOpenConns(5)
 	sqlDB.SetMaxIdleConns(2)
 	sqlDB.SetConnMaxLifetime(time.Hour)

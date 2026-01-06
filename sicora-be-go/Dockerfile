@@ -27,14 +27,10 @@ COPY userservice/ ./userservice/
 # Download dependencies
 RUN go work sync && go mod download
 
-# Build all services - each from its own directory context
+# Build servicios funcionales
+# TODO: agregar más servicios cuando estén listos (swag docs, archivos completos)
 RUN cd attendanceservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/attendanceservice ./cmd/server/
-# evalinservice excluido temporalmente - requiere swag docs
-RUN cd kbservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/kbservice ./cmd/server/
-RUN cd mevalservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/mevalservice ./cmd/server/
 RUN cd projectevalservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/projectevalservice ./cmd/server/
-RUN cd scheduleservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/scheduleservice ./cmd/server/
-RUN cd userservice && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /bin/userservice ./cmd/server/
 
 # Stage 2: Production
 FROM alpine:3.19 AS production
@@ -48,14 +44,9 @@ RUN addgroup -g 1001 -S sicora && \
 
 WORKDIR /app
 
-# Copy binaries from builder
+# Copy binaries from builder (2 servicios funcionales)
 COPY --from=builder /bin/attendanceservice /app/
-# evalinservice excluido temporalmente
-COPY --from=builder /bin/kbservice /app/
-COPY --from=builder /bin/mevalservice /app/
 COPY --from=builder /bin/projectevalservice /app/
-COPY --from=builder /bin/scheduleservice /app/
-COPY --from=builder /bin/userservice /app/
 
 # Copy supervisor config
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

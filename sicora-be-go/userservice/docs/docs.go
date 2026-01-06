@@ -51,25 +51,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Password changed successfully",
                         "schema": {
-                            "$ref": "#/definitions/dtos.AuthResponseDTO"
+                            "$ref": "#/definitions/userservice_internal_application_dtos.AuthResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Invalid input data",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "User doesn't need to change password",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -112,13 +112,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input data",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -144,7 +144,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.AuthenticateUserRequest"
+                            "$ref": "#/definitions/userservice_internal_application_dtos.AuthenticateUserRequest"
                         }
                     }
                 ],
@@ -152,25 +152,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Authentication successful",
                         "schema": {
-                            "$ref": "#/definitions/dtos.AuthResponseDTO"
+                            "$ref": "#/definitions/userservice_internal_application_dtos.AuthResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Invalid input data",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid credentials",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -213,19 +213,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input data",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid refresh token",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -259,25 +259,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Token refreshed successfully",
                         "schema": {
-                            "$ref": "#/definitions/dtos.AuthResponseDTO"
+                            "$ref": "#/definitions/userservice_internal_application_dtos.AuthResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Invalid input data",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid refresh token",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -320,19 +320,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input data",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid or expired token",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -358,7 +358,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.CreateUserRequestDTO"
+                            "$ref": "#/definitions/userservice_internal_application_dtos.CreateUserRequestDTO"
                         }
                     }
                 ],
@@ -373,32 +373,32 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input data",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Email already exists",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/users/change-password": {
+        "/users/bulk": {
             "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Change password for authenticated user",
+                "description": "Update multiple users in a single operation",
                 "consumes": [
                     "application/json"
                 ],
@@ -408,42 +408,184 @@ const docTemplate = `{
                 "tags": [
                     "Users"
                 ],
-                "summary": "Change password",
+                "summary": "Bulk update users",
                 "parameters": [
                     {
-                        "description": "Current and new password",
-                        "name": "passwords",
+                        "description": "Bulk user update data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.ChangePasswordRequestDTO"
+                            "$ref": "#/definitions/userservice_internal_application_dtos.BulkUpdateUserRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Password changed successfully",
+                        "description": "Bulk operation completed",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/userservice_internal_application_dtos.BulkOperationResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid input data",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Invalid current password",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create multiple users in a single operation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Bulk create users",
+                "parameters": [
+                    {
+                        "description": "Bulk user creation data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_application_dtos.BulkCreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bulk operation completed",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_application_dtos.BulkOperationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete multiple users in a single operation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Bulk delete users",
+                "parameters": [
+                    {
+                        "description": "Bulk user deletion data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_application_dtos.BulkDeleteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bulk operation completed",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_application_dtos.BulkOperationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/bulk/status": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Change status of multiple users in a single operation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Bulk change user status",
+                "parameters": [
+                    {
+                        "description": "Bulk status change data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_application_dtos.BulkStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bulk operation completed",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_application_dtos.BulkOperationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -471,25 +613,25 @@ const docTemplate = `{
                     "200": {
                         "description": "User profile retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/dtos.UserDTO"
+                            "$ref": "#/definitions/userservice_internal_application_dtos.UserDTO"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -518,7 +660,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.UpdateProfileRequestDTO"
+                            "$ref": "#/definitions/userservice_internal_application_dtos.UpdateProfileRequestDTO"
                         }
                     }
                 ],
@@ -526,37 +668,101 @@ const docTemplate = `{
                     "200": {
                         "description": "User profile updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/dtos.UserDTO"
+                            "$ref": "#/definitions/userservice_internal_application_dtos.UserDTO"
                         }
                     },
                     "400": {
                         "description": "Invalid input data",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Email already exists",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/profile/change-password": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Change the password of the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Change user password",
+                "parameters": [
+                    {
+                        "description": "Password change data",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_application_dtos.ChangePasswordRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password changed successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Invalid current password",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -595,19 +801,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid UUID format",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -618,7 +824,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update user data by admin",
+                "description": "Update a user's information. Admin-only endpoint.",
                 "consumes": [
                     "application/json"
                 ],
@@ -628,7 +834,7 @@ const docTemplate = `{
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Update user (Admin)",
+                "summary": "Update user (Admin only)",
                 "parameters": [
                     {
                         "type": "string",
@@ -643,7 +849,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.UpdateUserRequestDTO"
+                            "$ref": "#/definitions/userservice_internal_application_dtos.UpdateUserRequestDTO"
                         }
                     }
                 ],
@@ -658,19 +864,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input data",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin only",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -681,7 +893,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Soft delete a user by admin",
+                "description": "Soft delete a user. Admin-only endpoint.",
                 "consumes": [
                     "application/json"
                 ],
@@ -691,7 +903,7 @@ const docTemplate = `{
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Delete user (Admin)",
+                "summary": "Delete user (Admin only)",
                 "parameters": [
                     {
                         "type": "string",
@@ -702,7 +914,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "User deleted successfully",
                         "schema": {
                             "type": "object",
@@ -712,19 +924,157 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid UUID format",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin only",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/reset-password": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Reset a user's password and optionally set a new one. Admin-only endpoint.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Reset user password (Admin only)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Password reset data",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_application_dtos.AdminResetPasswordRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password reset successfully",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_application_dtos.AdminResetPasswordResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin only",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/status": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Activate or deactivate a user. Admin-only endpoint.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Toggle user status (Admin only)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User status updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID format",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin only",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/userservice_internal_domain_errors.ErrorResponse"
                         }
                     }
                 }
@@ -732,7 +1082,31 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dtos.AuthResponseDTO": {
+        "userservice_internal_application_dtos.AdminResetPasswordRequestDTO": {
+            "type": "object",
+            "properties": {
+                "new_password": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 10
+                }
+            }
+        },
+        "userservice_internal_application_dtos.AdminResetPasswordResponseDTO": {
+            "type": "object",
+            "properties": {
+                "must_change_password": {
+                    "type": "boolean"
+                },
+                "temporary_password": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "userservice_internal_application_dtos.AuthResponseDTO": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -748,11 +1122,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/dtos.UserDTO"
+                    "$ref": "#/definitions/userservice_internal_application_dtos.UserDTO"
                 }
             }
         },
-        "dtos.AuthenticateUserRequest": {
+        "userservice_internal_application_dtos.AuthenticateUserRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -768,7 +1142,143 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.ChangePasswordRequestDTO": {
+        "userservice_internal_application_dtos.BulkCreateUserRequest": {
+            "type": "object",
+            "required": [
+                "users"
+            ],
+            "properties": {
+                "users": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/userservice_internal_application_dtos.CreateUserRequestDTO"
+                    }
+                }
+            }
+        },
+        "userservice_internal_application_dtos.BulkDeleteRequest": {
+            "type": "object",
+            "required": [
+                "emails"
+            ],
+            "properties": {
+                "emails": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "userservice_internal_application_dtos.BulkOperationResponse": {
+            "type": "object",
+            "properties": {
+                "failure_count": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/userservice_internal_application_dtos.BulkUserResult"
+                    }
+                },
+                "success_count": {
+                    "type": "integer"
+                },
+                "total_processed": {
+                    "type": "integer"
+                }
+            }
+        },
+        "userservice_internal_application_dtos.BulkStatusRequest": {
+            "type": "object",
+            "required": [
+                "emails"
+            ],
+            "properties": {
+                "emails": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "is_active": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "userservice_internal_application_dtos.BulkUpdateUserItem": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "apellido": {
+                    "type": "string"
+                },
+                "documento": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "ficha_id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "nombre": {
+                    "type": "string"
+                },
+                "programa_formacion": {
+                    "type": "string"
+                }
+            }
+        },
+        "userservice_internal_application_dtos.BulkUpdateUserRequest": {
+            "type": "object",
+            "required": [
+                "users"
+            ],
+            "properties": {
+                "users": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/userservice_internal_application_dtos.BulkUpdateUserItem"
+                    }
+                }
+            }
+        },
+        "userservice_internal_application_dtos.BulkUserResult": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "userservice_internal_application_dtos.ChangePasswordRequestDTO": {
             "type": "object",
             "required": [
                 "current_password",
@@ -786,7 +1296,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.CreateUserRequestDTO": {
+        "userservice_internal_application_dtos.CreateUserRequestDTO": {
             "type": "object",
             "required": [
                 "apellido",
@@ -838,7 +1348,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.UpdateProfileRequestDTO": {
+        "userservice_internal_application_dtos.UpdateProfileRequestDTO": {
             "type": "object",
             "properties": {
                 "apellido": {
@@ -860,7 +1370,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.UpdateUserRequestDTO": {
+        "userservice_internal_application_dtos.UpdateUserRequestDTO": {
             "type": "object",
             "properties": {
                 "apellido": {
@@ -903,7 +1413,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.UserDTO": {
+        "userservice_internal_application_dtos.UserDTO": {
             "type": "object",
             "properties": {
                 "apellido": {
@@ -947,7 +1457,7 @@ const docTemplate = `{
                 }
             }
         },
-        "errors.ErrorCode": {
+        "userservice_internal_domain_errors.ErrorCode": {
             "type": "string",
             "enum": [
                 "INVALID_CREDENTIALS",
@@ -982,11 +1492,11 @@ const docTemplate = `{
                 "DatabaseError"
             ]
         },
-        "errors.ErrorDetails": {
+        "userservice_internal_domain_errors.ErrorDetails": {
             "type": "object",
             "properties": {
                 "code": {
-                    "$ref": "#/definitions/errors.ErrorCode"
+                    "$ref": "#/definitions/userservice_internal_domain_errors.ErrorCode"
                 },
                 "correlationId": {
                     "type": "string"
@@ -1005,11 +1515,11 @@ const docTemplate = `{
                 }
             }
         },
-        "errors.ErrorResponse": {
+        "userservice_internal_domain_errors.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
-                    "$ref": "#/definitions/errors.ErrorDetails"
+                    "$ref": "#/definitions/userservice_internal_domain_errors.ErrorDetails"
                 }
             }
         }

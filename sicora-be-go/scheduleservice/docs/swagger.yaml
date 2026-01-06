@@ -1,0 +1,684 @@
+basePath: /api/v1
+definitions:
+  gin.H:
+    additionalProperties: {}
+    type: object
+  scheduleservice_internal_application_dtos.AcademicGroupResponse:
+    properties:
+      academic_program:
+        $ref: '#/definitions/scheduleservice_internal_application_dtos.AcademicProgramResponse'
+      academic_program_id:
+        example: 550e8400-e29b-41d4-a716-446655440001
+        type: string
+      created_at:
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      is_active:
+        example: true
+        type: boolean
+      number:
+        example: "2691698"
+        type: string
+      quarter:
+        example: 3
+        type: integer
+      shift:
+        example: MANANA
+        type: string
+      updated_at:
+        type: string
+      year:
+        example: 2024
+        type: integer
+    type: object
+  scheduleservice_internal_application_dtos.AcademicProgramResponse:
+    properties:
+      code:
+        example: ADSO
+        type: string
+      created_at:
+        type: string
+      description:
+        example: Programa de formación en desarrollo de software
+        type: string
+      duration:
+        example: 24
+        type: integer
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      is_active:
+        example: true
+        type: boolean
+      name:
+        example: Análisis y Desarrollo de Software
+        type: string
+      type:
+        example: TECNOLOGO
+        type: string
+      updated_at:
+        type: string
+    type: object
+  scheduleservice_internal_application_dtos.BulkCreateSchedulesRequest:
+    properties:
+      schedules:
+        items:
+          $ref: '#/definitions/scheduleservice_internal_application_dtos.CreateScheduleRequest'
+        maxItems: 100
+        minItems: 1
+        type: array
+    required:
+    - schedules
+    type: object
+  scheduleservice_internal_application_dtos.BulkCreateSchedulesResponse:
+    properties:
+      created:
+        items:
+          $ref: '#/definitions/scheduleservice_internal_application_dtos.ScheduleResponse'
+        type: array
+      errors:
+        type: integer
+      failed:
+        items:
+          $ref: '#/definitions/scheduleservice_internal_application_dtos.BulkError'
+        type: array
+      succeeded:
+        type: integer
+      total:
+        type: integer
+    type: object
+  scheduleservice_internal_application_dtos.BulkError:
+    properties:
+      details:
+        type: string
+      error:
+        type: string
+      index:
+        type: integer
+    type: object
+  scheduleservice_internal_application_dtos.CSVError:
+    properties:
+      details:
+        type: string
+      error:
+        type: string
+      row:
+        type: integer
+    type: object
+  scheduleservice_internal_application_dtos.CSVUploadResponse:
+    properties:
+      created:
+        items:
+          $ref: '#/definitions/scheduleservice_internal_application_dtos.ScheduleResponse'
+        type: array
+      error_rows:
+        type: integer
+      errors:
+        items:
+          $ref: '#/definitions/scheduleservice_internal_application_dtos.CSVError'
+        type: array
+      processed_rows:
+        type: integer
+      success_rows:
+        type: integer
+      summary:
+        additionalProperties: true
+        type: object
+    type: object
+  scheduleservice_internal_application_dtos.CampusResponse:
+    properties:
+      address:
+        example: Calle 44 No. 1-104
+        type: string
+      city:
+        example: Mocoa
+        type: string
+      code:
+        example: CGDSS
+        type: string
+      created_at:
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      is_active:
+        example: true
+        type: boolean
+      name:
+        example: Centro de Gestión y Desarrollo Sostenible Suroccidente
+        type: string
+      updated_at:
+        type: string
+    type: object
+  scheduleservice_internal_application_dtos.CreateScheduleRequest:
+    properties:
+      academic_group_id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      block_identifier:
+        example: MLUN1
+        maxLength: 10
+        minLength: 4
+        type: string
+      day_of_week:
+        example: 1
+        maximum: 7
+        minimum: 1
+        type: integer
+      end_date:
+        example: "2024-06-15"
+        type: string
+      end_time:
+        example: "10:00"
+        type: string
+      instructor_id:
+        example: 550e8400-e29b-41d4-a716-446655440001
+        type: string
+      start_date:
+        example: "2024-01-15"
+        type: string
+      start_time:
+        example: "08:00"
+        type: string
+      subject:
+        example: Programación de Software
+        maxLength: 200
+        minLength: 3
+        type: string
+      venue_id:
+        example: 550e8400-e29b-41d4-a716-446655440002
+        type: string
+    required:
+    - academic_group_id
+    - block_identifier
+    - day_of_week
+    - end_date
+    - end_time
+    - instructor_id
+    - start_date
+    - start_time
+    - subject
+    - venue_id
+    type: object
+  scheduleservice_internal_application_dtos.PaginatedResponse-scheduleservice_internal_application_dtos_ScheduleResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/scheduleservice_internal_application_dtos.ScheduleResponse'
+        type: array
+      links:
+        $ref: '#/definitions/scheduleservice_internal_application_dtos.PaginationLinks'
+      pagination:
+        $ref: '#/definitions/scheduleservice_internal_application_dtos.PaginationMeta'
+    type: object
+  scheduleservice_internal_application_dtos.PaginationLinks:
+    properties:
+      first:
+        type: string
+      last:
+        type: string
+      next:
+        type: string
+      prev:
+        type: string
+      self:
+        type: string
+    type: object
+  scheduleservice_internal_application_dtos.PaginationMeta:
+    properties:
+      has_next:
+        type: boolean
+      has_prev:
+        type: boolean
+      page:
+        type: integer
+      page_size:
+        type: integer
+      pages:
+        type: integer
+      total:
+        type: integer
+    type: object
+  scheduleservice_internal_application_dtos.ScheduleResponse:
+    properties:
+      academic_group:
+        $ref: '#/definitions/scheduleservice_internal_application_dtos.AcademicGroupResponse'
+      academic_group_id:
+        example: 550e8400-e29b-41d4-a716-446655440001
+        type: string
+      block_identifier:
+        example: MLUN1
+        type: string
+      created_at:
+        type: string
+      day_of_week:
+        example: 1
+        type: integer
+      day_of_week_name:
+        example: Lunes
+        type: string
+      end_date:
+        example: "2024-06-15"
+        type: string
+      end_time:
+        example: "10:00"
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      instructor_id:
+        example: 550e8400-e29b-41d4-a716-446655440002
+        type: string
+      is_active:
+        example: true
+        type: boolean
+      start_date:
+        example: "2024-01-15"
+        type: string
+      start_time:
+        example: "08:00"
+        type: string
+      status:
+        example: ACTIVE
+        type: string
+      subject:
+        example: Programación de Software
+        type: string
+      updated_at:
+        type: string
+      venue:
+        $ref: '#/definitions/scheduleservice_internal_application_dtos.VenueResponse'
+      venue_id:
+        example: 550e8400-e29b-41d4-a716-446655440003
+        type: string
+    type: object
+  scheduleservice_internal_application_dtos.UpdateScheduleRequest:
+    properties:
+      academic_group_id:
+        type: string
+      block_identifier:
+        maxLength: 10
+        minLength: 4
+        type: string
+      day_of_week:
+        maximum: 7
+        minimum: 1
+        type: integer
+      end_date:
+        type: string
+      end_time:
+        type: string
+      instructor_id:
+        type: string
+      start_date:
+        type: string
+      start_time:
+        type: string
+      status:
+        enum:
+        - ACTIVE
+        - CANCELLED
+        - SUSPENDED
+        type: string
+      subject:
+        maxLength: 200
+        minLength: 3
+        type: string
+      venue_id:
+        type: string
+    type: object
+  scheduleservice_internal_application_dtos.VenueResponse:
+    properties:
+      campus:
+        $ref: '#/definitions/scheduleservice_internal_application_dtos.CampusResponse'
+      campus_id:
+        example: 550e8400-e29b-41d4-a716-446655440001
+        type: string
+      capacity:
+        example: 30
+        type: integer
+      code:
+        example: LAB-SW-01
+        type: string
+      created_at:
+        type: string
+      floor:
+        example: "2"
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      is_active:
+        example: true
+        type: boolean
+      name:
+        example: Laboratorio de Software
+        type: string
+      type:
+        example: LABORATORIO
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8002
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API para gestión de horarios académicos con operaciones bulk
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Schedule Service API
+  version: "1.0"
+paths:
+  /schedules:
+    get:
+      consumes:
+      - application/json
+      description: Lista horarios con filtros opcionales y paginación
+      parameters:
+      - default: 1
+        description: Número de página
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Tamaño de página
+        in: query
+        name: page_size
+        type: integer
+      - description: Filtrar por grupo académico
+        in: query
+        name: academic_group_id
+        type: string
+      - description: Filtrar por instructor
+        in: query
+        name: instructor_id
+        type: string
+      - description: Filtrar por ambiente
+        in: query
+        name: venue_id
+        type: string
+      - description: Filtrar por día de la semana (1-7)
+        in: query
+        name: day_of_week
+        type: integer
+      - description: Filtrar por estado
+        enum:
+        - ACTIVE
+        - CANCELLED
+        - SUSPENDED
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/scheduleservice_internal_application_dtos.PaginatedResponse-scheduleservice_internal_application_dtos_ScheduleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Listar horarios
+      tags:
+      - schedules
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo horario en el sistema
+      parameters:
+      - description: Datos del horario
+        in: body
+        name: schedule
+        required: true
+        schema:
+          $ref: '#/definitions/scheduleservice_internal_application_dtos.CreateScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/scheduleservice_internal_application_dtos.ScheduleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Crear horario
+      tags:
+      - schedules
+  /schedules/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un horario del sistema
+      parameters:
+      - description: ID del horario
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Eliminar horario
+      tags:
+      - schedules
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un horario específico por su ID
+      parameters:
+      - description: ID del horario
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/scheduleservice_internal_application_dtos.ScheduleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Obtener horario
+      tags:
+      - schedules
+    put:
+      consumes:
+      - application/json
+      description: Actualiza un horario existente
+      parameters:
+      - description: ID del horario
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Datos a actualizar
+        in: body
+        name: schedule
+        required: true
+        schema:
+          $ref: '#/definitions/scheduleservice_internal_application_dtos.UpdateScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/scheduleservice_internal_application_dtos.ScheduleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Actualizar horario
+      tags:
+      - schedules
+  /schedules/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Crea múltiples horarios en una sola operación
+      parameters:
+      - description: Lista de horarios a crear
+        in: body
+        name: schedules
+        required: true
+        schema:
+          $ref: '#/definitions/scheduleservice_internal_application_dtos.BulkCreateSchedulesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/scheduleservice_internal_application_dtos.BulkCreateSchedulesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Crear horarios masivamente
+      tags:
+      - schedules
+      - bulk
+  /schedules/upload-csv:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Procesa un archivo CSV para crear múltiples horarios
+      parameters:
+      - description: Archivo CSV con horarios
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/scheduleservice_internal_application_dtos.CSVUploadResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Cargar horarios desde CSV
+      tags:
+      - schedules
+      - bulk
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"evalinservice/internal/domain/valueobjects"
+
 	"github.com/google/uuid"
 )
 
@@ -96,6 +97,12 @@ type QuestionCreateRequest = QuestionCreateDTO
 type QuestionUpdateRequest = QuestionUpdateDTO
 type QuestionResponse = QuestionResponseDTO
 type QuestionFilterRequest = QuestionFiltersDTO
+
+// CreateQuestionRequest alias para handlers
+type CreateQuestionRequest = QuestionCreateDTO
+
+// UpdateQuestionRequest alias para handlers
+type UpdateQuestionRequest = QuestionUpdateDTO
 
 // QuestionBulkUpdateRequest representa una solicitud de actualización masiva
 type QuestionBulkUpdateRequest struct {

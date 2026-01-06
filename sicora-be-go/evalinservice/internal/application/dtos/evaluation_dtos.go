@@ -62,3 +62,9 @@ type EvaluationBulkUpdateRequest struct {
 	EvaluationIDs []uuid.UUID `json:"evaluation_ids" binding:"required"`
 	Status        string      `json:"status" binding:"required"`
 }
+
+// CreateEvaluationRequest es un alias para compatibilidad con handlers
+type CreateEvaluationRequest = EvaluationCreateRequest
+
+// UpdateEvaluationRequest es un alias para compatibilidad con handlers
+type UpdateEvaluationRequest = EvaluationUpdateRequest
