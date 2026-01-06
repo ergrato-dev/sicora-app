@@ -121,3 +121,70 @@ func (r *commentRepositoryImpl) CountByEvaluationID(ctx context.Context, evaluat
 	}
 	return count, nil
 }
+
+// GetByEvaluationID implements the interface method
+func (r *commentRepositoryImpl) GetByEvaluationID(ctx context.Context, evaluationID uuid.UUID) ([]*entities.Comment, error) {
+	return r.GetByEvaluation(ctx, evaluationID)
+}
+
+// GetByUserID gets comments by user ID
+func (r *commentRepositoryImpl) GetByUserID(ctx context.Context, userID uuid.UUID) ([]*entities.Comment, error) {
+	var comments []models.Comment
+	if err := r.db.WithContext(ctx).Where("author_id = ?", userID).
+		Order("created_at DESC").Find(&comments).Error; err != nil {
+		return nil, fmt.Errorf("failed to get comments by user: %w", err)
+	}
+
+	result := make([]*entities.Comment, len(comments))
+	for i, model := range comments {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// GetPublicCommentsByEvaluation gets public comments for an evaluation
+func (r *commentRepositoryImpl) GetPublicCommentsByEvaluation(ctx context.Context, evaluationID uuid.UUID) ([]*entities.Comment, error) {
+	var comments []models.Comment
+	if err := r.db.WithContext(ctx).Where("evaluation_id = ? AND is_private = false", evaluationID).
+		Order("created_at DESC").Find(&comments).Error; err != nil {
+		return nil, fmt.Errorf("failed to get public comments: %w", err)
+	}
+
+	result := make([]*entities.Comment, len(comments))
+	for i, model := range comments {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// GetPrivateCommentsByEvaluationAndUser gets private comments for a specific user
+func (r *commentRepositoryImpl) GetPrivateCommentsByEvaluationAndUser(ctx context.Context, evaluationID, userID uuid.UUID) ([]*entities.Comment, error) {
+	var comments []models.Comment
+	if err := r.db.WithContext(ctx).Where("evaluation_id = ? AND author_id = ? AND is_private = true", evaluationID, userID).
+		Order("created_at DESC").Find(&comments).Error; err != nil {
+		return nil, fmt.Errorf("failed to get private comments: %w", err)
+	}
+
+	result := make([]*entities.Comment, len(comments))
+	for i, model := range comments {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// GetCommentsByPeriod gets all comments for a period
+func (r *commentRepositoryImpl) GetCommentsByPeriod(ctx context.Context, periodID uuid.UUID) ([]*entities.Comment, error) {
+	var comments []models.Comment
+	if err := r.db.WithContext(ctx).
+		Joins("JOIN evaluations ON comments.evaluation_id = evaluations.id").
+		Where("evaluations.period_id = ?", periodID).
+		Order("comments.created_at DESC").Find(&comments).Error; err != nil {
+		return nil, fmt.Errorf("failed to get comments by period: %w", err)
+	}
+
+	result := make([]*entities.Comment, len(comments))
+	for i, model := range comments {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}

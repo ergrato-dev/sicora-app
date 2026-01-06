@@ -287,3 +287,157 @@ func (r *evaluationRepositoryImpl) GetAll(ctx context.Context, filters repositor
 	}
 	return result, nil
 }
+
+// GetByInstructorAndPeriod obtiene evaluaciones de un instructor en un período
+func (r *evaluationRepositoryImpl) GetByInstructorAndPeriod(ctx context.Context, instructorID, periodID uuid.UUID) ([]*entities.Evaluation, error) {
+	var evals []models.Evaluation
+	if err := r.db.WithContext(ctx).
+		Where("instructor_id = ? AND period_id = ?", instructorID, periodID).
+		Order("created_at DESC").
+		Find(&evals).Error; err != nil {
+		return nil, fmt.Errorf("failed to get evaluations by instructor and period: %w", err)
+	}
+
+	res := make([]*entities.Evaluation, len(evals))
+	for i, model := range evals {
+		res[i] = r.mapper.ToEntity(&model)
+	}
+	return res, nil
+}
+
+// GetByStudentAndPeriod obtiene evaluaciones de un estudiante en un período
+func (r *evaluationRepositoryImpl) GetByStudentAndPeriod(ctx context.Context, studentID, periodID uuid.UUID) ([]*entities.Evaluation, error) {
+	var evals []models.Evaluation
+	if err := r.db.WithContext(ctx).
+		Where("student_id = ? AND period_id = ?", studentID, periodID).
+		Order("created_at DESC").
+		Find(&evals).Error; err != nil {
+		return nil, fmt.Errorf("failed to get evaluations by student and period: %w", err)
+	}
+
+	res := make([]*entities.Evaluation, len(evals))
+	for i, model := range evals {
+		res[i] = r.mapper.ToEntity(&model)
+	}
+	return res, nil
+}
+
+// GetEvaluationByStudentInstructorPeriod obtiene una evaluación específica
+func (r *evaluationRepositoryImpl) GetEvaluationByStudentInstructorPeriod(ctx context.Context, studentID, instructorID, periodID uuid.UUID) (*entities.Evaluation, error) {
+	var model models.Evaluation
+	if err := r.db.WithContext(ctx).
+		Where("student_id = ? AND instructor_id = ? AND period_id = ?", studentID, instructorID, periodID).
+		First(&model).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get evaluation: %w", err)
+	}
+	return r.mapper.ToEntity(&model), nil
+}
+
+// GetSubmittedEvaluations obtiene evaluaciones enviadas
+func (r *evaluationRepositoryImpl) GetSubmittedEvaluations(ctx context.Context, filters repositories.EvaluationFilters) ([]*entities.Evaluation, error) {
+	query := r.db.WithContext(ctx).Where("status = ?", "SUBMITTED")
+
+	if filters.PeriodID != nil {
+		query = query.Where("period_id = ?", *filters.PeriodID)
+	}
+	if filters.InstructorID != nil {
+		query = query.Where("instructor_id = ?", *filters.InstructorID)
+	}
+
+	var evals []models.Evaluation
+	if err := query.Order("created_at DESC").Find(&evals).Error; err != nil {
+		return nil, fmt.Errorf("failed to get submitted evaluations: %w", err)
+	}
+
+	res := make([]*entities.Evaluation, len(evals))
+	for i, model := range evals {
+		res[i] = r.mapper.ToEntity(&model)
+	}
+	return res, nil
+}
+
+// GetDraftEvaluations obtiene evaluaciones en borrador
+func (r *evaluationRepositoryImpl) GetDraftEvaluations(ctx context.Context, filters repositories.EvaluationFilters) ([]*entities.Evaluation, error) {
+	query := r.db.WithContext(ctx).Where("status = ?", "DRAFT")
+
+	if filters.PeriodID != nil {
+		query = query.Where("period_id = ?", *filters.PeriodID)
+	}
+	if filters.InstructorID != nil {
+		query = query.Where("instructor_id = ?", *filters.InstructorID)
+	}
+
+	var evals []models.Evaluation
+	if err := query.Order("created_at DESC").Find(&evals).Error; err != nil {
+		return nil, fmt.Errorf("failed to get draft evaluations: %w", err)
+	}
+
+	res := make([]*entities.Evaluation, len(evals))
+	for i, model := range evals {
+		res[i] = r.mapper.ToEntity(&model)
+	}
+	return res, nil
+}
+
+// GetEvaluationsByPeriod obtiene evaluaciones por período
+func (r *evaluationRepositoryImpl) GetEvaluationsByPeriod(ctx context.Context, periodID uuid.UUID) ([]*entities.Evaluation, error) {
+	return r.GetByPeriod(ctx, periodID)
+}
+
+// GetParticipationStats obtiene estadísticas de participación
+func (r *evaluationRepositoryImpl) GetParticipationStats(ctx context.Context, periodID uuid.UUID, fichaID *string) (*repositories.ParticipationStats, error) {
+	stats := &repositories.ParticipationStats{
+		PeriodID: periodID,
+	}
+
+	// Contar total de evaluaciones
+	var totalCount int64
+	query := r.db.WithContext(ctx).Model(&models.Evaluation{}).Where("period_id = ?", periodID)
+	if err := query.Count(&totalCount).Error; err != nil {
+		return nil, fmt.Errorf("failed to count evaluations: %w", err)
+	}
+	stats.TotalEvaluations = int(totalCount)
+
+	// Contar evaluaciones enviadas
+	var submittedCount int64
+	if err := r.db.WithContext(ctx).Model(&models.Evaluation{}).
+		Where("period_id = ? AND status = ?", periodID, "SUBMITTED").
+		Count(&submittedCount).Error; err != nil {
+		return nil, fmt.Errorf("failed to count submitted evaluations: %w", err)
+	}
+	stats.SubmittedEvaluations = int(submittedCount)
+	stats.DraftEvaluations = stats.TotalEvaluations - stats.SubmittedEvaluations
+
+	if stats.TotalEvaluations > 0 {
+		stats.ParticipationRate = float64(stats.SubmittedEvaluations) / float64(stats.TotalEvaluations) * 100
+	}
+
+	return stats, nil
+}
+
+// GetInstructorEvaluationSummary obtiene resumen de evaluaciones de un instructor
+func (r *evaluationRepositoryImpl) GetInstructorEvaluationSummary(ctx context.Context, instructorID uuid.UUID, periodID *uuid.UUID) (*repositories.InstructorEvaluationSummary, error) {
+	summary := &repositories.InstructorEvaluationSummary{
+		InstructorID:         instructorID,
+		PeriodID:             periodID,
+		ResponseDistribution: make(map[string]int),
+		Categories:           make(map[string]*repositories.CategorySummary),
+		Comments:             make([]string, 0),
+	}
+
+	query := r.db.WithContext(ctx).Model(&models.Evaluation{}).Where("instructor_id = ?", instructorID)
+	if periodID != nil {
+		query = query.Where("period_id = ?", *periodID)
+	}
+
+	var count int64
+	if err := query.Count(&count).Error; err != nil {
+		return nil, fmt.Errorf("failed to count instructor evaluations: %w", err)
+	}
+	summary.TotalEvaluations = int(count)
+
+	return summary, nil
+}

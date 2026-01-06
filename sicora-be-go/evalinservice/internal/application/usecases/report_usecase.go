@@ -9,6 +9,7 @@ import (
 	"evalinservice/internal/domain/exceptions"
 	"evalinservice/internal/domain/repositories"
 	"evalinservice/internal/domain/valueobjects"
+
 	"github.com/google/uuid"
 )
 
@@ -31,7 +32,7 @@ func NewReportUseCase(
 }
 
 func (uc *ReportUseCase) CreateReport(ctx context.Context, req *dtos.ReportCreateRequest, generatedBy uuid.UUID) (*dtos.ReportResponse, error) {
-	period, err := uc.periodRepo.GetByID(ctx, req.PeriodID)
+	_, err := uc.periodRepo.GetByID(ctx, req.PeriodID)
 	if err != nil {
 		return nil, fmt.Errorf("period not found: %w", err)
 	}

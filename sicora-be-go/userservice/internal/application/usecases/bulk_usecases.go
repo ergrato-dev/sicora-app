@@ -99,10 +99,8 @@ func (uc *BulkUserUseCases) BulkCreateUsers(ctx context.Context, request *dtos.B
 			userReq.Nombre,
 			userReq.Apellido,
 			userReq.Email,
-			userReq.Password,
 			userReq.Documento,
 			entities.UserRole(userReq.Rol),
-			userReq.FichaID,
 			userReq.ProgramaFormacion,
 		)
 		if err != nil {
@@ -113,6 +111,11 @@ func (uc *BulkUserUseCases) BulkCreateUsers(ctx context.Context, request *dtos.B
 				Message: fmt.Sprintf("error creating user entity: %v", err),
 			})
 			continue
+		}
+
+		// Asignar ficha si es aprendiz
+		if userReq.FichaID != nil && *userReq.FichaID != "" {
+			user.FichaID = userReq.FichaID
 		}
 
 		users = append(users, user)
@@ -127,7 +130,7 @@ func (uc *BulkUserUseCases) BulkCreateUsers(ctx context.Context, request *dtos.B
 	if len(users) > 0 {
 		if err := uc.userRepo.BulkCreate(ctx, users); err != nil {
 			// Si falla la creación en masa, marcar todos como fallidos
-			for i, user := range users {
+			for _, user := range users {
 				for j := range response.Results {
 					if response.Results[j].Email == user.Email && response.Results[j].Success {
 						response.Results[j].Success = false
@@ -140,7 +143,7 @@ func (uc *BulkUserUseCases) BulkCreateUsers(ctx context.Context, request *dtos.B
 			}
 		} else {
 			// Actualizar resultados exitosos con IDs
-			for i, user := range users {
+			for _, user := range users {
 				for j := range response.Results {
 					if response.Results[j].Email == user.Email && response.Results[j].Success {
 						response.Results[j].UserID = &user.ID

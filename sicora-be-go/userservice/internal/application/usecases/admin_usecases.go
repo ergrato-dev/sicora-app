@@ -375,22 +375,22 @@ func (uc *UpdateUserUseCase) Execute(ctx context.Context, userID uuid.UUID, requ
 		// Validar ficha para aprendices
 		if user.Rol == entities.RoleAprendiz {
 			if request.FichaID == nil || *request.FichaID == "" {
-				if user.FichaID == "" {
+				if user.FichaID == nil || *user.FichaID == "" {
 					return nil, entities.NewDomainError("los aprendices deben tener una ficha asignada")
 				}
 			} else {
-				user.FichaID = *request.FichaID
+				user.FichaID = request.FichaID
 			}
 		} else {
 			// No-aprendices no deben tener ficha
-			user.FichaID = ""
+			user.FichaID = nil
 		}
 	}
 
 	// 6. Actualizar ficha si se especifica (solo para aprendices)
 	if request.FichaID != nil {
 		if user.Rol == entities.RoleAprendiz {
-			user.FichaID = *request.FichaID
+			user.FichaID = request.FichaID
 		} else {
 			return nil, entities.NewDomainError("solo los aprendices pueden tener ficha asignada")
 		}

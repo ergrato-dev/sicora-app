@@ -174,11 +174,20 @@ type AuthenticateUserRequest struct {
 // AuthResponseDTO representa la respuesta de autenticación
 type AuthResponseDTO struct {
 	AccessToken  string   `json:"access_token"`
+	Token        string   `json:"token,omitempty"` // Alias para compatibilidad con usecases
 	RefreshToken string   `json:"refresh_token"`
 	TokenType    string   `json:"token_type"`
 	ExpiresIn    int      `json:"expires_in"`
 	User         *UserDTO `json:"user"`
 }
+
+// GetProfileRequest representa la solicitud para obtener perfil
+type GetProfileRequest struct {
+	UserID uuid.UUID `json:"user_id" validate:"required"`
+}
+
+// CreateUserRequest es un alias para CreateUserRequestDTO
+type CreateUserRequest = CreateUserRequestDTO
 
 // GetUserRequest para obtener usuario por ID
 type GetUserRequest struct {

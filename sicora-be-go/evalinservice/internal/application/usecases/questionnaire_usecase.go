@@ -8,6 +8,7 @@ import (
 	"evalinservice/internal/domain/entities"
 	"evalinservice/internal/domain/exceptions"
 	"evalinservice/internal/domain/repositories"
+
 	"github.com/google/uuid"
 )
 
@@ -30,7 +31,6 @@ func (uc *QuestionnaireUseCase) CreateQuestionnaire(ctx context.Context, req *dt
 	questionnaire, err := entities.NewQuestionnaire(
 		req.Name,
 		req.Description,
-		req.Category,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create questionnaire: %w", err)
@@ -58,19 +58,21 @@ func (uc *QuestionnaireUseCase) UpdateQuestionnaire(ctx context.Context, id uuid
 		return nil, fmt.Errorf("questionnaire not found: %w", err)
 	}
 
-	if req.Name != "" {
-		questionnaire.UpdateName(req.Name)
+	if req.Name != nil && *req.Name != "" {
+		if err := questionnaire.UpdateName(*req.Name); err != nil {
+			return nil, fmt.Errorf("failed to update name: %w", err)
+		}
 	}
 
-	if req.Description != "" {
-		questionnaire.UpdateDescription(req.Description)
+	if req.Description != nil {
+		if err := questionnaire.UpdateDescription(*req.Description); err != nil {
+			return nil, fmt.Errorf("failed to update description: %w", err)
+		}
 	}
 
-	if req.Category != "" {
-		questionnaire.UpdateCategory(req.Category)
+	if req.IsActive != nil {
+		questionnaire.IsActive = *req.IsActive
 	}
-
-	questionnaire.SetActive(req.IsActive)
 
 	if err := uc.questionnaireRepo.Update(ctx, questionnaire); err != nil {
 		return nil, fmt.Errorf("failed to update questionnaire: %w", err)
@@ -80,7 +82,7 @@ func (uc *QuestionnaireUseCase) UpdateQuestionnaire(ctx context.Context, id uuid
 }
 
 func (uc *QuestionnaireUseCase) DeleteQuestionnaire(ctx context.Context, id uuid.UUID) error {
-	inUse, err := uc.questionnaireRepo.IsQuestionnaireInUse(ctx, id)
+	inUse, err := uc.questionnaireRepo.IsInUse(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to check if questionnaire is in use: %w", err)
 	}
@@ -96,7 +98,7 @@ func (uc *QuestionnaireUseCase) DeleteQuestionnaire(ctx context.Context, id uuid
 	return nil
 }
 
-func (uc *QuestionnaireUseCase) AddQuestionToQuestionnaire(ctx context.Context, questionnaireID, questionID uuid.UUID, order int) error {
+func (uc *QuestionnaireUseCase) AddQuestionToQuestionnaire(ctx context.Context, questionnaireID, questionID uuid.UUID) error {
 	questionnaire, err := uc.questionnaireRepo.GetByID(ctx, questionnaireID)
 	if err != nil {
 		return fmt.Errorf("questionnaire not found: %w", err)
@@ -111,7 +113,7 @@ func (uc *QuestionnaireUseCase) AddQuestionToQuestionnaire(ctx context.Context, 
 		return exceptions.NewValidationError("question", "cannot add inactive question to questionnaire")
 	}
 
-	if err := questionnaire.AddQuestion(questionID, order); err != nil {
+	if err := questionnaire.AddQuestion(questionID); err != nil {
 		return fmt.Errorf("failed to add question to questionnaire: %w", err)
 	}
 
@@ -140,7 +142,7 @@ func (uc *QuestionnaireUseCase) RemoveQuestionFromQuestionnaire(ctx context.Cont
 }
 
 func (uc *QuestionnaireUseCase) GetActiveQuestionnaires(ctx context.Context) ([]*dtos.QuestionnaireDTO, error) {
-	questionnaires, err := uc.questionnaireRepo.GetActive(ctx)
+	questionnaires, err := uc.questionnaireRepo.GetActiveQuestionnaires(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get active questionnaires: %w", err)
 	}
@@ -153,58 +155,33 @@ func (uc *QuestionnaireUseCase) GetActiveQuestionnaires(ctx context.Context) ([]
 	return responses, nil
 }
 
-func (uc *QuestionnaireUseCase) GetQuestionnairesByCategory(ctx context.Context, category string) ([]*dtos.QuestionnaireDTO, error) {
-	questionnaires, err := uc.questionnaireRepo.GetByCategory(ctx, category)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get questionnaires by category: %w", err)
-	}
-
-	responses := make([]*dtos.QuestionnaireDTO, len(questionnaires))
-	for i, questionnaire := range questionnaires {
-		responses[i] = uc.mapToQuestionnaireDTO(questionnaire)
-	}
-
-	return responses, nil
-}
-
 func (uc *QuestionnaireUseCase) GetQuestionnaireWithQuestions(ctx context.Context, id uuid.UUID) (*dtos.QuestionnaireWithQuestionsDTO, error) {
-	questionnaire, err := uc.questionnaireRepo.GetByID(ctx, id)
+	questionnaire, questions, err := uc.questionnaireRepo.GetQuestionnaireWithQuestions(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("questionnaire not found: %w", err)
 	}
 
-	questions := make([]*dtos.QuestionDTO, 0)
-	for _, questionOrder := range questionnaire.Questions {
-		question, err := uc.questionRepo.GetByID(ctx, questionOrder.QuestionID)
-		if err != nil {
-			continue
-		}
-
-		questionDTO := &dtos.QuestionDTO{
+	questionDTOs := make([]dtos.QuestionResponseDTO, 0, len(questions))
+	for _, question := range questions {
+		questionDTOs = append(questionDTOs, dtos.QuestionResponseDTO{
 			ID:          question.ID,
 			Text:        question.Text,
 			Description: question.Description,
-			Type:        string(question.Type),
-			IsRequired:  question.IsRequired,
-			IsActive:    question.IsActive,
-			Options:     question.Options,
-			Category:    question.Category,
-			CreatedAt:   question.CreatedAt,
-			UpdatedAt:   question.UpdatedAt,
-			Order:       questionOrder.Order,
-		}
-		questions = append(questions, questionDTO)
+			Type:        question.Type,
+		})
 	}
 
 	return &dtos.QuestionnaireWithQuestionsDTO{
-		ID:          questionnaire.ID,
-		Name:        questionnaire.Name,
-		Description: questionnaire.Description,
-		Category:    questionnaire.Category,
-		IsActive:    questionnaire.IsActive,
-		CreatedAt:   questionnaire.CreatedAt,
-		UpdatedAt:   questionnaire.UpdatedAt,
-		Questions:   questions,
+		Questionnaire: dtos.QuestionnaireResponseDTO{
+			ID:            questionnaire.ID,
+			Name:          questionnaire.Name,
+			Description:   questionnaire.Description,
+			IsActive:      questionnaire.IsActive,
+			QuestionCount: len(questionnaire.QuestionIDs),
+			CreatedAt:     questionnaire.CreatedAt,
+			UpdatedAt:     questionnaire.UpdatedAt,
+		},
+		Questions: questionDTOs,
 	}, nil
 }
 
@@ -213,9 +190,8 @@ func (uc *QuestionnaireUseCase) mapToQuestionnaireDTO(questionnaire *entities.Qu
 		ID:            questionnaire.ID,
 		Name:          questionnaire.Name,
 		Description:   questionnaire.Description,
-		Category:      questionnaire.Category,
 		IsActive:      questionnaire.IsActive,
-		QuestionCount: len(questionnaire.Questions),
+		QuestionCount: len(questionnaire.QuestionIDs),
 		CreatedAt:     questionnaire.CreatedAt,
 		UpdatedAt:     questionnaire.UpdatedAt,
 	}

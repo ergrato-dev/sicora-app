@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 
 	"evalinservice/internal/application/dtos"
@@ -193,34 +192,8 @@ func (h *EvaluationHandler) UpdateEvaluation(c *gin.Context) {
 // @Failure 500 {object} APIResponse
 // @Router /api/v1/evaluations/{id}/submit [post]
 func (h *EvaluationHandler) SubmitEvaluation(c *gin.Context) {
-	ctx := context.Background()
-
-	// Obtener ID de la evaluación
-	evaluationID, err := h.GetUserIDFromParams(c, "id")
-	if err != nil {
-		h.BadRequestResponse(c, "Invalid evaluation ID", nil)
-		return
-	}
-
-	// Enviar la evaluación
-	response, err := h.evaluationUseCase.SubmitEvaluation(ctx, evaluationID)
-	if err != nil {
-		h.logger.WithError(err).Error("Failed to submit evaluation")
-
-		switch err.Error() {
-		case "evaluation not found":
-			h.NotFoundResponse(c, "Evaluation not found")
-		case "evaluation already submitted":
-			h.BadRequestResponse(c, "Evaluation has already been submitted", nil)
-		case "evaluation incomplete":
-			h.BadRequestResponse(c, "Evaluation must be completed before submission", nil)
-		default:
-			h.InternalErrorResponse(c, "Failed to submit evaluation", err)
-		}
-		return
-	}
-
-	h.SuccessResponse(c, "Evaluation submitted successfully", response)
+	// TODO: Implementar cuando el usecase tenga el método SubmitEvaluation
+	h.InternalErrorResponse(c, "Method not yet implemented", nil)
 }
 
 // GetMyEvaluations obtiene las evaluaciones del usuario actual
@@ -235,36 +208,11 @@ func (h *EvaluationHandler) SubmitEvaluation(c *gin.Context) {
 // @Failure 500 {object} APIResponse
 // @Router /api/v1/evaluations/my [get]
 func (h *EvaluationHandler) GetMyEvaluations(c *gin.Context) {
-	ctx := context.Background()
-
-	// Obtener ID del usuario actual
-	userID, exists := middleware.GetUserIDFromContext(c)
-	if !exists {
-		h.UnauthorizedResponse(c, "User not authenticated")
-		return
-	}
-
-	// Obtener parámetros de paginación
-	pagination := h.GetPaginationParams(c)
-
-	// Obtener filtros adicionales
-	status := c.Query("status")
-
-	// Obtener evaluaciones del usuario
-	evaluations, total, err := h.evaluationUseCase.GetEvaluationsByStudent(ctx, userID, status, pagination.Page, pagination.Limit)
-	if err != nil {
-		h.logger.WithError(err).Error("Failed to get user evaluations")
-		h.InternalErrorResponse(c, "Failed to get evaluations", err)
-		return
-	}
-
-	// Calcular metadatos
-	meta := h.CalculateMeta(pagination.Page, pagination.Limit, total)
-
-	h.SuccessResponseWithMeta(c, "Evaluations retrieved successfully", evaluations, meta)
+	// TODO: Implementar cuando el usecase tenga el método GetEvaluationsByStudent
+	h.InternalErrorResponse(c, "Method not yet implemented", nil)
 }
 
-// GetEvaluationsByInstructor obtiene evaluaciones de un instructor específico
+// GetEvaluationsByInstructorHandler obtiene evaluaciones de un instructor específico
 // @Summary Obtener evaluaciones por instructor
 // @Description Obtiene todas las evaluaciones de un instructor específico
 // @Tags evaluations
@@ -276,7 +224,7 @@ func (h *EvaluationHandler) GetMyEvaluations(c *gin.Context) {
 // @Failure 400 {object} APIResponse
 // @Failure 500 {object} APIResponse
 // @Router /api/v1/evaluations/instructor/{instructor_id} [get]
-func (h *EvaluationHandler) GetEvaluationsByInstructor(c *gin.Context) {
+func (h *EvaluationHandler) GetEvaluationsByInstructorHandler(c *gin.Context) {
 	ctx := context.Background()
 
 	// Obtener ID del instructor
@@ -286,21 +234,15 @@ func (h *EvaluationHandler) GetEvaluationsByInstructor(c *gin.Context) {
 		return
 	}
 
-	// Obtener parámetros de paginación
-	pagination := h.GetPaginationParams(c)
-
-	// Obtener evaluaciones del instructor
-	evaluations, total, err := h.evaluationUseCase.GetEvaluationsByInstructor(ctx, instructorID, pagination.Page, pagination.Limit)
+	// Obtener evaluaciones del instructor (versión simplificada sin paginación)
+	evaluations, err := h.evaluationUseCase.GetEvaluationsByInstructor(ctx, instructorID)
 	if err != nil {
 		h.logger.WithError(err).Error("Failed to get instructor evaluations")
 		h.InternalErrorResponse(c, "Failed to get evaluations", err)
 		return
 	}
 
-	// Calcular metadatos
-	meta := h.CalculateMeta(pagination.Page, pagination.Limit, total)
-
-	h.SuccessResponseWithMeta(c, "Instructor evaluations retrieved successfully", evaluations, meta)
+	h.SuccessResponse(c, "Instructor evaluations retrieved successfully", evaluations)
 }
 
 // GetEvaluationStats obtiene estadísticas de evaluaciones
@@ -313,25 +255,6 @@ func (h *EvaluationHandler) GetEvaluationsByInstructor(c *gin.Context) {
 // @Failure 500 {object} APIResponse
 // @Router /api/v1/evaluations/stats [get]
 func (h *EvaluationHandler) GetEvaluationStats(c *gin.Context) {
-	ctx := context.Background()
-
-	var periodID *uuid.UUID
-	if periodIDStr := c.Query("period_id"); periodIDStr != "" {
-		if id, err := uuid.Parse(periodIDStr); err == nil {
-			periodID = &id
-		} else {
-			h.BadRequestResponse(c, "Invalid period ID", nil)
-			return
-		}
-	}
-
-	// Obtener estadísticas
-	stats, err := h.evaluationUseCase.GetEvaluationStatistics(ctx, periodID)
-	if err != nil {
-		h.logger.WithError(err).Error("Failed to get evaluation stats")
-		h.InternalErrorResponse(c, "Failed to get statistics", err)
-		return
-	}
-
-	h.SuccessResponse(c, "Statistics retrieved successfully", stats)
+	// TODO: Implementar cuando el usecase tenga el método GetEvaluationStatistics
+	h.InternalErrorResponse(c, "Method not yet implemented", nil)
 }

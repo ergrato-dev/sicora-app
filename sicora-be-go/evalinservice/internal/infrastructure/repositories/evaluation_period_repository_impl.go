@@ -214,9 +214,101 @@ func (r *evaluationPeriodRepositoryImpl) GetCurrentActivePeriod(ctx context.Cont
 	return r.mapper.ToEntity(&model), nil
 }
 
-// GetByStatus es un alias para GetPeriodsByStatus (para compatibilidad con usecases)
+// GetByStatus obtiene períodos por estado
 func (r *evaluationPeriodRepositoryImpl) GetByStatus(ctx context.Context, status valueobjects.PeriodStatus) ([]*entities.EvaluationPeriod, error) {
-	return r.GetPeriodsByStatus(ctx, status)
+	var periods []models.EvaluationPeriod
+	if err := r.db.WithContext(ctx).Where("status = ?", status).Find(&periods).Error; err != nil {
+		return nil, fmt.Errorf("failed to get periods by status: %w", err)
+	}
+
+	result := make([]*entities.EvaluationPeriod, len(periods))
+	for i, model := range periods {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// GetPeriodsByStatus es un alias para GetByStatus (para compatibilidad con interface)
+func (r *evaluationPeriodRepositoryImpl) GetPeriodsByStatus(ctx context.Context, status valueobjects.PeriodStatus) ([]*entities.EvaluationPeriod, error) {
+	return r.GetByStatus(ctx, status)
+}
+
+// GetCurrentPeriods obtiene los períodos activos actualmente
+func (r *evaluationPeriodRepositoryImpl) GetCurrentPeriods(ctx context.Context) ([]*entities.EvaluationPeriod, error) {
+	var periods []models.EvaluationPeriod
+	now := time.Now()
+	if err := r.db.WithContext(ctx).
+		Where("status = ? AND start_date <= ? AND end_date >= ?", "ACTIVE", now, now).
+		Find(&periods).Error; err != nil {
+		return nil, fmt.Errorf("failed to get current periods: %w", err)
+	}
+
+	result := make([]*entities.EvaluationPeriod, len(periods))
+	for i, model := range periods {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// GetPeriodsByQuestionnaire obtiene períodos que usan un cuestionario específico
+func (r *evaluationPeriodRepositoryImpl) GetPeriodsByQuestionnaire(ctx context.Context, questionnaireID uuid.UUID) ([]*entities.EvaluationPeriod, error) {
+	var periods []models.EvaluationPeriod
+	if err := r.db.WithContext(ctx).Where("questionnaire_id = ?", questionnaireID).Find(&periods).Error; err != nil {
+		return nil, fmt.Errorf("failed to get periods by questionnaire: %w", err)
+	}
+
+	result := make([]*entities.EvaluationPeriod, len(periods))
+	for i, model := range periods {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// GetUpcomingPeriods obtiene períodos próximos a comenzar
+func (r *evaluationPeriodRepositoryImpl) GetUpcomingPeriods(ctx context.Context, days int) ([]*entities.EvaluationPeriod, error) {
+	var periods []models.EvaluationPeriod
+	now := time.Now()
+	futureDate := now.AddDate(0, 0, days)
+	if err := r.db.WithContext(ctx).
+		Where("start_date > ? AND start_date <= ?", now, futureDate).
+		Find(&periods).Error; err != nil {
+		return nil, fmt.Errorf("failed to get upcoming periods: %w", err)
+	}
+
+	result := make([]*entities.EvaluationPeriod, len(periods))
+	for i, model := range periods {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// GetExpiringPeriods obtiene períodos próximos a terminar
+func (r *evaluationPeriodRepositoryImpl) GetExpiringPeriods(ctx context.Context, days int) ([]*entities.EvaluationPeriod, error) {
+	var periods []models.EvaluationPeriod
+	now := time.Now()
+	futureDate := now.AddDate(0, 0, days)
+	if err := r.db.WithContext(ctx).
+		Where("status = ? AND end_date >= ? AND end_date <= ?", "ACTIVE", now, futureDate).
+		Find(&periods).Error; err != nil {
+		return nil, fmt.Errorf("failed to get expiring periods: %w", err)
+	}
+
+	result := make([]*entities.EvaluationPeriod, len(periods))
+	for i, model := range periods {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// HasActivePeriodsForQuestionnaire verifica si hay períodos activos usando un cuestionario
+func (r *evaluationPeriodRepositoryImpl) HasActivePeriodsForQuestionnaire(ctx context.Context, questionnaireID uuid.UUID) (bool, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).Model(&models.EvaluationPeriod{}).
+		Where("questionnaire_id = ? AND status = ?", questionnaireID, "ACTIVE").
+		Count(&count).Error; err != nil {
+		return false, fmt.Errorf("failed to check active periods for questionnaire: %w", err)
+	}
+	return count > 0, nil
 }
 
 func (r *evaluationPeriodRepositoryImpl) GetByFichaID(ctx context.Context, fichaID uuid.UUID) ([]*entities.EvaluationPeriod, error) {

@@ -32,26 +32,25 @@ const (
 type CommitteeUseCases interface {
 	CreateCommittee(ctx context.Context, req *dto.CreateCommitteeRequest) (*dto.CommitteeResponse, error)
 	GetCommitteeByID(ctx context.Context, id uuid.UUID) (*dto.CommitteeResponse, error)
-	GetAllCommittees(ctx context.Context) ([]*dto.CommitteeResponse, error)
-	GetCommitteesByCenter(ctx context.Context, center string) ([]*dto.CommitteeResponse, error)
+	GetAllCommittees(ctx context.Context, limit, offset int) ([]*dto.CommitteeResponse, error)
 	GetCommitteesByType(ctx context.Context, committeeType string) ([]*dto.CommitteeResponse, error)
+	GetCommitteesByStatus(ctx context.Context, status string) ([]*dto.CommitteeResponse, error)
+	GetCommitteesByDateRange(ctx context.Context, startDate, endDate time.Time) ([]*dto.CommitteeResponse, error)
 	UpdateCommittee(ctx context.Context, id uuid.UUID, req *dto.UpdateCommitteeRequest) (*dto.CommitteeResponse, error)
 	DeleteCommittee(ctx context.Context, id uuid.UUID) error
-	GetAvailableCommitteesForAssignment(ctx context.Context, committeeType, center string) ([]*dto.CommitteeResponse, error)
 }
 
 type StudentCaseUseCases interface {
 	CreateStudentCase(ctx context.Context, req *dto.CreateStudentCaseRequest) (*dto.StudentCaseResponse, error)
 	GetStudentCaseByID(ctx context.Context, id uuid.UUID) (*dto.StudentCaseResponse, error)
-	GetStudentCasesByCaseNumber(ctx context.Context, caseNumber string) (*dto.StudentCaseResponse, error)
 	GetStudentCasesByStudentID(ctx context.Context, studentID uuid.UUID) ([]*dto.StudentCaseResponse, error)
 	GetStudentCasesByCommitteeID(ctx context.Context, committeeID uuid.UUID) ([]*dto.StudentCaseResponse, error)
 	GetStudentCasesByStatus(ctx context.Context, status string) ([]*dto.StudentCaseResponse, error)
+	GetStudentCasesByType(ctx context.Context, caseType string) ([]*dto.StudentCaseResponse, error)
 	GetPendingStudentCases(ctx context.Context) ([]*dto.StudentCaseResponse, error)
-	GetOverdueStudentCases(ctx context.Context) ([]*dto.StudentCaseResponse, error)
+	GetAutoDetectedCases(ctx context.Context) ([]*dto.StudentCaseResponse, error)
 	UpdateStudentCase(ctx context.Context, id uuid.UUID, req *dto.UpdateStudentCaseRequest) (*dto.StudentCaseResponse, error)
 	DeleteStudentCase(ctx context.Context, id uuid.UUID) error
-	AssignCaseToCommittee(ctx context.Context, caseID, committeeID uuid.UUID) error
 }
 
 type ImprovementPlanUseCases interface {
@@ -65,29 +64,34 @@ type ImprovementPlanUseCases interface {
 	UpdateProgress(ctx context.Context, id uuid.UUID, progress int, notes string) error
 }
 
+// SanctionUseCases - Aligned with SENA Agreement 009/2024
 type SanctionUseCases interface {
 	CreateSanction(ctx context.Context, req *dto.CreateSanctionRequest) (*dto.SanctionResponse, error)
 	GetSanctionByID(ctx context.Context, id uuid.UUID) (*dto.SanctionResponse, error)
-	GetSanctionsByStudentCaseID(ctx context.Context, studentCaseID uuid.UUID) ([]*dto.SanctionResponse, error)
 	GetSanctionsByStudentID(ctx context.Context, studentID uuid.UUID) ([]*dto.SanctionResponse, error)
 	GetSanctionsByType(ctx context.Context, sanctionType string) ([]*dto.SanctionResponse, error)
-	GetSanctionsByStatus(ctx context.Context, status string) ([]*dto.SanctionResponse, error)
+	GetActiveSanctions(ctx context.Context) ([]*dto.SanctionResponse, error)
+	GetAppealableSanctions(ctx context.Context) ([]*dto.SanctionResponse, error)
 	UpdateSanction(ctx context.Context, id uuid.UUID, req *dto.UpdateSanctionRequest) (*dto.SanctionResponse, error)
 	DeleteSanction(ctx context.Context, id uuid.UUID) error
-	ActivateSanction(ctx context.Context, id uuid.UUID) error
-	CompleteSanction(ctx context.Context, id uuid.UUID) error
-	RevokeSanction(ctx context.Context, id uuid.UUID, reason string) error
+	MarkAsAppealed(ctx context.Context, id uuid.UUID) error
+	UpdateComplianceStatus(ctx context.Context, id uuid.UUID, status string) error
+	SetAppealResult(ctx context.Context, id uuid.UUID, result string) error
 }
 
+// AppealUseCases - Aligned with SENA Agreement 009/2024
 type AppealUseCases interface {
 	CreateAppeal(ctx context.Context, req *dto.CreateAppealRequest) (*dto.AppealResponse, error)
 	GetAppealByID(ctx context.Context, id uuid.UUID) (*dto.AppealResponse, error)
-	GetAppealsByStudentCaseID(ctx context.Context, studentCaseID uuid.UUID) ([]*dto.AppealResponse, error)
+	GetAppealsBySanctionID(ctx context.Context, sanctionID uuid.UUID) ([]*dto.AppealResponse, error)
 	GetAppealsByStudentID(ctx context.Context, studentID uuid.UUID) ([]*dto.AppealResponse, error)
-	GetAppealsByStatus(ctx context.Context, status string) ([]*dto.AppealResponse, error)
+	GetPendingAppeals(ctx context.Context) ([]*dto.AppealResponse, error)
+	GetAdmittedAppeals(ctx context.Context) ([]*dto.AppealResponse, error)
 	UpdateAppeal(ctx context.Context, id uuid.UUID, req *dto.UpdateAppealRequest) (*dto.AppealResponse, error)
 	DeleteAppeal(ctx context.Context, id uuid.UUID) error
-	ProcessAppeal(ctx context.Context, id uuid.UUID, accepted bool, resolution string) error
+	AdmitAppeal(ctx context.Context, id uuid.UUID, rationale string) error
+	RejectAppeal(ctx context.Context, id uuid.UUID, rationale string) error
+	SetFinalDecision(ctx context.Context, id uuid.UUID, decision string, rationale string) error
 }
 
 // Implementation of Committee Use Cases
@@ -108,21 +112,18 @@ func NewCommitteeUseCases(
 
 func (uc *committeeUseCases) CreateCommittee(ctx context.Context, req *dto.CreateCommitteeRequest) (*dto.CommitteeResponse, error) {
 	// Validate committee type
-	if req.Type != "DISCIPLINARY" && req.Type != "ACADEMIC" {
-		return nil, fmt.Errorf("invalid committee type: %s", req.Type)
-	}
+	committeeType := entities.CommitteeType(req.CommitteeType)
 
 	// Create committee entity
 	committee := &entities.Committee{
-		ID:          uuid.New(),
-		Name:        req.Name,
-		Type:        entities.CommitteeType(req.Type),
-		Status:      entities.CommitteeStatusActive,
-		Center:      req.Center,
-		Coordinator: req.Coordinator,
-		MaxMembers:  req.MaxMembers,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		ID:             uuid.New(),
+		CommitteeDate:  req.CommitteeDate,
+		CommitteeType:  committeeType,
+		Status:         entities.CommitteeStatusScheduled,
+		ProgramID:      req.ProgramID,
+		AcademicPeriod: req.AcademicPeriod,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
 	}
 
 	// Save to repository
@@ -145,8 +146,8 @@ func (uc *committeeUseCases) GetCommitteeByID(ctx context.Context, id uuid.UUID)
 	return uc.toCommitteeResponse(committee), nil
 }
 
-func (uc *committeeUseCases) GetAllCommittees(ctx context.Context) ([]*dto.CommitteeResponse, error) {
-	committees, err := uc.committeeRepo.GetAll(ctx)
+func (uc *committeeUseCases) GetAllCommittees(ctx context.Context, limit, offset int) ([]*dto.CommitteeResponse, error) {
+	committees, err := uc.committeeRepo.GetAll(ctx, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get committees: %w", err)
 	}
@@ -159,10 +160,10 @@ func (uc *committeeUseCases) GetAllCommittees(ctx context.Context) ([]*dto.Commi
 	return responses, nil
 }
 
-func (uc *committeeUseCases) GetCommitteesByCenter(ctx context.Context, center string) ([]*dto.CommitteeResponse, error) {
-	committees, err := uc.committeeRepo.GetByCenter(ctx, center)
+func (uc *committeeUseCases) GetCommitteesByType(ctx context.Context, committeeType string) ([]*dto.CommitteeResponse, error) {
+	committees, err := uc.committeeRepo.GetByType(ctx, entities.CommitteeType(committeeType))
 	if err != nil {
-		return nil, fmt.Errorf("failed to get committees by center: %w", err)
+		return nil, fmt.Errorf("failed to get committees by type: %w", err)
 	}
 
 	responses := make([]*dto.CommitteeResponse, len(committees))
@@ -173,10 +174,24 @@ func (uc *committeeUseCases) GetCommitteesByCenter(ctx context.Context, center s
 	return responses, nil
 }
 
-func (uc *committeeUseCases) GetCommitteesByType(ctx context.Context, committeeType string) ([]*dto.CommitteeResponse, error) {
-	committees, err := uc.committeeRepo.GetByType(ctx, committeeType)
+func (uc *committeeUseCases) GetCommitteesByStatus(ctx context.Context, status string) ([]*dto.CommitteeResponse, error) {
+	committees, err := uc.committeeRepo.GetByStatus(ctx, entities.CommitteeStatus(status))
 	if err != nil {
-		return nil, fmt.Errorf("failed to get committees by type: %w", err)
+		return nil, fmt.Errorf("failed to get committees by status: %w", err)
+	}
+
+	responses := make([]*dto.CommitteeResponse, len(committees))
+	for i, committee := range committees {
+		responses[i] = uc.toCommitteeResponse(committee)
+	}
+
+	return responses, nil
+}
+
+func (uc *committeeUseCases) GetCommitteesByDateRange(ctx context.Context, startDate, endDate time.Time) ([]*dto.CommitteeResponse, error) {
+	committees, err := uc.committeeRepo.GetByDateRange(ctx, startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get committees by date range: %w", err)
 	}
 
 	responses := make([]*dto.CommitteeResponse, len(committees))
@@ -197,17 +212,17 @@ func (uc *committeeUseCases) UpdateCommittee(ctx context.Context, id uuid.UUID, 
 	}
 
 	// Update fields if provided
-	if req.Name != "" {
-		committee.Name = req.Name
+	if req.CommitteeDate != nil {
+		committee.CommitteeDate = *req.CommitteeDate
 	}
 	if req.Status != "" {
 		committee.Status = entities.CommitteeStatus(req.Status)
 	}
-	if req.Coordinator != "" {
-		committee.Coordinator = req.Coordinator
+	if req.AcademicPeriod != "" {
+		committee.AcademicPeriod = req.AcademicPeriod
 	}
-	if req.MaxMembers > 0 {
-		committee.MaxMembers = req.MaxMembers
+	if req.SessionMinutes != nil {
+		committee.SessionMinutes = req.SessionMinutes
 	}
 
 	committee.UpdatedAt = time.Now()
@@ -231,33 +246,20 @@ func (uc *committeeUseCases) DeleteCommittee(ctx context.Context, id uuid.UUID) 
 	return uc.committeeRepo.Delete(ctx, id)
 }
 
-func (uc *committeeUseCases) GetAvailableCommitteesForAssignment(ctx context.Context, committeeType, center string) ([]*dto.CommitteeResponse, error) {
-	committees, err := uc.committeeRepo.GetAvailableForAssignment(ctx, committeeType, center)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get available committees: %w", err)
-	}
-
-	responses := make([]*dto.CommitteeResponse, len(committees))
-	for i, committee := range committees {
-		responses[i] = uc.toCommitteeResponse(committee)
-	}
-
-	return responses, nil
-}
-
 // Helper methods
 func (uc *committeeUseCases) toCommitteeResponse(committee *entities.Committee) *dto.CommitteeResponse {
 	response := &dto.CommitteeResponse{
-		ID:             committee.ID,
-		Name:           committee.Name,
-		Type:           string(committee.Type),
-		Status:         string(committee.Status),
-		Center:         committee.Center,
-		Coordinator:    committee.Coordinator,
-		MaxMembers:     committee.MaxMembers,
-		CurrentMembers: committee.CurrentMembers,
-		CreatedAt:      committee.CreatedAt,
-		UpdatedAt:      committee.UpdatedAt,
+		ID:              committee.ID,
+		CommitteeDate:   committee.CommitteeDate,
+		CommitteeType:   string(committee.CommitteeType),
+		Status:          string(committee.Status),
+		ProgramID:       committee.ProgramID,
+		AcademicPeriod:  committee.AcademicPeriod,
+		AgendaGenerated: committee.AgendaGenerated,
+		QuorumAchieved:  committee.QuorumAchieved,
+		SessionMinutes:  committee.SessionMinutes,
+		CreatedAt:       committee.CreatedAt,
+		UpdatedAt:       committee.UpdatedAt,
 	}
 
 	// Convert members if present
@@ -265,15 +267,13 @@ func (uc *committeeUseCases) toCommitteeResponse(committee *entities.Committee) 
 		response.Members = make([]dto.CommitteeMemberResponse, len(committee.Members))
 		for i, member := range committee.Members {
 			response.Members[i] = dto.CommitteeMemberResponse{
-				ID:              member.ID,
-				CommitteeID:     member.CommitteeID,
-				UserID:          member.UserID,
-				Role:            string(member.Role),
-				Status:          string(member.Status),
-				AppointmentDate: member.AppointmentDate,
-				EndDate:         member.EndDate,
-				CreatedAt:       member.CreatedAt,
-				UpdatedAt:       member.UpdatedAt,
+				ID:          member.ID,
+				CommitteeID: member.CommitteeID,
+				UserID:      member.UserID,
+				MemberRole:  string(member.MemberRole),
+				IsPresent:   member.IsPresent,
+				VotePower:   member.VotePower,
+				CreatedAt:   member.CreatedAt,
 			}
 		}
 	}
@@ -307,36 +307,44 @@ func (uc *studentCaseUseCases) CreateStudentCase(ctx context.Context, req *dto.C
 		return nil, fmt.Errorf("committee not found")
 	}
 
-	// Generate case number
-	caseNumber, err := uc.studentCaseRepo.GenerateCaseNumber(ctx, req.Type)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate case number: %w", err)
+	// Convert detection criteria if provided
+	var detectionCriteria entities.DetectionCriteria
+	if req.DetectionCriteria != nil {
+		detectionCriteria = entities.DetectionCriteria{
+			AverageGrade:        req.DetectionCriteria.AverageGrade,
+			DisciplinaryFaults:  req.DetectionCriteria.DisciplinaryFaults,
+			AttendanceRate:      req.DetectionCriteria.AttendanceRate,
+			LeadershipIndicator: req.DetectionCriteria.LeadershipIndicator,
+			ComplianceRate:      req.DetectionCriteria.ComplianceRate,
+			DaysOverdue:         req.DetectionCriteria.DaysOverdue,
+		}
 	}
 
-	// Set priority if not provided
-	priority := req.Priority
-	if priority == "" {
-		priority = "MEDIUM"
+	// Convert evidence documents
+	var evidenceDocuments []entities.EvidenceDocument
+	for _, doc := range req.EvidenceDocuments {
+		evidenceDocuments = append(evidenceDocuments, entities.EvidenceDocument{
+			URL:         doc.URL,
+			Type:        doc.Type,
+			Description: doc.Description,
+			UploadedAt:  time.Now(),
+		})
 	}
 
 	// Create student case entity
 	studentCase := &entities.StudentCase{
-		ID:          uuid.New(),
-		StudentID:   req.StudentID,
-		CommitteeID: req.CommitteeID,
-		CaseNumber:  caseNumber,
-		Type:        entities.CaseType(req.Type),
-		Severity:    entities.CaseSeverity(req.Severity),
-		Status:      entities.CaseStatusPending,
-		Priority:    entities.CasePriority(priority),
-		Title:       req.Title,
-		Description: req.Description,
-		Evidence:    req.Evidence,
-		ReportedBy:  req.ReportedBy,
-		ReportDate:  time.Now(),
-		DueDate:     req.DueDate,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		ID:                 uuid.New(),
+		StudentID:          req.StudentID,
+		CommitteeID:        req.CommitteeID,
+		CaseType:           entities.CaseType(req.CaseType),
+		CaseStatus:         entities.CaseStatusDetected,
+		AutomaticDetection: req.AutomaticDetection,
+		DetectionCriteria:  detectionCriteria,
+		CaseDescription:    req.CaseDescription,
+		EvidenceDocuments:  evidenceDocuments,
+		InstructorComments: req.InstructorComments,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	// Save to repository
@@ -349,18 +357,6 @@ func (uc *studentCaseUseCases) CreateStudentCase(ctx context.Context, req *dto.C
 
 func (uc *studentCaseUseCases) GetStudentCaseByID(ctx context.Context, id uuid.UUID) (*dto.StudentCaseResponse, error) {
 	studentCase, err := uc.studentCaseRepo.GetByID(ctx, id)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get student case: %w", err)
-	}
-	if studentCase == nil {
-		return nil, fmt.Errorf("student case not found")
-	}
-
-	return uc.toStudentCaseResponse(studentCase), nil
-}
-
-func (uc *studentCaseUseCases) GetStudentCasesByCaseNumber(ctx context.Context, caseNumber string) (*dto.StudentCaseResponse, error) {
-	studentCase, err := uc.studentCaseRepo.GetByCaseNumber(ctx, caseNumber)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get student case: %w", err)
 	}
@@ -400,9 +396,23 @@ func (uc *studentCaseUseCases) GetStudentCasesByCommitteeID(ctx context.Context,
 }
 
 func (uc *studentCaseUseCases) GetStudentCasesByStatus(ctx context.Context, status string) ([]*dto.StudentCaseResponse, error) {
-	cases, err := uc.studentCaseRepo.GetByStatus(ctx, status)
+	cases, err := uc.studentCaseRepo.GetByStatus(ctx, entities.CaseStatus(status))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get student cases: %w", err)
+	}
+
+	responses := make([]*dto.StudentCaseResponse, len(cases))
+	for i, studentCase := range cases {
+		responses[i] = uc.toStudentCaseResponse(studentCase)
+	}
+
+	return responses, nil
+}
+
+func (uc *studentCaseUseCases) GetStudentCasesByType(ctx context.Context, caseType string) ([]*dto.StudentCaseResponse, error) {
+	cases, err := uc.studentCaseRepo.GetByType(ctx, entities.CaseType(caseType))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get student cases by type: %w", err)
 	}
 
 	responses := make([]*dto.StudentCaseResponse, len(cases))
@@ -427,10 +437,10 @@ func (uc *studentCaseUseCases) GetPendingStudentCases(ctx context.Context) ([]*d
 	return responses, nil
 }
 
-func (uc *studentCaseUseCases) GetOverdueStudentCases(ctx context.Context) ([]*dto.StudentCaseResponse, error) {
-	cases, err := uc.studentCaseRepo.GetOverdueCases(ctx)
+func (uc *studentCaseUseCases) GetAutoDetectedCases(ctx context.Context) ([]*dto.StudentCaseResponse, error) {
+	cases, err := uc.studentCaseRepo.GetAutoDetectedCases(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get overdue cases: %w", err)
+		return nil, fmt.Errorf("failed to get auto-detected cases: %w", err)
 	}
 
 	responses := make([]*dto.StudentCaseResponse, len(cases))
@@ -451,23 +461,26 @@ func (uc *studentCaseUseCases) UpdateStudentCase(ctx context.Context, id uuid.UU
 	}
 
 	// Update fields if provided
-	if req.Status != "" {
-		studentCase.Status = entities.CaseStatus(req.Status)
+	if req.CaseStatus != "" {
+		studentCase.CaseStatus = entities.CaseStatus(req.CaseStatus)
 	}
-	if req.Priority != "" {
-		studentCase.Priority = entities.CasePriority(req.Priority)
+	if req.CaseDescription != "" {
+		studentCase.CaseDescription = req.CaseDescription
 	}
-	if req.Description != "" {
-		studentCase.Description = req.Description
+	if req.InstructorComments != nil {
+		studentCase.InstructorComments = req.InstructorComments
 	}
-	if req.Evidence != "" {
-		studentCase.Evidence = req.Evidence
-	}
-	if req.DueDate != nil {
-		studentCase.DueDate = req.DueDate
-	}
-	if req.ResolutionDate != nil {
-		studentCase.ResolutionDate = req.ResolutionDate
+	if len(req.EvidenceDocuments) > 0 {
+		var evidenceDocuments []entities.EvidenceDocument
+		for _, doc := range req.EvidenceDocuments {
+			evidenceDocuments = append(evidenceDocuments, entities.EvidenceDocument{
+				URL:         doc.URL,
+				Type:        doc.Type,
+				Description: doc.Description,
+				UploadedAt:  time.Now(),
+			})
+		}
+		studentCase.EvidenceDocuments = evidenceDocuments
 	}
 
 	studentCase.UpdatedAt = time.Now()
@@ -491,52 +504,45 @@ func (uc *studentCaseUseCases) DeleteStudentCase(ctx context.Context, id uuid.UU
 	return uc.studentCaseRepo.Delete(ctx, id)
 }
 
-func (uc *studentCaseUseCases) AssignCaseToCommittee(ctx context.Context, caseID, committeeID uuid.UUID) error {
-	// Get student case
-	studentCase, err := uc.studentCaseRepo.GetByID(ctx, caseID)
-	if err != nil {
-		return fmt.Errorf("failed to get student case: %w", err)
-	}
-	if studentCase == nil {
-		return fmt.Errorf("student case not found")
-	}
-
-	// Validate committee exists
-	committee, err := uc.committeeRepo.GetByID(ctx, committeeID)
-	if err != nil {
-		return fmt.Errorf("failed to get committee: %w", err)
-	}
-	if committee == nil {
-		return fmt.Errorf("committee not found")
-	}
-
-	// Update case with new committee
-	studentCase.CommitteeID = committeeID
-	studentCase.UpdatedAt = time.Now()
-
-	return uc.studentCaseRepo.Update(ctx, studentCase)
-}
-
 // Helper methods
 func (uc *studentCaseUseCases) toStudentCaseResponse(studentCase *entities.StudentCase) *dto.StudentCaseResponse {
+	// Convert detection criteria
+	var detectionCriteria *dto.DetectionCriteriaDTO
+	if studentCase.DetectionCriteria.AverageGrade > 0 || studentCase.DetectionCriteria.DisciplinaryFaults > 0 {
+		detectionCriteria = &dto.DetectionCriteriaDTO{
+			AverageGrade:        studentCase.DetectionCriteria.AverageGrade,
+			DisciplinaryFaults:  studentCase.DetectionCriteria.DisciplinaryFaults,
+			AttendanceRate:      studentCase.DetectionCriteria.AttendanceRate,
+			LeadershipIndicator: studentCase.DetectionCriteria.LeadershipIndicator,
+			ComplianceRate:      studentCase.DetectionCriteria.ComplianceRate,
+			DaysOverdue:         studentCase.DetectionCriteria.DaysOverdue,
+		}
+	}
+
+	// Convert evidence documents
+	var evidenceDocuments []dto.EvidenceDocumentDTO
+	for _, doc := range studentCase.EvidenceDocuments {
+		evidenceDocuments = append(evidenceDocuments, dto.EvidenceDocumentDTO{
+			URL:         doc.URL,
+			Type:        doc.Type,
+			Description: doc.Description,
+			UploadedAt:  doc.UploadedAt,
+		})
+	}
+
 	return &dto.StudentCaseResponse{
-		ID:             studentCase.ID,
-		StudentID:      studentCase.StudentID,
-		CommitteeID:    studentCase.CommitteeID,
-		CaseNumber:     studentCase.CaseNumber,
-		Type:           string(studentCase.Type),
-		Severity:       string(studentCase.Severity),
-		Status:         string(studentCase.Status),
-		Priority:       string(studentCase.Priority),
-		Title:          studentCase.Title,
-		Description:    studentCase.Description,
-		Evidence:       studentCase.Evidence,
-		ReportedBy:     studentCase.ReportedBy,
-		ReportDate:     studentCase.ReportDate,
-		DueDate:        studentCase.DueDate,
-		ResolutionDate: studentCase.ResolutionDate,
-		CreatedAt:      studentCase.CreatedAt,
-		UpdatedAt:      studentCase.UpdatedAt,
+		ID:                 studentCase.ID,
+		StudentID:          studentCase.StudentID,
+		CommitteeID:        studentCase.CommitteeID,
+		CaseType:           string(studentCase.CaseType),
+		CaseStatus:         string(studentCase.CaseStatus),
+		AutomaticDetection: studentCase.AutomaticDetection,
+		DetectionCriteria:  detectionCriteria,
+		CaseDescription:    studentCase.CaseDescription,
+		EvidenceDocuments:  evidenceDocuments,
+		InstructorComments: studentCase.InstructorComments,
+		CreatedAt:          studentCase.CreatedAt,
+		UpdatedAt:          studentCase.UpdatedAt,
 	}
 }
 
@@ -557,34 +563,68 @@ func NewImprovementPlanUseCases(
 }
 
 func (uc *improvementPlanUseCases) CreateImprovementPlan(ctx context.Context, req *dto.CreateImprovementPlanRequest) (*dto.ImprovementPlanResponse, error) {
-	// Validate student case exists
-	studentCase, err := uc.studentCaseRepo.GetByID(ctx, req.StudentCaseID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get student case: %w", err)
+	// Validate student case exists if provided
+	if req.StudentCaseID != nil {
+		studentCase, err := uc.studentCaseRepo.GetByID(ctx, *req.StudentCaseID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get student case: %w", err)
+		}
+		if studentCase == nil {
+			return nil, fmt.Errorf("student case not found")
+		}
 	}
-	if studentCase == nil {
-		return nil, fmt.Errorf("student case not found")
+
+	// Convert objectives
+	objectives := make([]entities.Objective, len(req.Objectives))
+	for i, obj := range req.Objectives {
+		objectives[i] = entities.Objective{
+			ID:          uuid.New().String(),
+			Description: obj.Description,
+			Target:      obj.Target,
+			Deadline:    obj.Deadline,
+			Completed:   false,
+		}
+	}
+
+	// Convert activities
+	activities := make([]entities.Activity, len(req.Activities))
+	for i, act := range req.Activities {
+		activities[i] = entities.Activity{
+			ID:          uuid.New().String(),
+			Name:        act.Name,
+			Description: act.Description,
+			DueDate:     act.DueDate,
+			Completed:   false,
+		}
+	}
+
+	// Convert success criteria
+	successCriteria := make([]entities.SuccessCriteria, len(req.SuccessCriteria))
+	for i, sc := range req.SuccessCriteria {
+		successCriteria[i] = entities.SuccessCriteria{
+			ID:          uuid.New().String(),
+			Description: sc.Description,
+			Metric:      sc.Metric,
+			Target:      sc.Target,
+			Achieved:    false,
+		}
 	}
 
 	plan := &entities.ImprovementPlan{
-		ID:                 uuid.New(),
-		StudentCaseID:      req.StudentCaseID,
-		StudentID:          req.StudentID,
-		SupervisorID:       req.SupervisorID,
-		PlanNumber:         req.PlanNumber,
-		Title:              req.Title,
-		Description:        req.Description,
-		Objectives:         req.Objectives,
-		Activities:         req.Activities,
-		Resources:          req.Resources,
-		Timeline:           req.Timeline,
-		EvaluationCriteria: req.EvaluationCriteria,
-		StartDate:          req.StartDate,
-		EndDate:            req.EndDate,
-		Status:             entities.PlanStatusActive,
-		Progress:           0,
-		CreatedAt:          time.Now(),
-		UpdatedAt:          time.Now(),
+		ID:                      uuid.New(),
+		StudentID:               req.StudentID,
+		StudentCaseID:           req.StudentCaseID,
+		PlanType:                entities.PlanType(req.PlanType),
+		StartDate:               req.StartDate,
+		EndDate:                 req.EndDate,
+		Objectives:              objectives,
+		Activities:              activities,
+		SuccessCriteria:         successCriteria,
+		ResponsibleInstructorID: req.ResponsibleInstructorID,
+		CurrentStatus:           entities.PlanStatusActive,
+		CompliancePercentage:    0,
+		CreatedAt:               time.Now(),
+		UpdatedAt:               time.Now(),
 	}
 
 	if err := uc.improvementPlanRepo.Create(ctx, plan); err != nil {
@@ -607,17 +647,29 @@ func (uc *improvementPlanUseCases) GetImprovementPlanByID(ctx context.Context, i
 }
 
 func (uc *improvementPlanUseCases) GetImprovementPlansByStudentCaseID(ctx context.Context, studentCaseID uuid.UUID) ([]*dto.ImprovementPlanResponse, error) {
-	plans, err := uc.improvementPlanRepo.GetByStudentCaseID(ctx, studentCaseID)
+	// Get plans by student case - use StudentID with the case's StudentID
+	studentCase, err := uc.studentCaseRepo.GetByID(ctx, studentCaseID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get student case: %w", err)
+	}
+	if studentCase == nil {
+		return nil, fmt.Errorf("student case not found")
+	}
+
+	plans, err := uc.improvementPlanRepo.GetByStudentID(ctx, studentCase.StudentID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get improvement plans: %w", err)
 	}
 
-	responses := make([]*dto.ImprovementPlanResponse, len(plans))
-	for i, plan := range plans {
-		responses[i] = uc.toImprovementPlanResponse(plan)
+	// Filter plans that match the studentCaseID
+	var filteredPlans []*dto.ImprovementPlanResponse
+	for _, plan := range plans {
+		if plan.StudentCaseID != nil && *plan.StudentCaseID == studentCaseID {
+			filteredPlans = append(filteredPlans, uc.toImprovementPlanResponse(plan))
+		}
 	}
 
-	return responses, nil
+	return filteredPlans, nil
 }
 
 func (uc *improvementPlanUseCases) GetImprovementPlansByStudentID(ctx context.Context, studentID uuid.UUID) ([]*dto.ImprovementPlanResponse, error) {
@@ -635,7 +687,7 @@ func (uc *improvementPlanUseCases) GetImprovementPlansByStudentID(ctx context.Co
 }
 
 func (uc *improvementPlanUseCases) GetImprovementPlansBySupervisorID(ctx context.Context, supervisorID uuid.UUID) ([]*dto.ImprovementPlanResponse, error) {
-	plans, err := uc.improvementPlanRepo.GetBySupervisorID(ctx, supervisorID)
+	plans, err := uc.improvementPlanRepo.GetByInstructor(ctx, supervisorID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get improvement plans: %w", err)
 	}
@@ -657,36 +709,77 @@ func (uc *improvementPlanUseCases) UpdateImprovementPlan(ctx context.Context, id
 		return nil, fmt.Errorf("improvement plan not found")
 	}
 
-	// Update fields if provided
-	if req.Title != "" {
-		plan.Title = req.Title
+	// Update status if provided
+	if req.CurrentStatus != "" {
+		plan.CurrentStatus = entities.PlanStatus(req.CurrentStatus)
 	}
-	if req.Description != "" {
-		plan.Description = req.Description
+
+	// Update compliance percentage if provided
+	if req.CompliancePercentage != nil {
+		plan.CompliancePercentage = *req.CompliancePercentage
 	}
-	if req.Objectives != "" {
-		plan.Objectives = req.Objectives
+
+	// Update final evaluation if provided
+	if req.FinalEvaluation != nil {
+		plan.FinalEvaluation = req.FinalEvaluation
 	}
-	if req.Activities != "" {
-		plan.Activities = req.Activities
+
+	// Update objectives if provided
+	if len(req.Objectives) > 0 {
+		objectives := make([]entities.Objective, len(req.Objectives))
+		for i, obj := range req.Objectives {
+			id := obj.ID
+			if id == "" {
+				id = uuid.New().String()
+			}
+			objectives[i] = entities.Objective{
+				ID:          id,
+				Description: obj.Description,
+				Target:      obj.Target,
+				Deadline:    obj.Deadline,
+				Completed:   obj.Completed,
+			}
+		}
+		plan.Objectives = objectives
 	}
-	if req.Resources != "" {
-		plan.Resources = req.Resources
+
+	// Update activities if provided
+	if len(req.Activities) > 0 {
+		activities := make([]entities.Activity, len(req.Activities))
+		for i, act := range req.Activities {
+			id := act.ID
+			if id == "" {
+				id = uuid.New().String()
+			}
+			activities[i] = entities.Activity{
+				ID:          id,
+				Name:        act.Name,
+				Description: act.Description,
+				DueDate:     act.DueDate,
+				Completed:   act.Completed,
+				CompletedAt: act.CompletedAt,
+			}
+		}
+		plan.Activities = activities
 	}
-	if req.Timeline != "" {
-		plan.Timeline = req.Timeline
-	}
-	if req.EvaluationCriteria != "" {
-		plan.EvaluationCriteria = req.EvaluationCriteria
-	}
-	if req.StartDate != nil {
-		plan.StartDate = *req.StartDate
-	}
-	if req.EndDate != nil {
-		plan.EndDate = *req.EndDate
-	}
-	if req.Status != "" {
-		plan.Status = entities.PlanStatus(req.Status)
+
+	// Update success criteria if provided
+	if len(req.SuccessCriteria) > 0 {
+		successCriteria := make([]entities.SuccessCriteria, len(req.SuccessCriteria))
+		for i, sc := range req.SuccessCriteria {
+			id := sc.ID
+			if id == "" {
+				id = uuid.New().String()
+			}
+			successCriteria[i] = entities.SuccessCriteria{
+				ID:          id,
+				Description: sc.Description,
+				Metric:      sc.Metric,
+				Target:      sc.Target,
+				Achieved:    sc.Achieved,
+			}
+		}
+		plan.SuccessCriteria = successCriteria
 	}
 
 	plan.UpdatedAt = time.Now()
@@ -723,42 +816,74 @@ func (uc *improvementPlanUseCases) UpdateProgress(ctx context.Context, id uuid.U
 		return fmt.Errorf("progress must be between 0 and 100")
 	}
 
-	plan.Progress = progress
-	plan.ProgressNotes = notes
+	plan.CompliancePercentage = float64(progress)
+	if notes != "" {
+		plan.FinalEvaluation = &notes
+	}
 	plan.UpdatedAt = time.Now()
 
 	// Update status based on progress
 	if progress == 100 {
-		plan.Status = entities.PlanStatusCompleted
-	} else if progress > 0 {
-		plan.Status = entities.PlanStatusInProgress
+		plan.CurrentStatus = entities.PlanStatusCompleted
 	}
 
 	return uc.improvementPlanRepo.Update(ctx, plan)
 }
 
 func (uc *improvementPlanUseCases) toImprovementPlanResponse(plan *entities.ImprovementPlan) *dto.ImprovementPlanResponse {
+	// Convert objectives
+	objectives := make([]dto.ObjectiveDTO, len(plan.Objectives))
+	for i, obj := range plan.Objectives {
+		objectives[i] = dto.ObjectiveDTO{
+			ID:          obj.ID,
+			Description: obj.Description,
+			Target:      obj.Target,
+			Deadline:    obj.Deadline,
+			Completed:   obj.Completed,
+		}
+	}
+
+	// Convert activities
+	activities := make([]dto.ActivityDTO, len(plan.Activities))
+	for i, act := range plan.Activities {
+		activities[i] = dto.ActivityDTO{
+			ID:          act.ID,
+			Name:        act.Name,
+			Description: act.Description,
+			DueDate:     act.DueDate,
+			Completed:   act.Completed,
+			CompletedAt: act.CompletedAt,
+		}
+	}
+
+	// Convert success criteria
+	successCriteria := make([]dto.SuccessCriteriaDTO, len(plan.SuccessCriteria))
+	for i, sc := range plan.SuccessCriteria {
+		successCriteria[i] = dto.SuccessCriteriaDTO{
+			ID:          sc.ID,
+			Description: sc.Description,
+			Metric:      sc.Metric,
+			Target:      sc.Target,
+			Achieved:    sc.Achieved,
+		}
+	}
+
 	return &dto.ImprovementPlanResponse{
-		ID:                 plan.ID,
-		StudentCaseID:      plan.StudentCaseID,
-		StudentID:          plan.StudentID,
-		SupervisorID:       plan.SupervisorID,
-		PlanNumber:         plan.PlanNumber,
-		Title:              plan.Title,
-		Description:        plan.Description,
-		Objectives:         plan.Objectives,
-		Activities:         plan.Activities,
-		Resources:          plan.Resources,
-		Timeline:           plan.Timeline,
-		EvaluationCriteria: plan.EvaluationCriteria,
-		StartDate:          plan.StartDate,
-		EndDate:            plan.EndDate,
-		Status:             string(plan.Status),
-		Progress:           plan.Progress,
-		ProgressNotes:      plan.ProgressNotes,
-		SupervisorNotes:    plan.SupervisorNotes,
-		CreatedAt:          plan.CreatedAt,
-		UpdatedAt:          plan.UpdatedAt,
+		ID:                      plan.ID,
+		StudentID:               plan.StudentID,
+		StudentCaseID:           plan.StudentCaseID,
+		PlanType:                string(plan.PlanType),
+		StartDate:               plan.StartDate,
+		EndDate:                 plan.EndDate,
+		Objectives:              objectives,
+		Activities:              activities,
+		SuccessCriteria:         successCriteria,
+		ResponsibleInstructorID: plan.ResponsibleInstructorID,
+		CurrentStatus:           string(plan.CurrentStatus),
+		CompliancePercentage:    plan.CompliancePercentage,
+		FinalEvaluation:         plan.FinalEvaluation,
+		CreatedAt:               plan.CreatedAt,
+		UpdatedAt:               plan.UpdatedAt,
 	}
 }
 
@@ -789,24 +914,19 @@ func (uc *sanctionUseCases) CreateSanction(ctx context.Context, req *dto.CreateS
 	}
 
 	sanction := &entities.Sanction{
-		ID:               uuid.New(),
-		StudentCaseID:    req.StudentCaseID,
-		StudentID:        req.StudentID,
-		SanctionNumber:   req.SanctionNumber,
-		Type:             entities.SanctionType(req.Type),
-		Severity:         entities.SeverityLevel(req.Severity),
-		Status:           entities.SanctionStatusActive,
-		Title:            req.Title,
-		Description:      req.Description,
-		StartDate:        req.StartDate,
-		EndDate:          req.EndDate,
-		Conditions:       req.Conditions,
-		RequiredActions:  req.RequiredActions,
-		ComplianceNotes:  "",
-		IssuedBy:         req.IssuedBy,
-		ApprovedBy:       req.ApprovedBy,
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+		ID:                 uuid.New(),
+		StudentID:          req.StudentID,
+		StudentCaseID:      req.StudentCaseID,
+		SanctionType:       entities.SanctionType(req.SanctionType),
+		SeverityLevel:      req.SeverityLevel,
+		Description:        req.Description,
+		StartDate:          req.StartDate,
+		EndDate:            req.EndDate,
+		ComplianceRequired: req.ComplianceRequired,
+		ComplianceStatus:   entities.ComplianceStatusPending,
+		Appealed:           false,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	if err := uc.sanctionRepo.Create(ctx, sanction); err != nil {
@@ -828,20 +948,6 @@ func (uc *sanctionUseCases) GetSanctionByID(ctx context.Context, id uuid.UUID) (
 	return uc.toSanctionResponse(sanction), nil
 }
 
-func (uc *sanctionUseCases) GetSanctionsByStudentCaseID(ctx context.Context, studentCaseID uuid.UUID) ([]*dto.SanctionResponse, error) {
-	sanctions, err := uc.sanctionRepo.GetByStudentCaseID(ctx, studentCaseID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get sanctions: %w", err)
-	}
-
-	responses := make([]*dto.SanctionResponse, len(sanctions))
-	for i, sanction := range sanctions {
-		responses[i] = uc.toSanctionResponse(sanction)
-	}
-
-	return responses, nil
-}
-
 func (uc *sanctionUseCases) GetSanctionsByStudentID(ctx context.Context, studentID uuid.UUID) ([]*dto.SanctionResponse, error) {
 	sanctions, err := uc.sanctionRepo.GetByStudentID(ctx, studentID)
 	if err != nil {
@@ -857,7 +963,7 @@ func (uc *sanctionUseCases) GetSanctionsByStudentID(ctx context.Context, student
 }
 
 func (uc *sanctionUseCases) GetSanctionsByType(ctx context.Context, sanctionType string) ([]*dto.SanctionResponse, error) {
-	sanctions, err := uc.sanctionRepo.GetByType(ctx, sanctionType)
+	sanctions, err := uc.sanctionRepo.GetByType(ctx, entities.SanctionType(sanctionType))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get sanctions: %w", err)
 	}
@@ -870,10 +976,24 @@ func (uc *sanctionUseCases) GetSanctionsByType(ctx context.Context, sanctionType
 	return responses, nil
 }
 
-func (uc *sanctionUseCases) GetSanctionsByStatus(ctx context.Context, status string) ([]*dto.SanctionResponse, error) {
-	sanctions, err := uc.sanctionRepo.GetByStatus(ctx, status)
+func (uc *sanctionUseCases) GetActiveSanctions(ctx context.Context) ([]*dto.SanctionResponse, error) {
+	sanctions, err := uc.sanctionRepo.GetActiveSanctions(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get sanctions: %w", err)
+		return nil, fmt.Errorf("failed to get active sanctions: %w", err)
+	}
+
+	responses := make([]*dto.SanctionResponse, len(sanctions))
+	for i, sanction := range sanctions {
+		responses[i] = uc.toSanctionResponse(sanction)
+	}
+
+	return responses, nil
+}
+
+func (uc *sanctionUseCases) GetAppealableSanctions(ctx context.Context) ([]*dto.SanctionResponse, error) {
+	sanctions, err := uc.sanctionRepo.GetAppealableSanctions(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get appealable sanctions: %w", err)
 	}
 
 	responses := make([]*dto.SanctionResponse, len(sanctions))
@@ -894,29 +1014,11 @@ func (uc *sanctionUseCases) UpdateSanction(ctx context.Context, id uuid.UUID, re
 	}
 
 	// Update fields if provided
-	if req.Title != "" {
-		sanction.Title = req.Title
-	}
-	if req.Description != "" {
-		sanction.Description = req.Description
-	}
-	if req.StartDate != nil {
-		sanction.StartDate = *req.StartDate
+	if req.ComplianceStatus != "" {
+		sanction.ComplianceStatus = entities.ComplianceStatus(req.ComplianceStatus)
 	}
 	if req.EndDate != nil {
-		sanction.EndDate = *req.EndDate
-	}
-	if req.Conditions != "" {
-		sanction.Conditions = req.Conditions
-	}
-	if req.RequiredActions != "" {
-		sanction.RequiredActions = req.RequiredActions
-	}
-	if req.ComplianceNotes != "" {
-		sanction.ComplianceNotes = req.ComplianceNotes
-	}
-	if req.Status != "" {
-		sanction.Status = entities.SanctionStatus(req.Status)
+		sanction.EndDate = req.EndDate
 	}
 
 	sanction.UpdatedAt = time.Now()
@@ -940,7 +1042,7 @@ func (uc *sanctionUseCases) DeleteSanction(ctx context.Context, id uuid.UUID) er
 	return uc.sanctionRepo.Delete(ctx, id)
 }
 
-func (uc *sanctionUseCases) ActivateSanction(ctx context.Context, id uuid.UUID) error {
+func (uc *sanctionUseCases) MarkAsAppealed(ctx context.Context, id uuid.UUID) error {
 	sanction, err := uc.sanctionRepo.GetByID(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to get sanction: %w", err)
@@ -949,13 +1051,13 @@ func (uc *sanctionUseCases) ActivateSanction(ctx context.Context, id uuid.UUID) 
 		return fmt.Errorf("sanction not found")
 	}
 
-	sanction.Status = entities.SanctionStatusActive
+	sanction.MarkAsAppealed()
 	sanction.UpdatedAt = time.Now()
 
 	return uc.sanctionRepo.Update(ctx, sanction)
 }
 
-func (uc *sanctionUseCases) CompleteSanction(ctx context.Context, id uuid.UUID) error {
+func (uc *sanctionUseCases) UpdateComplianceStatus(ctx context.Context, id uuid.UUID, status string) error {
 	sanction, err := uc.sanctionRepo.GetByID(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to get sanction: %w", err)
@@ -964,13 +1066,13 @@ func (uc *sanctionUseCases) CompleteSanction(ctx context.Context, id uuid.UUID) 
 		return fmt.Errorf("sanction not found")
 	}
 
-	sanction.Status = entities.SanctionStatusCompleted
+	sanction.ComplianceStatus = entities.ComplianceStatus(status)
 	sanction.UpdatedAt = time.Now()
 
 	return uc.sanctionRepo.Update(ctx, sanction)
 }
 
-func (uc *sanctionUseCases) RevokeSanction(ctx context.Context, id uuid.UUID, reason string) error {
+func (uc *sanctionUseCases) SetAppealResult(ctx context.Context, id uuid.UUID, result string) error {
 	sanction, err := uc.sanctionRepo.GetByID(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to get sanction: %w", err)
@@ -979,80 +1081,103 @@ func (uc *sanctionUseCases) RevokeSanction(ctx context.Context, id uuid.UUID, re
 		return fmt.Errorf("sanction not found")
 	}
 
-	sanction.Status = entities.SanctionStatusRevoked
-	sanction.ComplianceNotes = fmt.Sprintf("Revoked: %s", reason)
+	sanction.SetAppealResult(entities.AppealResult(result))
 	sanction.UpdatedAt = time.Now()
 
 	return uc.sanctionRepo.Update(ctx, sanction)
 }
 
 func (uc *sanctionUseCases) toSanctionResponse(sanction *entities.Sanction) *dto.SanctionResponse {
+	var appealResult *string
+	if sanction.AppealResult != nil {
+		r := string(*sanction.AppealResult)
+		appealResult = &r
+	}
+
 	return &dto.SanctionResponse{
-		ID:              sanction.ID,
-		StudentCaseID:   sanction.StudentCaseID,
-		StudentID:       sanction.StudentID,
-		SanctionNumber:  sanction.SanctionNumber,
-		Type:            string(sanction.Type),
-		Severity:        string(sanction.Severity),
-		Status:          string(sanction.Status),
-		Title:           sanction.Title,
-		Description:     sanction.Description,
-		StartDate:       sanction.StartDate,
-		EndDate:         sanction.EndDate,
-		Conditions:      sanction.Conditions,
-		RequiredActions: sanction.RequiredActions,
-		ComplianceNotes: sanction.ComplianceNotes,
-		IssuedBy:        sanction.IssuedBy,
-		ApprovedBy:      sanction.ApprovedBy,
-		CreatedAt:       sanction.CreatedAt,
-		UpdatedAt:       sanction.UpdatedAt,
+		ID:                  sanction.ID,
+		StudentID:           sanction.StudentID,
+		StudentCaseID:       sanction.StudentCaseID,
+		SanctionType:        string(sanction.SanctionType),
+		SeverityLevel:       sanction.SeverityLevel,
+		SeverityDescription: sanction.GetSeverityDescription(),
+		Description:         sanction.Description,
+		StartDate:           sanction.StartDate,
+		EndDate:             sanction.EndDate,
+		ComplianceRequired:  sanction.ComplianceRequired,
+		ComplianceStatus:    string(sanction.ComplianceStatus),
+		AppealDeadline:      sanction.AppealDeadline,
+		Appealed:            sanction.Appealed,
+		AppealResult:        appealResult,
+		IsActive:            sanction.IsActive(),
+		IsAppealable:        sanction.IsAppealable(),
+		DurationDays:        sanction.GetDurationDays(),
+		CreatedAt:           sanction.CreatedAt,
+		UpdatedAt:           sanction.UpdatedAt,
 	}
 }
 
-// Implementation of Appeal Use Cases
+// Implementation of Appeal Use Cases - Aligned with SENA Agreement 009/2024
 type appealUseCases struct {
-	appealRepo      repositories.AppealRepository
-	studentCaseRepo repositories.StudentCaseRepository
+	appealRepo   repositories.AppealRepository
+	sanctionRepo repositories.SanctionRepository
 }
 
 func NewAppealUseCases(
 	appealRepo repositories.AppealRepository,
-	studentCaseRepo repositories.StudentCaseRepository,
+	sanctionRepo repositories.SanctionRepository,
 ) AppealUseCases {
 	return &appealUseCases{
-		appealRepo:      appealRepo,
-		studentCaseRepo: studentCaseRepo,
+		appealRepo:   appealRepo,
+		sanctionRepo: sanctionRepo,
 	}
 }
 
 func (uc *appealUseCases) CreateAppeal(ctx context.Context, req *dto.CreateAppealRequest) (*dto.AppealResponse, error) {
-	// Validate student case exists
-	studentCase, err := uc.studentCaseRepo.GetByID(ctx, req.StudentCaseID)
+	// Validate sanction exists and is appealable
+	sanction, err := uc.sanctionRepo.GetByID(ctx, req.SanctionID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get student case: %w", err)
+		return nil, fmt.Errorf("failed to get sanction: %w", err)
 	}
-	if studentCase == nil {
-		return nil, fmt.Errorf("student case not found")
+	if sanction == nil {
+		return nil, fmt.Errorf("sanction not found")
+	}
+	if !sanction.IsAppealable() {
+		return nil, fmt.Errorf("sanction is not appealable")
+	}
+
+	// Convert supporting documents
+	supportingDocs := make([]entities.SupportingDocument, len(req.SupportingDocuments))
+	for i, doc := range req.SupportingDocuments {
+		supportingDocs[i] = entities.SupportingDocument{
+			URL:         doc.URL,
+			Type:        doc.Type,
+			Description: doc.Description,
+			UploadedAt:  time.Now(),
+		}
 	}
 
 	appeal := &entities.Appeal{
-		ID:            uuid.New(),
-		StudentCaseID: req.StudentCaseID,
-		StudentID:     req.StudentID,
-		AppealNumber:  req.AppealNumber,
-		Type:          entities.AppealType(req.Type),
-		Status:        entities.AppealStatusSubmitted,
-		Reason:        req.Reason,
-		Evidence:      req.Evidence,
-		RequestedBy:   req.RequestedBy,
-		RequestDate:   req.RequestDate,
-		Priority:      entities.CasePriority(req.Priority),
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+		ID:                  uuid.New(),
+		SanctionID:          req.SanctionID,
+		StudentID:           req.StudentID,
+		SubmissionDate:      time.Now(),
+		DeadlineDate:        *sanction.AppealDeadline,
+		AppealGrounds:       req.AppealGrounds,
+		SupportingDocuments: supportingDocs,
+		AdmissibilityStatus: entities.AdmissibilityStatusPending,
+		CreatedAt:           time.Now(),
+		UpdatedAt:           time.Now(),
 	}
 
 	if err := uc.appealRepo.Create(ctx, appeal); err != nil {
 		return nil, fmt.Errorf("failed to create appeal: %w", err)
+	}
+
+	// Mark sanction as appealed
+	sanction.MarkAsAppealed()
+	if err := uc.sanctionRepo.Update(ctx, sanction); err != nil {
+		return nil, fmt.Errorf("failed to mark sanction as appealed: %w", err)
 	}
 
 	return uc.toAppealResponse(appeal), nil
@@ -1070,8 +1195,8 @@ func (uc *appealUseCases) GetAppealByID(ctx context.Context, id uuid.UUID) (*dto
 	return uc.toAppealResponse(appeal), nil
 }
 
-func (uc *appealUseCases) GetAppealsByStudentCaseID(ctx context.Context, studentCaseID uuid.UUID) ([]*dto.AppealResponse, error) {
-	appeals, err := uc.appealRepo.GetByStudentCaseID(ctx, studentCaseID)
+func (uc *appealUseCases) GetAppealsBySanctionID(ctx context.Context, sanctionID uuid.UUID) ([]*dto.AppealResponse, error) {
+	appeals, err := uc.appealRepo.GetBySanctionID(ctx, sanctionID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get appeals: %w", err)
 	}
@@ -1098,10 +1223,24 @@ func (uc *appealUseCases) GetAppealsByStudentID(ctx context.Context, studentID u
 	return responses, nil
 }
 
-func (uc *appealUseCases) GetAppealsByStatus(ctx context.Context, status string) ([]*dto.AppealResponse, error) {
-	appeals, err := uc.appealRepo.GetByStatus(ctx, status)
+func (uc *appealUseCases) GetPendingAppeals(ctx context.Context) ([]*dto.AppealResponse, error) {
+	appeals, err := uc.appealRepo.GetPendingAppeals(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get appeals: %w", err)
+		return nil, fmt.Errorf("failed to get pending appeals: %w", err)
+	}
+
+	responses := make([]*dto.AppealResponse, len(appeals))
+	for i, appeal := range appeals {
+		responses[i] = uc.toAppealResponse(appeal)
+	}
+
+	return responses, nil
+}
+
+func (uc *appealUseCases) GetAdmittedAppeals(ctx context.Context) ([]*dto.AppealResponse, error) {
+	appeals, err := uc.appealRepo.GetAdmittedAppeals(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get admitted appeals: %w", err)
 	}
 
 	responses := make([]*dto.AppealResponse, len(appeals))
@@ -1121,27 +1260,22 @@ func (uc *appealUseCases) UpdateAppeal(ctx context.Context, id uuid.UUID, req *d
 		return nil, fmt.Errorf("appeal not found")
 	}
 
-	// Update fields if provided
-	if req.Reason != "" {
-		appeal.Reason = req.Reason
+	// Update admissibility status if provided
+	if req.AdmissibilityStatus != "" {
+		appeal.AdmissibilityStatus = entities.AdmissibilityStatus(req.AdmissibilityStatus)
 	}
-	if req.Evidence != "" {
-		appeal.Evidence = req.Evidence
+	if req.AdmissibilityRationale != "" {
+		appeal.AdmissibilityRationale = &req.AdmissibilityRationale
 	}
-	if req.Status != "" {
-		appeal.Status = entities.AppealStatus(req.Status)
+	if req.SecondInstanceCommitteeID != nil {
+		appeal.SecondInstanceCommitteeID = req.SecondInstanceCommitteeID
 	}
-	if req.Priority != "" {
-		appeal.Priority = entities.CasePriority(req.Priority)
+	if req.FinalDecision != "" {
+		decision := entities.FinalDecision(req.FinalDecision)
+		appeal.FinalDecision = &decision
 	}
-	if req.ReviewDate != nil {
-		appeal.ReviewDate = req.ReviewDate
-	}
-	if req.Resolution != "" {
-		appeal.Resolution = req.Resolution
-	}
-	if req.ReviewedBy != nil {
-		appeal.ReviewedBy = req.ReviewedBy
+	if req.FinalRationale != "" {
+		appeal.FinalRationale = &req.FinalRationale
 	}
 
 	appeal.UpdatedAt = time.Now()
@@ -1165,7 +1299,7 @@ func (uc *appealUseCases) DeleteAppeal(ctx context.Context, id uuid.UUID) error 
 	return uc.appealRepo.Delete(ctx, id)
 }
 
-func (uc *appealUseCases) ProcessAppeal(ctx context.Context, id uuid.UUID, accepted bool, resolution string) error {
+func (uc *appealUseCases) AdmitAppeal(ctx context.Context, id uuid.UUID, rationale string) error {
 	appeal, err := uc.appealRepo.GetByID(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to get appeal: %w", err)
@@ -1174,37 +1308,85 @@ func (uc *appealUseCases) ProcessAppeal(ctx context.Context, id uuid.UUID, accep
 		return fmt.Errorf("appeal not found")
 	}
 
-	if accepted {
-		appeal.Status = entities.AppealStatusAccepted
-	} else {
-		appeal.Status = entities.AppealStatusRejected
+	appeal.Admit(rationale)
+	appeal.UpdatedAt = time.Now()
+
+	return uc.appealRepo.Update(ctx, appeal)
+}
+
+func (uc *appealUseCases) RejectAppeal(ctx context.Context, id uuid.UUID, rationale string) error {
+	appeal, err := uc.appealRepo.GetByID(ctx, id)
+	if err != nil {
+		return fmt.Errorf("failed to get appeal: %w", err)
+	}
+	if appeal == nil {
+		return fmt.Errorf("appeal not found")
 	}
 
-	appeal.Resolution = resolution
-	now := time.Now()
-	appeal.ReviewDate = &now
-	appeal.UpdatedAt = now
+	appeal.Reject(rationale)
+	appeal.UpdatedAt = time.Now()
+
+	return uc.appealRepo.Update(ctx, appeal)
+}
+
+func (uc *appealUseCases) SetFinalDecision(ctx context.Context, id uuid.UUID, decision string, rationale string) error {
+	appeal, err := uc.appealRepo.GetByID(ctx, id)
+	if err != nil {
+		return fmt.Errorf("failed to get appeal: %w", err)
+	}
+	if appeal == nil {
+		return fmt.Errorf("appeal not found")
+	}
+
+	appeal.SetFinalDecision(entities.FinalDecision(decision), rationale)
+	appeal.UpdatedAt = time.Now()
+
+	// Update related sanction with appeal result
+	sanction, err := uc.sanctionRepo.GetByID(ctx, appeal.SanctionID)
+	if err == nil && sanction != nil {
+		sanction.SetAppealResult(entities.AppealResult(decision))
+		uc.sanctionRepo.Update(ctx, sanction)
+	}
 
 	return uc.appealRepo.Update(ctx, appeal)
 }
 
 func (uc *appealUseCases) toAppealResponse(appeal *entities.Appeal) *dto.AppealResponse {
+	// Convert supporting documents to DTOs
+	supportingDocs := make([]dto.SupportingDocumentDTO, len(appeal.SupportingDocuments))
+	for i, doc := range appeal.SupportingDocuments {
+		supportingDocs[i] = dto.SupportingDocumentDTO{
+			URL:         doc.URL,
+			Type:        doc.Type,
+			Description: doc.Description,
+			UploadedAt:  doc.UploadedAt,
+		}
+	}
+
+	var finalDecision *string
+	if appeal.FinalDecision != nil {
+		d := string(*appeal.FinalDecision)
+		finalDecision = &d
+	}
+
 	return &dto.AppealResponse{
-		ID:            appeal.ID,
-		StudentCaseID: appeal.StudentCaseID,
-		StudentID:     appeal.StudentID,
-		AppealNumber:  appeal.AppealNumber,
-		Type:          string(appeal.Type),
-		Status:        string(appeal.Status),
-		Reason:        appeal.Reason,
-		Evidence:      appeal.Evidence,
-		RequestedBy:   appeal.RequestedBy,
-		RequestDate:   appeal.RequestDate,
-		ReviewDate:    appeal.ReviewDate,
-		Resolution:    appeal.Resolution,
-		ReviewedBy:    appeal.ReviewedBy,
-		Priority:      string(appeal.Priority),
-		CreatedAt:     appeal.CreatedAt,
-		UpdatedAt:     appeal.UpdatedAt,
+		ID:                        appeal.ID,
+		SanctionID:                appeal.SanctionID,
+		StudentID:                 appeal.StudentID,
+		SubmissionDate:            appeal.SubmissionDate,
+		DeadlineDate:              appeal.DeadlineDate,
+		AppealGrounds:             appeal.AppealGrounds,
+		SupportingDocuments:       supportingDocs,
+		AdmissibilityStatus:       string(appeal.AdmissibilityStatus),
+		AdmissibilityRationale:    appeal.AdmissibilityRationale,
+		SecondInstanceCommitteeID: appeal.SecondInstanceCommitteeID,
+		FinalDecision:             finalDecision,
+		FinalRationale:            appeal.FinalRationale,
+		IsWithinDeadline:          appeal.IsWithinDeadline(),
+		IsAdmitted:                appeal.IsAdmitted(),
+		HasFinalDecision:          appeal.HasFinalDecision(),
+		IsSuccessful:              appeal.IsSuccessful(),
+		CreatedAt:                 appeal.CreatedAt,
+		UpdatedAt:                 appeal.UpdatedAt,
 	}
 }

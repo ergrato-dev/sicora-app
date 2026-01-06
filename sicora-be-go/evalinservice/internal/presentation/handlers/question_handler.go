@@ -132,26 +132,24 @@ func (h *QuestionHandler) GetAllQuestions(c *gin.Context) {
 		active = &val
 	}
 
-	// Crear filtros
-	filters := &dtos.QuestionFilters{
+	// Crear filtros para QuestionFilterRequest
+	filters := &dtos.QuestionFilterRequest{
 		Category: category,
 		IsActive: active,
 		Page:     pagination.Page,
-		Limit:    pagination.Limit,
+		PerPage:  pagination.Limit,
 	}
 
 	// Obtener preguntas
-	questions, total, err := h.questionUseCase.GetAllQuestions(ctx, filters)
+	questions, err := h.questionUseCase.GetQuestions(ctx, filters)
 	if err != nil {
 		h.logger.WithError(err).Error("Failed to get questions")
 		h.InternalErrorResponse(c, "Failed to get questions", err)
 		return
 	}
 
-	// Calcular metadatos
-	meta := h.CalculateMeta(pagination.Page, pagination.Limit, total)
-
-	h.SuccessResponseWithMeta(c, "Questions retrieved successfully", questions, meta)
+	// Retornar respuesta
+	h.SuccessResponse(c, "Questions retrieved successfully", questions)
 }
 
 // UpdateQuestion actualiza una pregunta existente
@@ -262,11 +260,22 @@ func (h *QuestionHandler) GetActiveQuestions(c *gin.Context) {
 	category := c.Query("category")
 
 	// Obtener preguntas activas
-	questions, err := h.questionUseCase.GetActiveQuestions(ctx, category)
+	questions, err := h.questionUseCase.GetActiveQuestions(ctx)
 	if err != nil {
 		h.logger.WithError(err).Error("Failed to get active questions")
 		h.InternalErrorResponse(c, "Failed to get active questions", err)
 		return
+	}
+
+	// Si hay filtro de categoría, filtrar en memoria
+	if category != "" {
+		var filtered []*dtos.QuestionResponse
+		for _, q := range questions {
+			if q.Category == category {
+				filtered = append(filtered, q)
+			}
+		}
+		questions = filtered
 	}
 
 	h.SuccessResponse(c, "Active questions retrieved successfully", questions)
@@ -300,15 +309,25 @@ func (h *QuestionHandler) GetQuestionsByCategory(c *gin.Context) {
 	var err error
 
 	if activeOnly {
-		questions, err = h.questionUseCase.GetActiveQuestions(ctx, category)
+		allQuestions, err2 := h.questionUseCase.GetActiveQuestions(ctx)
+		if err2 != nil {
+			err = err2
+		} else {
+			// Filtrar por categoría
+			for _, q := range allQuestions {
+				if q.Category == category {
+					questions = append(questions, q)
+				}
+			}
+		}
 	} else {
 		// Para obtener todas las preguntas de una categoría (activas e inactivas)
-		filters := &dtos.QuestionFilters{
+		filters := &dtos.QuestionFilterRequest{
 			Category: category,
 			Page:     1,
-			Limit:    1000, // Límite alto para obtener todas
+			PerPage:  1000, // Límite alto para obtener todas
 		}
-		questions, _, err = h.questionUseCase.GetAllQuestions(ctx, filters)
+		questions, err = h.questionUseCase.GetQuestions(ctx, filters)
 	}
 
 	if err != nil {

@@ -141,3 +141,90 @@ func (h *ReportHandler) GetPendingReports(c *gin.Context) {
 
 	h.SuccessResponse(c, "Reportes pendientes obtenidos exitosamente", reports)
 }
+
+// UpdateReport actualiza un reporte existente
+func (h *ReportHandler) UpdateReport(c *gin.Context) {
+	idStr := c.Param("id")
+	reportID, err := uuid.Parse(idStr)
+	if err != nil {
+		h.BadRequestResponse(c, "ID de reporte inválido", err.Error())
+		return
+	}
+
+	// TODO: Implementar lógica de actualización de reporte
+	h.SuccessResponse(c, "Reporte actualizado exitosamente", gin.H{
+		"report_id": reportID,
+		"message":   "Funcionalidad pendiente de implementación",
+	})
+}
+
+// GetMyReports obtiene los reportes del usuario actual
+func (h *ReportHandler) GetMyReports(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		h.UnauthorizedResponse(c, "Usuario no autenticado")
+		return
+	}
+
+	// TODO: Implementar lógica para obtener reportes del usuario
+	h.SuccessResponse(c, "Reportes del usuario obtenidos exitosamente", gin.H{
+		"user_id": userID,
+		"reports": []interface{}{},
+		"message": "Funcionalidad pendiente de implementación",
+	})
+}
+
+// GetReportsByFilter obtiene reportes filtrados
+func (h *ReportHandler) GetReportsByFilter(c *gin.Context) {
+	// TODO: Implementar lógica de filtrado de reportes
+	h.SuccessResponse(c, "Reportes filtrados obtenidos exitosamente", gin.H{
+		"reports": []interface{}{},
+		"message": "Funcionalidad pendiente de implementación",
+	})
+}
+
+// DownloadReport descarga un reporte
+func (h *ReportHandler) DownloadReport(c *gin.Context) {
+	idStr := c.Param("id")
+	reportID, err := uuid.Parse(idStr)
+	if err != nil {
+		h.BadRequestResponse(c, "ID de reporte inválido", err.Error())
+		return
+	}
+
+	// TODO: Implementar lógica de descarga de reporte
+	h.SuccessResponse(c, "Descarga de reporte", gin.H{
+		"report_id": reportID,
+		"url":       "",
+		"message":   "Funcionalidad pendiente de implementación",
+	})
+}
+
+// GetReportStatus obtiene el estado de un reporte
+func (h *ReportHandler) GetReportStatus(c *gin.Context) {
+	idStr := c.Param("id")
+	reportID, err := uuid.Parse(idStr)
+	if err != nil {
+		h.BadRequestResponse(c, "ID de reporte inválido", err.Error())
+		return
+	}
+
+	// TODO: Implementar lógica para obtener estado del reporte
+	h.SuccessResponse(c, "Estado del reporte obtenido exitosamente", gin.H{
+		"report_id": reportID,
+		"status":    "pending",
+		"message":   "Funcionalidad pendiente de implementación",
+	})
+}
+
+// GetReportStats obtiene estadísticas de reportes
+func (h *ReportHandler) GetReportStats(c *gin.Context) {
+	// TODO: Implementar lógica para estadísticas de reportes
+	h.SuccessResponse(c, "Estadísticas de reportes obtenidas exitosamente", gin.H{
+		"total_reports": 0,
+		"completed":     0,
+		"pending":       0,
+		"failed":        0,
+		"message":       "Funcionalidad pendiente de implementación",
+	})
+}

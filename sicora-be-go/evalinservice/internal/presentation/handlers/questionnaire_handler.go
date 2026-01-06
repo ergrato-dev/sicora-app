@@ -81,6 +81,18 @@ func (h *QuestionnaireHandler) GetActiveQuestionnaires(c *gin.Context) {
 	h.SuccessResponse(c, "Cuestionarios activos obtenidos exitosamente", questionnaires)
 }
 
+// GetAllQuestionnaires obtiene todos los cuestionarios (activos e inactivos)
+func (h *QuestionnaireHandler) GetAllQuestionnaires(c *gin.Context) {
+	// Por ahora retornar solo los activos - TODO: implementar paginación completa
+	questionnaires, err := h.questionnaireUseCase.GetActiveQuestionnaires(c.Request.Context())
+	if err != nil {
+		h.InternalErrorResponse(c, "Error al obtener cuestionarios", err)
+		return
+	}
+
+	h.SuccessResponse(c, "Cuestionarios obtenidos exitosamente", questionnaires)
+}
+
 // UpdateQuestionnaire actualiza un cuestionario existente
 func (h *QuestionnaireHandler) UpdateQuestionnaire(c *gin.Context) {
 	idStr := c.Param("id")
@@ -192,10 +204,7 @@ func (h *QuestionnaireHandler) AddQuestionToQuestionnaire(c *gin.Context) {
 		return
 	}
 
-	// El orden se puede calcular automáticamente o recibir como parámetro adicional
-	order := 1 // Por defecto
-
-	err = h.questionnaireUseCase.AddQuestionToQuestionnaire(c.Request.Context(), questionnaireID, req.QuestionID, order)
+	err = h.questionnaireUseCase.AddQuestionToQuestionnaire(c.Request.Context(), questionnaireID, req.QuestionID)
 	if err != nil {
 		h.InternalErrorResponse(c, "Error al agregar pregunta al cuestionario", err)
 		return

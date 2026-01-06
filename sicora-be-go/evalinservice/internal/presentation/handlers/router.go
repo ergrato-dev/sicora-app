@@ -163,7 +163,7 @@ func setupEvaluationRoutes(api *gin.RouterGroup, handlers *HandlerContainer, aut
 	// Rutas específicas para instructores
 	instructorEvals := evaluations.Group("/instructor")
 	instructorEvals.Use(authMiddleware.RequireRole("instructor", "admin"))
-	instructorEvals.GET("/:instructor_id", handlers.Evaluation.GetEvaluationsByInstructor)
+	instructorEvals.GET("/:instructor_id", handlers.Evaluation.GetEvaluationsByInstructorHandler)
 
 	// Rutas de estadísticas (admin y instructores)
 	stats := evaluations.Group("/stats")

@@ -60,6 +60,25 @@ type ErrorDetails struct {
 	CorrelationID string    `json:"correlationId,omitempty"`
 }
 
+// NewErrorResponse creates a new standardized error response
+// code: error code string, message: human readable message, details: optional additional info
+func NewErrorResponse(code string, message string, details map[string]interface{}) ErrorResponse {
+	detailsStr := ""
+	if details != nil {
+		if d, ok := details["details"]; ok {
+			detailsStr = fmt.Sprintf("%v", d)
+		}
+	}
+	return ErrorResponse{
+		Error: ErrorDetails{
+			Code:      ErrorCode(code),
+			Message:   message,
+			Details:   detailsStr,
+			Timestamp: time.Now().UTC(),
+		},
+	}
+}
+
 // NewDomainError creates a new domain error with the specified parameters
 func NewDomainError(code ErrorCode, message string, statusCode int) *DomainError {
 	return &DomainError{

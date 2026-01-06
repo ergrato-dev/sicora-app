@@ -71,7 +71,7 @@ func (r *faqRepository) Delete(ctx context.Context, id, tenantID string) error {
 
 func (r *faqRepository) SearchByVector(ctx context.Context, tenantID string, embedding []float32, threshold float64, limit int) ([]*entities.FAQ, error) {
 	var faqs []*entities.FAQ
-	
+
 	// Vector similarity search using pgvector
 	query := `
 		SELECT *, (1 - (question_embedding <=> ?)) as similarity 
@@ -80,25 +80,25 @@ func (r *faqRepository) SearchByVector(ctx context.Context, tenantID string, emb
 		ORDER BY similarity DESC 
 		LIMIT ?
 	`
-	
+
 	err := r.db.WithContext(ctx).
 		Raw(query, embedding, tenantID, embedding, threshold, limit).
 		Scan(&faqs).Error
-	
+
 	return faqs, err
 }
 
 func (r *faqRepository) SearchByText(ctx context.Context, tenantID string, query string, limit int) ([]*entities.FAQ, error) {
 	var faqs []*entities.FAQ
-	
+
 	searchPattern := fmt.Sprintf("%%%s%%", query)
 	err := r.db.WithContext(ctx).
-		Where("tenant_id = ? AND (question ILIKE ? OR answer ILIKE ?)", 
+		Where("tenant_id = ? AND (question ILIKE ? OR answer ILIKE ?)",
 			tenantID, searchPattern, searchPattern).
 		Order("created_at DESC").
 		Limit(limit).
 		Find(&faqs).Error
-	
+
 	return faqs, err
 }
 
@@ -132,8 +132,8 @@ func (r *faqRepository) UpdateRating(ctx context.Context, id, tenantID string, r
 		Model(&entities.FAQ{}).
 		Where("id = ? AND tenant_id = ?", id, tenantID).
 		Updates(map[string]interface{}{
-			"rating":      rating,
-			"updated_at":  time.Now(),
+			"rating":     rating,
+			"updated_at": time.Now(),
 		}).Error
 }
 
@@ -146,24 +146,65 @@ func (r *faqRepository) IncrementViews(ctx context.Context, id, tenantID string)
 
 func (r *faqRepository) GetPopular(ctx context.Context, tenantID string, limit int) ([]*entities.FAQ, error) {
 	var faqs []*entities.FAQ
-	
+
 	err := r.db.WithContext(ctx).
 		Where("tenant_id = ?", tenantID).
 		Order("view_count DESC, rating DESC").
 		Limit(limit).
 		Find(&faqs).Error
-	
+
 	return faqs, err
 }
 
 func (r *faqRepository) GetRecent(ctx context.Context, tenantID string, limit int) ([]*entities.FAQ, error) {
 	var faqs []*entities.FAQ
-	
+
 	err := r.db.WithContext(ctx).
 		Where("tenant_id = ?", tenantID).
 		Order("created_at DESC").
 		Limit(limit).
 		Find(&faqs).Error
-	
+
 	return faqs, err
+}
+
+// GetFAQStats returns statistics for a FAQ item
+func (r *faqRepository) GetFAQStats(ctx context.Context, faqID interface{}) (*repositories.FAQStats, error) {
+	var faq entities.FAQ
+	err := r.db.WithContext(ctx).
+		Where("id = ?", faqID).
+		First(&faq).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// Calculate stats from the FAQ entity
+	totalRatings := int64(faq.HelpfulCount + faq.UnhelpfulCount)
+	var avgRating float64
+	if totalRatings > 0 {
+		avgRating = float64(faq.HelpfulCount) / float64(totalRatings) * 5.0 // Convert to 5-star scale
+	}
+
+	return &repositories.FAQStats{
+		TotalViews:      int64(faq.ViewCount),
+		UniqueViews:     int64(faq.ViewCount), // Simplified - no unique tracking
+		HelpfulCount:    int64(faq.HelpfulCount),
+		NotHelpfulCount: int64(faq.UnhelpfulCount),
+		AverageRating:   avgRating,
+		TotalRatings:    totalRatings,
+	}, nil
+}
+
+// GetAnalytics returns analytics data for a FAQ item
+func (r *faqRepository) GetAnalytics(ctx context.Context, faqID interface{}, from, to interface{}) ([]entities.FAQAnalytic, error) {
+	// TODO: Implement proper analytics tracking
+	// For now, return empty slice as placeholder
+	return []entities.FAQAnalytic{}, nil
+}
+
+// UpdateSearchIndex updates the search index for a FAQ item
+func (r *faqRepository) UpdateSearchIndex(ctx context.Context, faqID interface{}) error {
+	// TODO: Implement search index update logic
+	// This could involve regenerating embeddings or updating full-text search indexes
+	return nil
 }

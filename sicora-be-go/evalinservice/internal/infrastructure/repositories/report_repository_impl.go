@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -127,7 +126,7 @@ func (r *reportRepositoryImpl) GetRecentReports(ctx context.Context, limit int) 
 	return result, nil
 }
 
-func (r *reportRepositoryImpl) GetReportsByDateRange(ctx context.Context, startDate, endDate time.Time) ([]*entities.Report, error) {
+func (r *reportRepositoryImpl) GetReportsByDateRange(ctx context.Context, startDate, endDate string) ([]*entities.Report, error) {
 	var reports []models.Report
 	if err := r.db.WithContext(ctx).
 		Where("created_at BETWEEN ? AND ?", startDate, endDate).
@@ -205,6 +204,22 @@ func (r *reportRepositoryImpl) GetByStatus(ctx context.Context, status valueobje
 	if err := r.db.WithContext(ctx).Where("status = ?", string(status)).
 		Order("created_at DESC").Find(&reports).Error; err != nil {
 		return nil, fmt.Errorf("failed to get reports by status: %w", err)
+	}
+
+	result := make([]*entities.Report, len(reports))
+	for i, model := range reports {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// GetCompletedReportsByPeriod obtiene reportes completados de un período
+func (r *reportRepositoryImpl) GetCompletedReportsByPeriod(ctx context.Context, periodID uuid.UUID) ([]*entities.Report, error) {
+	var reports []models.Report
+	if err := r.db.WithContext(ctx).
+		Where("period_id = ? AND status = ?", periodID, string(valueobjects.ReportStatusCompleted)).
+		Order("created_at DESC").Find(&reports).Error; err != nil {
+		return nil, fmt.Errorf("failed to get completed reports by period: %w", err)
 	}
 
 	result := make([]*entities.Report, len(reports))

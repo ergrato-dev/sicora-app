@@ -6,204 +6,234 @@ import (
 	"github.com/google/uuid"
 )
 
-// Committee DTOs
+// Committee DTOs - Aligned with SENA Agreement 009/2024
 type CreateCommitteeRequest struct {
-	Name        string `json:"name" validate:"required,min=3,max=100"`
-	Type        string `json:"type" validate:"required,oneof=DISCIPLINARY ACADEMIC"`
-	Center      string `json:"center" validate:"required,min=3,max=50"`
-	Coordinator string `json:"coordinator" validate:"required,min=3,max=100"`
-	MaxMembers  int    `json:"max_members" validate:"required,min=3,max=15"`
+	CommitteeDate  time.Time  `json:"committee_date" validate:"required"`
+	CommitteeType  string     `json:"committee_type" validate:"required,oneof=MONTHLY EXTRAORDINARY APPEALS SPECIAL"`
+	ProgramID      *uuid.UUID `json:"program_id,omitempty"`
+	AcademicPeriod string     `json:"academic_period" validate:"required,min=3,max=20"`
 }
 
 type UpdateCommitteeRequest struct {
-	Name        string `json:"name,omitempty" validate:"omitempty,min=3,max=100"`
-	Status      string `json:"status,omitempty" validate:"omitempty,oneof=ACTIVE INACTIVE"`
-	Coordinator string `json:"coordinator,omitempty" validate:"omitempty,min=3,max=100"`
-	MaxMembers  int    `json:"max_members,omitempty" validate:"omitempty,min=3,max=15"`
+	CommitteeDate  *time.Time `json:"committee_date,omitempty"`
+	Status         string     `json:"status,omitempty" validate:"omitempty,oneof=SCHEDULED IN_SESSION COMPLETED CANCELLED POSTPONED"`
+	AcademicPeriod string     `json:"academic_period,omitempty" validate:"omitempty,min=3,max=20"`
+	SessionMinutes *string    `json:"session_minutes,omitempty"`
 }
 
 type CommitteeResponse struct {
-	ID             uuid.UUID                 `json:"id"`
-	Name           string                    `json:"name"`
-	Type           string                    `json:"type"`
-	Status         string                    `json:"status"`
-	Center         string                    `json:"center"`
-	Coordinator    string                    `json:"coordinator"`
-	MaxMembers     int                       `json:"max_members"`
-	CurrentMembers int                       `json:"current_members"`
-	Members        []CommitteeMemberResponse `json:"members,omitempty"`
-	CreatedAt      time.Time                 `json:"created_at"`
-	UpdatedAt      time.Time                 `json:"updated_at"`
+	ID              uuid.UUID                 `json:"id"`
+	CommitteeDate   time.Time                 `json:"committee_date"`
+	CommitteeType   string                    `json:"committee_type"`
+	Status          string                    `json:"status"`
+	ProgramID       *uuid.UUID                `json:"program_id,omitempty"`
+	AcademicPeriod  string                    `json:"academic_period"`
+	AgendaGenerated bool                      `json:"agenda_generated"`
+	QuorumAchieved  bool                      `json:"quorum_achieved"`
+	SessionMinutes  *string                   `json:"session_minutes,omitempty"`
+	Members         []CommitteeMemberResponse `json:"members,omitempty"`
+	CreatedAt       time.Time                 `json:"created_at"`
+	UpdatedAt       time.Time                 `json:"updated_at"`
 }
 
-// Committee Member DTOs
+// Committee Member DTOs - Aligned with SENA Agreement 009/2024
 type CreateCommitteeMemberRequest struct {
-	CommitteeID     uuid.UUID `json:"committee_id" validate:"required"`
-	UserID          uuid.UUID `json:"user_id" validate:"required"`
-	Role            string    `json:"role" validate:"required,oneof=PRESIDENT SECRETARY MEMBER COORDINATOR"`
-	AppointmentDate time.Time `json:"appointment_date" validate:"required"`
+	CommitteeID uuid.UUID `json:"committee_id" validate:"required"`
+	UserID      uuid.UUID `json:"user_id" validate:"required"`
+	MemberRole  string    `json:"member_role" validate:"required,oneof=COORDINATOR INSTRUCTOR REPRESENTATIVE SECRETARY PRESIDENT"`
+	VotePower   int       `json:"vote_power,omitempty" validate:"omitempty,min=0,max=3"`
 }
 
 type UpdateCommitteeMemberRequest struct {
-	Role    string     `json:"role,omitempty" validate:"omitempty,oneof=PRESIDENT SECRETARY MEMBER COORDINATOR"`
-	Status  string     `json:"status,omitempty" validate:"omitempty,oneof=ACTIVE INACTIVE"`
-	EndDate *time.Time `json:"end_date,omitempty"`
+	MemberRole string `json:"member_role,omitempty" validate:"omitempty,oneof=COORDINATOR INSTRUCTOR REPRESENTATIVE SECRETARY PRESIDENT"`
+	IsPresent  *bool  `json:"is_present,omitempty"`
+	VotePower  *int   `json:"vote_power,omitempty" validate:"omitempty,min=0,max=3"`
 }
 
 type CommitteeMemberResponse struct {
-	ID              uuid.UUID  `json:"id"`
-	CommitteeID     uuid.UUID  `json:"committee_id"`
-	UserID          uuid.UUID  `json:"user_id"`
-	Role            string     `json:"role"`
-	Status          string     `json:"status"`
-	AppointmentDate time.Time  `json:"appointment_date"`
-	EndDate         *time.Time `json:"end_date,omitempty"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
+	ID          uuid.UUID `json:"id"`
+	CommitteeID uuid.UUID `json:"committee_id"`
+	UserID      uuid.UUID `json:"user_id"`
+	MemberRole  string    `json:"member_role"`
+	IsPresent   bool      `json:"is_present"`
+	VotePower   int       `json:"vote_power"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
-// Student Case DTOs
+// Student Case DTOs - Aligned with SENA Agreement 009/2024
 type CreateStudentCaseRequest struct {
-	StudentID   uuid.UUID  `json:"student_id" validate:"required"`
-	CommitteeID uuid.UUID  `json:"committee_id" validate:"required"`
-	Type        string     `json:"type" validate:"required,oneof=DISCIPLINARY ACADEMIC"`
-	Severity    string     `json:"severity" validate:"required,oneof=MINOR MODERATE SEVERE CRITICAL"`
-	Priority    string     `json:"priority,omitempty" validate:"omitempty,oneof=LOW MEDIUM HIGH URGENT"`
-	Title       string     `json:"title" validate:"required,min=5,max=200"`
-	Description string     `json:"description" validate:"required,min=10"`
-	Evidence    string     `json:"evidence,omitempty"`
-	ReportedBy  string     `json:"reported_by" validate:"required,min=3,max=100"`
-	DueDate     *time.Time `json:"due_date,omitempty"`
+	StudentID          uuid.UUID             `json:"student_id" validate:"required"`
+	CommitteeID        uuid.UUID             `json:"committee_id" validate:"required"`
+	CaseType           string                `json:"case_type" validate:"required,oneof=RECOGNITION IMPROVEMENT_PLAN SANCTION APPEAL FOLLOW_UP"`
+	AutomaticDetection bool                  `json:"automatic_detection"`
+	DetectionCriteria  *DetectionCriteriaDTO `json:"detection_criteria,omitempty"`
+	CaseDescription    string                `json:"case_description" validate:"required,min=10"`
+	EvidenceDocuments  []EvidenceDocumentDTO `json:"evidence_documents,omitempty"`
+	InstructorComments *string               `json:"instructor_comments,omitempty"`
+}
+
+type DetectionCriteriaDTO struct {
+	AverageGrade        float64 `json:"average_grade,omitempty"`
+	DisciplinaryFaults  int     `json:"disciplinary_faults,omitempty"`
+	AttendanceRate      float64 `json:"attendance_rate,omitempty"`
+	LeadershipIndicator bool    `json:"leadership_indicator,omitempty"`
+	ComplianceRate      float64 `json:"compliance_rate,omitempty"`
+	DaysOverdue         int     `json:"days_overdue,omitempty"`
+}
+
+type EvidenceDocumentDTO struct {
+	URL         string    `json:"url"`
+	Type        string    `json:"type"`
+	Description string    `json:"description"`
+	UploadedAt  time.Time `json:"uploaded_at,omitempty"`
 }
 
 type UpdateStudentCaseRequest struct {
-	Status         string     `json:"status,omitempty" validate:"omitempty,oneof=PENDING IN_PROGRESS RESOLVED APPEALED CLOSED"`
-	Priority       string     `json:"priority,omitempty" validate:"omitempty,oneof=LOW MEDIUM HIGH URGENT"`
-	Description    string     `json:"description,omitempty" validate:"omitempty,min=10"`
-	Evidence       string     `json:"evidence,omitempty"`
-	DueDate        *time.Time `json:"due_date,omitempty"`
-	ResolutionDate *time.Time `json:"resolution_date,omitempty"`
+	CaseStatus         string                `json:"case_status,omitempty" validate:"omitempty,oneof=DETECTED PENDING IN_REVIEW RESOLVED"`
+	CaseDescription    string                `json:"case_description,omitempty" validate:"omitempty,min=10"`
+	InstructorComments *string               `json:"instructor_comments,omitempty"`
+	EvidenceDocuments  []EvidenceDocumentDTO `json:"evidence_documents,omitempty"`
 }
 
 type StudentCaseResponse struct {
-	ID                uuid.UUID                    `json:"id"`
-	StudentID         uuid.UUID                    `json:"student_id"`
-	CommitteeID       uuid.UUID                    `json:"committee_id"`
-	CaseNumber        string                       `json:"case_number"`
-	Type              string                       `json:"type"`
-	Severity          string                       `json:"severity"`
-	Status            string                       `json:"status"`
-	Priority          string                       `json:"priority"`
-	Title             string                       `json:"title"`
-	Description       string                       `json:"description"`
-	Evidence          string                       `json:"evidence"`
-	ReportedBy        string                       `json:"reported_by"`
-	ReportDate        time.Time                    `json:"report_date"`
-	DueDate           *time.Time                   `json:"due_date,omitempty"`
-	ResolutionDate    *time.Time                   `json:"resolution_date,omitempty"`
-	Committee         *CommitteeResponse           `json:"committee,omitempty"`
-	ImprovementPlans  []ImprovementPlanResponse    `json:"improvement_plans,omitempty"`
-	Sanctions         []SanctionResponse           `json:"sanctions,omitempty"`
-	Decisions         []CommitteeDecisionResponse  `json:"decisions,omitempty"`
-	Appeals           []AppealResponse             `json:"appeals,omitempty"`
-	CreatedAt         time.Time                    `json:"created_at"`
-	UpdatedAt         time.Time                    `json:"updated_at"`
+	ID                 uuid.UUID                   `json:"id"`
+	StudentID          uuid.UUID                   `json:"student_id"`
+	CommitteeID        uuid.UUID                   `json:"committee_id"`
+	CaseType           string                      `json:"case_type"`
+	CaseStatus         string                      `json:"case_status"`
+	AutomaticDetection bool                        `json:"automatic_detection"`
+	DetectionCriteria  *DetectionCriteriaDTO       `json:"detection_criteria,omitempty"`
+	CaseDescription    string                      `json:"case_description"`
+	EvidenceDocuments  []EvidenceDocumentDTO       `json:"evidence_documents,omitempty"`
+	InstructorComments *string                     `json:"instructor_comments,omitempty"`
+	Committee          *CommitteeResponse          `json:"committee,omitempty"`
+	ImprovementPlans   []ImprovementPlanResponse   `json:"improvement_plans,omitempty"`
+	Sanctions          []SanctionResponse          `json:"sanctions,omitempty"`
+	Decisions          []CommitteeDecisionResponse `json:"decisions,omitempty"`
+	CreatedAt          time.Time                   `json:"created_at"`
+	UpdatedAt          time.Time                   `json:"updated_at"`
 }
 
-// Improvement Plan DTOs
+// Improvement Plan DTOs - Aligned with SENA Agreement 009/2024
+
+// ObjectiveDTO represents a specific objective in the improvement plan
+type ObjectiveDTO struct {
+	ID          string    `json:"id,omitempty"`
+	Description string    `json:"description" validate:"required,min=10"`
+	Target      string    `json:"target" validate:"required"`
+	Deadline    time.Time `json:"deadline" validate:"required"`
+	Completed   bool      `json:"completed,omitempty"`
+}
+
+// ActivityDTO represents an activity to be completed
+type ActivityDTO struct {
+	ID          string     `json:"id,omitempty"`
+	Name        string     `json:"name" validate:"required,min=3,max=100"`
+	Description string     `json:"description" validate:"required,min=10"`
+	DueDate     time.Time  `json:"due_date" validate:"required"`
+	Completed   bool       `json:"completed,omitempty"`
+	CompletedAt *time.Time `json:"completed_at,omitempty"`
+}
+
+// SuccessCriteriaDTO represents criteria for success
+type SuccessCriteriaDTO struct {
+	ID          string  `json:"id,omitempty"`
+	Description string  `json:"description" validate:"required,min=10"`
+	Metric      string  `json:"metric" validate:"required"`
+	Target      float64 `json:"target" validate:"required"`
+	Achieved    bool    `json:"achieved,omitempty"`
+}
+
 type CreateImprovementPlanRequest struct {
-	StudentCaseID uuid.UUID `json:"student_case_id" validate:"required"`
-	StudentID     uuid.UUID `json:"student_id" validate:"required"`
-	Title         string    `json:"title" validate:"required,min=5,max=200"`
-	Description   string    `json:"description" validate:"required,min=10"`
-	Objectives    string    `json:"objectives" validate:"required,min=10"`
-	Activities    string    `json:"activities" validate:"required,min=10"`
-	Resources     string    `json:"resources,omitempty"`
-	Timeline      string    `json:"timeline" validate:"required,min=10"`
-	StartDate     time.Time `json:"start_date" validate:"required"`
-	EndDate       time.Time `json:"end_date" validate:"required"`
-	SupervisorID  uuid.UUID `json:"supervisor_id" validate:"required"`
+	StudentID               uuid.UUID            `json:"student_id" validate:"required"`
+	StudentCaseID           *uuid.UUID           `json:"student_case_id,omitempty"`
+	PlanType                string               `json:"plan_type" validate:"required,oneof=ACADEMIC DISCIPLINARY MIXED"`
+	StartDate               time.Time            `json:"start_date" validate:"required"`
+	EndDate                 time.Time            `json:"end_date" validate:"required"`
+	Objectives              []ObjectiveDTO       `json:"objectives" validate:"required,min=1"`
+	Activities              []ActivityDTO        `json:"activities" validate:"required,min=1"`
+	SuccessCriteria         []SuccessCriteriaDTO `json:"success_criteria" validate:"required,min=1"`
+	ResponsibleInstructorID *uuid.UUID           `json:"responsible_instructor_id,omitempty"`
 }
 
 type UpdateImprovementPlanRequest struct {
-	Status          string     `json:"status,omitempty" validate:"omitempty,oneof=PENDING IN_PROGRESS COMPLETED FAILED"`
-	Progress        int        `json:"progress,omitempty" validate:"omitempty,min=0,max=100"`
-	SupervisorNotes string     `json:"supervisor_notes,omitempty"`
-	CompletionDate  *time.Time `json:"completion_date,omitempty"`
+	CurrentStatus        string               `json:"current_status,omitempty" validate:"omitempty,oneof=ACTIVE COMPLETED FAILED EXTENDED"`
+	CompliancePercentage *float64             `json:"compliance_percentage,omitempty" validate:"omitempty,min=0,max=100"`
+	FinalEvaluation      *string              `json:"final_evaluation,omitempty"`
+	Objectives           []ObjectiveDTO       `json:"objectives,omitempty"`
+	Activities           []ActivityDTO        `json:"activities,omitempty"`
+	SuccessCriteria      []SuccessCriteriaDTO `json:"success_criteria,omitempty"`
 }
 
 type ImprovementPlanResponse struct {
-	ID              uuid.UUID  `json:"id"`
-	StudentCaseID   uuid.UUID  `json:"student_case_id"`
-	StudentID       uuid.UUID  `json:"student_id"`
-	Title           string     `json:"title"`
-	Description     string     `json:"description"`
-	Objectives      string     `json:"objectives"`
-	Activities      string     `json:"activities"`
-	Resources       string     `json:"resources"`
-	Timeline        string     `json:"timeline"`
-	Status          string     `json:"status"`
-	StartDate       time.Time  `json:"start_date"`
-	EndDate         time.Time  `json:"end_date"`
-	CompletionDate  *time.Time `json:"completion_date,omitempty"`
-	Progress        int        `json:"progress"`
-	SupervisorID    uuid.UUID  `json:"supervisor_id"`
-	SupervisorNotes string     `json:"supervisor_notes"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
+	ID                      uuid.UUID            `json:"id"`
+	StudentID               uuid.UUID            `json:"student_id"`
+	StudentCaseID           *uuid.UUID           `json:"student_case_id,omitempty"`
+	PlanType                string               `json:"plan_type"`
+	StartDate               time.Time            `json:"start_date"`
+	EndDate                 time.Time            `json:"end_date"`
+	Objectives              []ObjectiveDTO       `json:"objectives"`
+	Activities              []ActivityDTO        `json:"activities"`
+	SuccessCriteria         []SuccessCriteriaDTO `json:"success_criteria"`
+	ResponsibleInstructorID *uuid.UUID           `json:"responsible_instructor_id,omitempty"`
+	CurrentStatus           string               `json:"current_status"`
+	CompliancePercentage    float64              `json:"compliance_percentage"`
+	FinalEvaluation         *string              `json:"final_evaluation,omitempty"`
+	CreatedAt               time.Time            `json:"created_at"`
+	UpdatedAt               time.Time            `json:"updated_at"`
 }
 
-// Sanction DTOs
+// Sanction DTOs - Aligned with SENA Agreement 009/2024
 type CreateSanctionRequest struct {
-	StudentCaseID  uuid.UUID  `json:"student_case_id" validate:"required"`
-	StudentID      uuid.UUID  `json:"student_id" validate:"required"`
-	Type           string     `json:"type" validate:"required,oneof=WARNING CONDITIONAL_ENROLLMENT ENROLLMENT_CANCELLATION"`
-	Severity       string     `json:"severity" validate:"required,oneof=MINOR MODERATE SEVERE CRITICAL"`
-	Title          string     `json:"title" validate:"required,min=5,max=200"`
-	Description    string     `json:"description" validate:"required,min=10"`
-	Justification  string     `json:"justification" validate:"required,min=10"`
-	StartDate      time.Time  `json:"start_date" validate:"required"`
-	EndDate        *time.Time `json:"end_date,omitempty"`
-	IsAppealable   bool       `json:"is_appealable"`
-	AppealDeadline *time.Time `json:"appeal_deadline,omitempty"`
+	StudentID          uuid.UUID  `json:"student_id" validate:"required"`
+	StudentCaseID      uuid.UUID  `json:"student_case_id" validate:"required"`
+	SanctionType       string     `json:"sanction_type" validate:"required,oneof=VERBAL_WARNING WRITTEN_WARNING ACADEMIC_COMMITMENT IMPROVEMENT_PLAN CONDITIONAL_ENROLLMENT TEMPORARY_SUSPENSION DEFINITIVE_CANCELLATION"`
+	SeverityLevel      int        `json:"severity_level" validate:"required,min=1,max=7"`
+	Description        string     `json:"description" validate:"required,min=10"`
+	StartDate          time.Time  `json:"start_date" validate:"required"`
+	EndDate            *time.Time `json:"end_date,omitempty"`
+	ComplianceRequired bool       `json:"compliance_required"`
 }
 
 type UpdateSanctionRequest struct {
-	Status         string     `json:"status,omitempty" validate:"omitempty,oneof=PENDING ACTIVE COMPLETED REVOKED"`
-	CompletionDate *time.Time `json:"completion_date,omitempty"`
+	ComplianceStatus string     `json:"compliance_status,omitempty" validate:"omitempty,oneof=PENDING IN_PROGRESS COMPLETED VIOLATED"`
+	EndDate          *time.Time `json:"end_date,omitempty"`
 }
 
 type SanctionResponse struct {
-	ID              uuid.UUID  `json:"id"`
-	StudentCaseID   uuid.UUID  `json:"student_case_id"`
-	StudentID       uuid.UUID  `json:"student_id"`
-	Type            string     `json:"type"`
-	Severity        string     `json:"severity"`
-	Status          string     `json:"status"`
-	Title           string     `json:"title"`
-	Description     string     `json:"description"`
-	Justification   string     `json:"justification"`
-	StartDate       time.Time  `json:"start_date"`
-	EndDate         *time.Time `json:"end_date,omitempty"`
-	CompletionDate  *time.Time `json:"completion_date,omitempty"`
-	IsAppealable    bool       `json:"is_appealable"`
-	AppealDeadline  *time.Time `json:"appeal_deadline,omitempty"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
+	ID                  uuid.UUID  `json:"id"`
+	StudentID           uuid.UUID  `json:"student_id"`
+	StudentCaseID       uuid.UUID  `json:"student_case_id"`
+	SanctionType        string     `json:"sanction_type"`
+	SeverityLevel       int        `json:"severity_level"`
+	SeverityDescription string     `json:"severity_description"`
+	Description         string     `json:"description"`
+	StartDate           time.Time  `json:"start_date"`
+	EndDate             *time.Time `json:"end_date,omitempty"`
+	ComplianceRequired  bool       `json:"compliance_required"`
+	ComplianceStatus    string     `json:"compliance_status"`
+	AppealDeadline      *time.Time `json:"appeal_deadline,omitempty"`
+	Appealed            bool       `json:"appealed"`
+	AppealResult        *string    `json:"appeal_result,omitempty"`
+	IsActive            bool       `json:"is_active"`
+	IsAppealable        bool       `json:"is_appealable"`
+	DurationDays        int        `json:"duration_days"`
+	CreatedAt           time.Time  `json:"created_at"`
+	UpdatedAt           time.Time  `json:"updated_at"`
 }
 
 // Committee Decision DTOs
 type CreateCommitteeDecisionRequest struct {
-	CommitteeID     uuid.UUID  `json:"committee_id" validate:"required"`
-	StudentCaseID   *uuid.UUID `json:"student_case_id,omitempty"`
-	Type            string     `json:"type" validate:"required,oneof=CASE_RESOLUTION SANCTION_APPROVAL APPEAL_RESOLUTION POLICY_DECISION"`
-	Title           string     `json:"title" validate:"required,min=5,max=200"`
-	Description     string     `json:"description" validate:"required,min=10"`
-	Resolution      string     `json:"resolution" validate:"required,min=10"`
-	Justification   string     `json:"justification" validate:"required,min=10"`
-	VotingResult    string     `json:"voting_result,omitempty"`
-	AttendeesList   string     `json:"attendees_list,omitempty"`
-	DecisionDate    time.Time  `json:"decision_date" validate:"required"`
+	CommitteeID   uuid.UUID  `json:"committee_id" validate:"required"`
+	StudentCaseID *uuid.UUID `json:"student_case_id,omitempty"`
+	Type          string     `json:"type" validate:"required,oneof=CASE_RESOLUTION SANCTION_APPROVAL APPEAL_RESOLUTION POLICY_DECISION"`
+	Title         string     `json:"title" validate:"required,min=5,max=200"`
+	Description   string     `json:"description" validate:"required,min=10"`
+	Resolution    string     `json:"resolution" validate:"required,min=10"`
+	Justification string     `json:"justification" validate:"required,min=10"`
+	VotingResult  string     `json:"voting_result,omitempty"`
+	AttendeesList string     `json:"attendees_list,omitempty"`
+	DecisionDate  time.Time  `json:"decision_date" validate:"required"`
 }
 
 type UpdateCommitteeDecisionRequest struct {
@@ -234,47 +264,48 @@ type CommitteeDecisionResponse struct {
 	UpdatedAt          time.Time  `json:"updated_at"`
 }
 
-// Appeal DTOs
+// Appeal DTOs - Aligned with SENA Agreement 009/2024
+type SupportingDocumentDTO struct {
+	URL         string    `json:"url" validate:"required,url"`
+	Type        string    `json:"type" validate:"required"`
+	Description string    `json:"description"`
+	UploadedAt  time.Time `json:"uploaded_at,omitempty"`
+}
+
 type CreateAppealRequest struct {
-	StudentCaseID       uuid.UUID `json:"student_case_id" validate:"required"`
-	StudentID           uuid.UUID `json:"student_id" validate:"required"`
-	Type                string    `json:"type" validate:"required,oneof=SANCTION_APPEAL DECISION_APPEAL PROCESS_APPEAL"`
-	Priority            string    `json:"priority,omitempty" validate:"omitempty,oneof=LOW MEDIUM HIGH URGENT"`
-	Subject             string    `json:"subject" validate:"required,min=5,max=200"`
-	Description         string    `json:"description" validate:"required,min=10"`
-	Justification       string    `json:"justification" validate:"required,min=10"`
-	Evidence            string    `json:"evidence,omitempty"`
-	RequestedResolution string    `json:"requested_resolution" validate:"required,min=10"`
+	SanctionID          uuid.UUID               `json:"sanction_id" validate:"required"`
+	StudentID           uuid.UUID               `json:"student_id" validate:"required"`
+	AppealGrounds       string                  `json:"appeal_grounds" validate:"required,min=50"`
+	SupportingDocuments []SupportingDocumentDTO `json:"supporting_documents,omitempty"`
 }
 
 type UpdateAppealRequest struct {
-	Status          string     `json:"status,omitempty" validate:"omitempty,oneof=SUBMITTED UNDER_REVIEW ACCEPTED REJECTED WITHDRAWN"`
-	ReviewDate      *time.Time `json:"review_date,omitempty"`
-	ResolutionDate  *time.Time `json:"resolution_date,omitempty"`
-	ReviewerNotes   string     `json:"reviewer_notes,omitempty"`
-	FinalResolution string     `json:"final_resolution,omitempty"`
+	AdmissibilityStatus       string     `json:"admissibility_status,omitempty" validate:"omitempty,oneof=PENDING ADMITTED REJECTED"`
+	AdmissibilityRationale    string     `json:"admissibility_rationale,omitempty"`
+	SecondInstanceCommitteeID *uuid.UUID `json:"second_instance_committee_id,omitempty"`
+	FinalDecision             string     `json:"final_decision,omitempty" validate:"omitempty,oneof=CONFIRMED MODIFIED REVOKED"`
+	FinalRationale            string     `json:"final_rationale,omitempty"`
 }
 
 type AppealResponse struct {
-	ID                  uuid.UUID  `json:"id"`
-	StudentCaseID       uuid.UUID  `json:"student_case_id"`
-	StudentID           uuid.UUID  `json:"student_id"`
-	AppealNumber        string     `json:"appeal_number"`
-	Type                string     `json:"type"`
-	Status              string     `json:"status"`
-	Priority            string     `json:"priority"`
-	Subject             string     `json:"subject"`
-	Description         string     `json:"description"`
-	Justification       string     `json:"justification"`
-	Evidence            string     `json:"evidence"`
-	RequestedResolution string     `json:"requested_resolution"`
-	SubmissionDate      time.Time  `json:"submission_date"`
-	ReviewDate          *time.Time `json:"review_date,omitempty"`
-	ResolutionDate      *time.Time `json:"resolution_date,omitempty"`
-	ReviewerNotes       string     `json:"reviewer_notes"`
-	FinalResolution     string     `json:"final_resolution"`
-	CreatedAt           time.Time  `json:"created_at"`
-	UpdatedAt           time.Time  `json:"updated_at"`
+	ID                        uuid.UUID               `json:"id"`
+	SanctionID                uuid.UUID               `json:"sanction_id"`
+	StudentID                 uuid.UUID               `json:"student_id"`
+	SubmissionDate            time.Time               `json:"submission_date"`
+	DeadlineDate              time.Time               `json:"deadline_date"`
+	AppealGrounds             string                  `json:"appeal_grounds"`
+	SupportingDocuments       []SupportingDocumentDTO `json:"supporting_documents,omitempty"`
+	AdmissibilityStatus       string                  `json:"admissibility_status"`
+	AdmissibilityRationale    *string                 `json:"admissibility_rationale,omitempty"`
+	SecondInstanceCommitteeID *uuid.UUID              `json:"second_instance_committee_id,omitempty"`
+	FinalDecision             *string                 `json:"final_decision,omitempty"`
+	FinalRationale            *string                 `json:"final_rationale,omitempty"`
+	IsWithinDeadline          bool                    `json:"is_within_deadline"`
+	IsAdmitted                bool                    `json:"is_admitted"`
+	HasFinalDecision          bool                    `json:"has_final_decision"`
+	IsSuccessful              bool                    `json:"is_successful"`
+	CreatedAt                 time.Time               `json:"created_at"`
+	UpdatedAt                 time.Time               `json:"updated_at"`
 }
 
 // Common DTOs

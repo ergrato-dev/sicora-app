@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"evalinservice/internal/domain/entities"
@@ -64,9 +65,16 @@ func (r *configurationRepositoryImpl) Update(ctx context.Context, config *entiti
 	return nil
 }
 
-func (r *configurationRepositoryImpl) Delete(ctx context.Context, key string) error {
-	if err := r.db.WithContext(ctx).Where("key = ?", key).Delete(&models.Configuration{}).Error; err != nil {
+func (r *configurationRepositoryImpl) Delete(ctx context.Context, id uuid.UUID) error {
+	if err := r.db.WithContext(ctx).Where("id = ?", id).Delete(&models.Configuration{}).Error; err != nil {
 		return fmt.Errorf("failed to delete configuration: %w", err)
+	}
+	return nil
+}
+
+func (r *configurationRepositoryImpl) DeleteByKey(ctx context.Context, key string) error {
+	if err := r.db.WithContext(ctx).Where("key = ?", key).Delete(&models.Configuration{}).Error; err != nil {
+		return fmt.Errorf("failed to delete configuration by key: %w", err)
 	}
 	return nil
 }
@@ -123,6 +131,59 @@ func (r *configurationRepositoryImpl) BulkUpdate(ctx context.Context, configs []
 		if err := r.db.WithContext(ctx).Save(model).Error; err != nil {
 			return fmt.Errorf("failed to bulk update configuration: %w", err)
 		}
+	}
+	return nil
+}
+
+func (r *configurationRepositoryImpl) GetByID(ctx context.Context, id uuid.UUID) (*entities.Configuration, error) {
+	var model models.Configuration
+	if err := r.db.WithContext(ctx).First(&model, "id = ?", id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get configuration by ID: %w", err)
+	}
+	return r.mapper.ToEntity(&model), nil
+}
+
+func (r *configurationRepositoryImpl) GetActiveConfigurations(ctx context.Context) ([]*entities.Configuration, error) {
+	var configs []models.Configuration
+	if err := r.db.WithContext(ctx).Where("is_active = ?", true).Find(&configs).Error; err != nil {
+		return nil, fmt.Errorf("failed to get active configurations: %w", err)
+	}
+
+	result := make([]*entities.Configuration, len(configs))
+	for i, model := range configs {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+func (r *configurationRepositoryImpl) GetEditableConfigurations(ctx context.Context) ([]*entities.Configuration, error) {
+	var configs []models.Configuration
+	if err := r.db.WithContext(ctx).Where("is_editable = ?", true).Find(&configs).Error; err != nil {
+		return nil, fmt.Errorf("failed to get editable configurations: %w", err)
+	}
+
+	result := make([]*entities.Configuration, len(configs))
+	for i, model := range configs {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+func (r *configurationRepositoryImpl) GetValueByKey(ctx context.Context, key string) (string, error) {
+	return r.GetValue(ctx, key)
+}
+
+func (r *configurationRepositoryImpl) SetValueByKey(ctx context.Context, key, value string, updatedBy uuid.UUID) error {
+	if err := r.db.WithContext(ctx).Model(&models.Configuration{}).
+		Where("key = ?", key).
+		Updates(map[string]interface{}{
+			"value":      value,
+			"updated_by": updatedBy,
+		}).Error; err != nil {
+		return fmt.Errorf("failed to set configuration value: %w", err)
 	}
 	return nil
 }

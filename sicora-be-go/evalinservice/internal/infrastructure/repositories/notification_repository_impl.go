@@ -195,11 +195,41 @@ func (r *notificationRepositoryImpl) DeleteOldNotifications(ctx context.Context,
 	return nil
 }
 
-func (r *notificationRepositoryImpl) GetByEntityID(ctx context.Context, entityID uuid.UUID) ([]*entities.Notification, error) {
+func (r *notificationRepositoryImpl) GetByEntityID(ctx context.Context, entityType string, entityID uuid.UUID) ([]*entities.Notification, error) {
 	var notifications []models.Notification
-	if err := r.db.WithContext(ctx).Where("entity_id = ?", entityID).
+	if err := r.db.WithContext(ctx).Where("entity_type = ? AND entity_id = ?", entityType, entityID).
 		Order("created_at DESC").Find(&notifications).Error; err != nil {
 		return nil, fmt.Errorf("failed to get notifications by entity ID: %w", err)
+	}
+
+	result := make([]*entities.Notification, len(notifications))
+	for i, model := range notifications {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// GetUnsentNotifications obtiene notificaciones no enviadas
+func (r *notificationRepositoryImpl) GetUnsentNotifications(ctx context.Context) ([]*entities.Notification, error) {
+	var notifications []models.Notification
+	if err := r.db.WithContext(ctx).Where("is_sent = ?", false).
+		Order("created_at ASC").Find(&notifications).Error; err != nil {
+		return nil, fmt.Errorf("failed to get unsent notifications: %w", err)
+	}
+
+	result := make([]*entities.Notification, len(notifications))
+	for i, model := range notifications {
+		result[i] = r.mapper.ToEntity(&model)
+	}
+	return result, nil
+}
+
+// GetRecentNotificationsByRecipient obtiene notificaciones recientes de un recipient
+func (r *notificationRepositoryImpl) GetRecentNotificationsByRecipient(ctx context.Context, recipient uuid.UUID, limit int) ([]*entities.Notification, error) {
+	var notifications []models.Notification
+	if err := r.db.WithContext(ctx).Where("recipient_id = ?", recipient).
+		Order("created_at DESC").Limit(limit).Find(&notifications).Error; err != nil {
+		return nil, fmt.Errorf("failed to get recent notifications: %w", err)
 	}
 
 	result := make([]*entities.Notification, len(notifications))
