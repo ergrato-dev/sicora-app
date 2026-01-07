@@ -182,9 +182,36 @@
   <text x="965" y="425" class="status-text">✓ Completo</text>
   <text x="1065" y="425" class="status-text" fill="#4caf50">✓ Sí</text>
   
+  <!-- ProjectEvalService Go -->
+  <rect x="620" y="445" width="530" height="40" fill="#2d2d2d" rx="3"/>
+  <text x="640" y="470" class="service-name" fill="#4caf50">projectevalservice</text>
+  <text x="780" y="470" class="percent" fill="#4caf50">100%</text>
+  <text x="860" y="470" class="percent" fill="#4caf50">100%</text>
+  <circle cx="950" cy="465" r="8" fill="#4caf50"/>
+  <text x="965" y="470" class="status-text">✓ Completo</text>
+  <text x="1065" y="470" class="status-text" fill="#4caf50">✓ Sí</text>
+  
+  <!-- ApiGateway Go (NUEVO) -->
+  <rect x="620" y="490" width="530" height="40" fill="#252525" rx="3"/>
+  <text x="640" y="515" class="service-name" fill="#4caf50">apigateway</text>
+  <text x="780" y="515" class="percent" fill="#4caf50">100%</text>
+  <text x="860" y="515" class="percent" fill="#4caf50">100%</text>
+  <circle cx="950" cy="510" r="8" fill="#4caf50"/>
+  <text x="965" y="515" class="status-text">✓ Completo</text>
+  <text x="1065" y="515" class="status-text" fill="#4caf50">✓ Sí</text>
+  
+  <!-- AIService Go (No aplica) -->
+  <rect x="620" y="535" width="530" height="40" fill="#2d2d2d" rx="3"/>
+  <text x="640" y="560" class="service-name" fill="#888888">aiservice</text>
+  <text x="780" y="560" class="percent" fill="#888888">N/A</text>
+  <text x="860" y="560" class="percent" fill="#888888">N/A</text>
+  <circle cx="950" cy="555" r="8" fill="#888888"/>
+  <text x="965" y="560" class="status-text" fill="#888888">Solo Python</text>
+  <text x="1065" y="560" class="status-text" fill="#888888">—</text>
+  
   <!-- Summary Metrics Section -->
   <rect x="50" y="590" width="1100" height="120" fill="#252525" rx="8"/>
-  <text x="600" y="615" text-anchor="middle" class="service-name">📊 RESUMEN CONSOLIDADO - PROJECTEVALSERVICE PYTHON 100% ✓</text>
+  <text x="600" y="615" text-anchor="middle" class="service-name">📊 RESUMEN CONSOLIDADO - API GATEWAY GO ✅ 8/8 SERVICIOS COMPLETOS</text>
   
   <!-- Python Metrics -->
   <rect x="80" y="630" width="200" height="65" fill="#1e3a5f" rx="5"/>
@@ -194,7 +221,7 @@
   <!-- Go Metrics -->
   <rect x="310" y="630" width="200" height="65" fill="#004d40" rx="5"/>
   <text x="410" y="655" text-anchor="middle" class="metric-label">Go Compilables</text>
-  <text x="410" y="685" text-anchor="middle" class="metric-value" fill="#4caf50">6/6 (100%)</text>
+  <text x="410" y="685" text-anchor="middle" class="metric-value" fill="#4caf50">8/8 (100%)</text>
   
   <!-- HUs Metrics -->
   <rect x="540" y="630" width="200" height="65" fill="#3e2723" rx="5"/>
@@ -224,5 +251,5 @@
   
   <!-- Footer -->
   <text x="600" y="820" text-anchor="middle" class="subtitle">Generado: 6 Enero 2026 | Proyecto: SICORA - Sistema de Información de Coordinación Académica</text>
-  <text x="600" y="845" text-anchor="middle" class="legend-text">✅ ProjectEvalService: 62 tests (100%), 41 endpoints | Python 3.14+ | Go: 6/6 compilables</text>
+  <text x="600" y="845" text-anchor="middle" class="legend-text">✅ Go: 8/8 servicios (apigateway, userservice, scheduleservice, attendanceservice, evalinservice, kbservice, projectevalservice, mevalservice)</text>
 </svg>
