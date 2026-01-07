@@ -2,11 +2,13 @@ package repositories
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 
 	"mevalservice/internal/domain/entities"
@@ -109,15 +111,14 @@ func (r *studentCaseRepository) GetByCommitteeID(ctx context.Context, committeeI
 	return cases, nil
 }
 
-func (r *studentCaseRepository) GetByStatus(ctx context.Context, status string) ([]*entities.StudentCase, error) {
+func (r *studentCaseRepository) GetByStatus(ctx context.Context, status entities.CaseStatus) ([]*entities.StudentCase, error) {
 	var models []database.StudentCaseModel
 	if err := r.db.WithContext(ctx).
 		Preload("Committee").
 		Preload("ImprovementPlans").
 		Preload("Sanctions").
 		Preload("Decisions").
-		Preload("Appeals").
-		Where("status = ?", status).
+		Where("case_status = ?", string(status)).
 		Order("created_at DESC").
 		Find(&models).Error; err != nil {
 		return nil, err
@@ -137,9 +138,8 @@ func (r *studentCaseRepository) GetPendingCases(ctx context.Context) ([]*entitie
 		Preload("ImprovementPlans").
 		Preload("Sanctions").
 		Preload("Decisions").
-		Preload("Appeals").
-		Where("status IN ?", []string{"PENDING", "IN_PROGRESS"}).
-		Order("priority DESC, created_at ASC").
+		Where("case_status IN ?", []string{"PENDING", "IN_REVIEW", "DETECTED"}).
+		Order("created_at ASC").
 		Find(&models).Error; err != nil {
 		return nil, err
 	}
@@ -224,46 +224,153 @@ func (r *studentCaseRepository) GenerateCaseNumber(ctx context.Context, caseType
 
 // Conversion methods
 func (r *studentCaseRepository) toModel(studentCase *entities.StudentCase) *database.StudentCaseModel {
+	// Marshal DetectionCriteria and EvidenceDocuments to JSON
+	detectionCriteriaJSON, _ := json.Marshal(studentCase.DetectionCriteria)
+	evidenceDocumentsJSON, _ := json.Marshal(studentCase.EvidenceDocuments)
+
 	model := &database.StudentCaseModel{
-		ID:             studentCase.ID,
-		StudentID:      studentCase.StudentID,
-		CommitteeID:    studentCase.CommitteeID,
-		CaseNumber:     studentCase.CaseNumber,
-		Type:           string(studentCase.Type),
-		Severity:       string(studentCase.Severity),
-		Status:         string(studentCase.Status),
-		Priority:       string(studentCase.Priority),
-		Title:          studentCase.Title,
-		Description:    studentCase.Description,
-		Evidence:       studentCase.Evidence,
-		ReportedBy:     studentCase.ReportedBy,
-		ReportDate:     studentCase.ReportDate,
-		DueDate:        studentCase.DueDate,
-		ResolutionDate: studentCase.ResolutionDate,
-		CreatedAt:      studentCase.CreatedAt,
-		UpdatedAt:      studentCase.UpdatedAt,
+		ID:                 studentCase.ID,
+		StudentID:          studentCase.StudentID,
+		CommitteeID:        studentCase.CommitteeID,
+		CaseType:           string(studentCase.CaseType),
+		CaseStatus:         string(studentCase.CaseStatus),
+		AutomaticDetection: studentCase.AutomaticDetection,
+		DetectionCriteria:  datatypes.JSON(detectionCriteriaJSON),
+		CaseDescription:    studentCase.CaseDescription,
+		EvidenceDocuments:  datatypes.JSON(evidenceDocumentsJSON),
+		InstructorComments: studentCase.InstructorComments,
+		CreatedAt:          studentCase.CreatedAt,
+		UpdatedAt:          studentCase.UpdatedAt,
 	}
 	return model
 }
 
 func (r *studentCaseRepository) toEntity(model *database.StudentCaseModel) *entities.StudentCase {
+	// Unmarshal DetectionCriteria from JSON
+	var detectionCriteria entities.DetectionCriteria
+	_ = json.Unmarshal(model.DetectionCriteria, &detectionCriteria)
+	// Unmarshal EvidenceDocuments from JSON
+	var evidenceDocuments []entities.EvidenceDocument
+	_ = json.Unmarshal(model.EvidenceDocuments, &evidenceDocuments)
+
 	return &entities.StudentCase{
-		ID:             model.ID,
-		StudentID:      model.StudentID,
-		CommitteeID:    model.CommitteeID,
-		CaseNumber:     model.CaseNumber,
-		Type:           entities.CaseType(model.Type),
-		Severity:       entities.CaseSeverity(model.Severity),
-		Status:         entities.CaseStatus(model.Status),
-		Priority:       entities.CasePriority(model.Priority),
-		Title:          model.Title,
-		Description:    model.Description,
-		Evidence:       model.Evidence,
-		ReportedBy:     model.ReportedBy,
-		ReportDate:     model.ReportDate,
-		DueDate:        model.DueDate,
-		ResolutionDate: model.ResolutionDate,
-		CreatedAt:      model.CreatedAt,
-		UpdatedAt:      model.UpdatedAt,
+		ID:                 model.ID,
+		StudentID:          model.StudentID,
+		CommitteeID:        model.CommitteeID,
+		CaseType:           entities.CaseType(model.CaseType),
+		CaseStatus:         entities.CaseStatus(model.CaseStatus),
+		AutomaticDetection: model.AutomaticDetection,
+		DetectionCriteria:  detectionCriteria,
+		CaseDescription:    model.CaseDescription,
+		EvidenceDocuments:  evidenceDocuments,
+		InstructorComments: model.InstructorComments,
+		CreatedAt:          model.CreatedAt,
+		UpdatedAt:          model.UpdatedAt,
 	}
+}
+
+// Additional methods required by interface
+func (r *studentCaseRepository) GetAll(ctx context.Context, limit, offset int) ([]*entities.StudentCase, error) {
+	var models []database.StudentCaseModel
+	query := r.db.WithContext(ctx).Order("created_at DESC")
+	if limit > 0 {
+		query = query.Limit(limit).Offset(offset)
+	}
+	if err := query.Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	cases := make([]*entities.StudentCase, len(models))
+	for i, model := range models {
+		cases[i] = r.toEntity(&model)
+	}
+	return cases, nil
+}
+
+func (r *studentCaseRepository) GetByType(ctx context.Context, caseType entities.CaseType) ([]*entities.StudentCase, error) {
+	var models []database.StudentCaseModel
+	if err := r.db.WithContext(ctx).Where("case_type = ?", string(caseType)).Order("created_at DESC").Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	cases := make([]*entities.StudentCase, len(models))
+	for i, model := range models {
+		cases[i] = r.toEntity(&model)
+	}
+	return cases, nil
+}
+
+func (r *studentCaseRepository) GetByStatusEntity(ctx context.Context, status entities.CaseStatus) ([]*entities.StudentCase, error) {
+	var models []database.StudentCaseModel
+	if err := r.db.WithContext(ctx).Where("case_status = ?", string(status)).Order("created_at DESC").Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	cases := make([]*entities.StudentCase, len(models))
+	for i, model := range models {
+		cases[i] = r.toEntity(&model)
+	}
+	return cases, nil
+}
+
+func (r *studentCaseRepository) GetAutoDetectedCases(ctx context.Context) ([]*entities.StudentCase, error) {
+	var models []database.StudentCaseModel
+	if err := r.db.WithContext(ctx).Where("automatic_detection = ?", true).Order("created_at DESC").Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	cases := make([]*entities.StudentCase, len(models))
+	for i, model := range models {
+		cases[i] = r.toEntity(&model)
+	}
+	return cases, nil
+}
+
+func (r *studentCaseRepository) GetManualCases(ctx context.Context) ([]*entities.StudentCase, error) {
+	var models []database.StudentCaseModel
+	if err := r.db.WithContext(ctx).Where("automatic_detection = ?", false).Order("created_at DESC").Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	cases := make([]*entities.StudentCase, len(models))
+	for i, model := range models {
+		cases[i] = r.toEntity(&model)
+	}
+	return cases, nil
+}
+
+func (r *studentCaseRepository) GetRecognitionCases(ctx context.Context) ([]*entities.StudentCase, error) {
+	return r.GetByType(ctx, entities.CaseTypeRecognition)
+}
+
+func (r *studentCaseRepository) GetSanctionCases(ctx context.Context) ([]*entities.StudentCase, error) {
+	return r.GetByType(ctx, entities.CaseTypeSanction)
+}
+
+func (r *studentCaseRepository) GetAppealCases(ctx context.Context) ([]*entities.StudentCase, error) {
+	return r.GetByType(ctx, entities.CaseTypeAppeal)
+}
+
+func (r *studentCaseRepository) GetCaseCount(ctx context.Context) (int64, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).Model(&database.StudentCaseModel{}).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (r *studentCaseRepository) GetCaseCountByType(ctx context.Context, caseType entities.CaseType) (int64, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).Model(&database.StudentCaseModel{}).Where("case_type = ?", string(caseType)).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (r *studentCaseRepository) GetCaseCountByStudent(ctx context.Context, studentID uuid.UUID) (int64, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).Model(&database.StudentCaseModel{}).Where("student_id = ?", studentID).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }

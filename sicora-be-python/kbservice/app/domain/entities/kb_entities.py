@@ -220,7 +220,20 @@ class KnowledgeItem:
         self._unhelpful_count += 1
     
     def is_accessible_by(self, user_role: UserRole) -> bool:
-        """Check if the content is accessible by the given user role."""
+        """Check if the content is accessible by the given user role.
+        
+        - Admins can access any content regardless of status
+        - Other users can only access published content for their target audience
+        """
+        # Admins can access everything
+        if user_role == UserRole.ADMIN:
+            return True
+        
+        # Non-admins can only access published content
+        if self._status != ContentStatus.PUBLISHED:
+            return False
+        
+        # Check target audience
         if self._target_audience == TargetAudience.ALL:
             return True
         
@@ -233,6 +246,16 @@ class KnowledgeItem:
         
         allowed_roles = role_mapping.get(self._target_audience, [])
         return user_role in allowed_roles
+    
+    def can_be_edited_by(self, user_id: UUID, user_role: UserRole) -> bool:
+        """Check if the content can be edited by the given user.
+        
+        - Admins can edit any content
+        - Authors can edit their own content
+        """
+        if user_role == UserRole.ADMIN:
+            return True
+        return user_id == self._author_id
     
     def is_published(self) -> bool:
         """Check if the knowledge item is published."""

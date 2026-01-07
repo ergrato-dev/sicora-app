@@ -1,4 +1,5 @@
 package main
+
 // @title           SICORA mevalservice API
 // @version         1.0
 // @description     Microservicio mevalservice del Sistema de Información de Coordinación Académica (SICORA) - SENA
@@ -18,11 +19,10 @@ package main
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 
-
 import (
-	_ "mevalservice/docs"
 	"context"
 	"log"
+	_ "mevalservice/docs"
 	"net/http"
 	"os"
 	"os/signal"
@@ -71,7 +71,7 @@ func main() {
 	studentCaseUC := usecases.NewStudentCaseUseCases(repos.StudentCase, repos.Committee)
 	improvementPlanUC := usecases.NewImprovementPlanUseCases(repos.ImprovementPlan, repos.StudentCase)
 	sanctionUC := usecases.NewSanctionUseCases(repos.Sanction, repos.StudentCase)
-	appealUC := usecases.NewAppealUseCases(repos.Appeal, repos.StudentCase)
+	appealUC := usecases.NewAppealUseCases(repos.Appeal, repos.Sanction)
 
 	// Initialize handlers
 	committeeHandler := handlers.NewCommitteeHandler(committeeUC)

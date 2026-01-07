@@ -95,7 +95,7 @@ async def kb_domain_exception_handler(request: Request, exc: KbDomainException):
             detail=str(exc),
             error_code=error_code,
             timestamp=datetime.now(timezone.utc)
-        ).model_dump()
+        ).model_dump(mode='json')
     )
 
 
@@ -110,7 +110,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             detail=exc.detail,
             error_code="HTTP_ERROR",
             timestamp=datetime.now(timezone.utc)
-        ).model_dump()
+        ).model_dump(mode='json')
     )
 
 
@@ -125,7 +125,7 @@ async def general_exception_handler(request: Request, exc: Exception):
             detail="Internal server error",
             error_code="INTERNAL_SERVER_ERROR",
             timestamp=datetime.now(timezone.utc)
-        ).model_dump()
+        ).model_dump(mode='json')
     )
 
 

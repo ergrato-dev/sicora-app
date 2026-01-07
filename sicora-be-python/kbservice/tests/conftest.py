@@ -1,10 +1,11 @@
 """Pytest configuration for KbService tests."""
 
 import pytest
+import pytest_asyncio
 import asyncio
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 
 import sys
 import os
@@ -18,15 +19,7 @@ from app.infrastructure.config.database import get_db_session
 from app.config import settings
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create an instance of the default event loop for the test session."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture
 async def test_engine():
     """Create test database engine."""
     # Use in-memory SQLite for tests
@@ -46,7 +39,7 @@ async def test_engine():
     await engine.dispose()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
     """Create test database session."""
     SessionLocal = async_sessionmaker(
@@ -57,7 +50,7 @@ async def test_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_client(test_session) -> AsyncGenerator[AsyncClient, None]:
     """Create test HTTP client."""
     
@@ -66,7 +59,8 @@ async def test_client(test_session) -> AsyncGenerator[AsyncClient, None]:
     
     app.dependency_overrides[get_db_session] = override_get_db
     
-    async with AsyncClient(base_url="http://testserver") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://testserver") as client:
         yield client
     
     app.dependency_overrides.clear()

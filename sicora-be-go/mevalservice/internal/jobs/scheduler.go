@@ -114,58 +114,57 @@ func (js *JobScheduler) Stop() {
 	log.Println("Job scheduler stopped")
 }
 
-// createMonthlyCommittees creates monthly committees for each center
+// createMonthlyCommittees creates monthly committees
 func (js *JobScheduler) createMonthlyCommittees() {
 	ctx := context.Background()
 	currentDate := time.Now()
 	
 	log.Printf("Creating monthly committees for %s %d", currentDate.Month(), currentDate.Year())
 
-	// Get all existing committees to identify centers
-	committees, err := js.committeeRepo.GetAll(ctx)
+	// Get all existing committees to identify programs
+	committees, err := js.committeeRepo.GetAll(ctx, 0, 0)
 	if err != nil {
 		log.Printf("Error getting committees for monthly creation: %v", err)
 		return
 	}
 
-	centers := make(map[string]bool)
+	programs := make(map[string]bool)
 	for _, committee := range committees {
-		centers[committee.Center] = true
+		if committee.ProgramID != nil {
+			programs[committee.ProgramID.String()] = true
+		}
 	}
 
-	// Create monthly committees for each center
-	for center := range centers {
-		// Create Academic Committee
-		js.createCommitteeForCenter(ctx, center, "ACADEMIC", "MONTHLY")
-		
-		// Create Disciplinary Committee
-		js.createCommitteeForCenter(ctx, center, "DISCIPLINARY", "MONTHLY")
+	// Create monthly committee for each program
+	for programID := range programs {
+		js.createCommitteeForProgram(ctx, programID, "MONTHLY")
+	}
+
+	// Also create a general monthly committee if no programs exist
+	if len(programs) == 0 {
+		js.createCommitteeForProgram(ctx, "", "MONTHLY")
 	}
 }
 
-// createCommitteeForCenter creates a committee for a specific center
-func (js *JobScheduler) createCommitteeForCenter(ctx context.Context, center, committeeType, subType string) {
+// createCommitteeForProgram creates a committee for a specific program
+func (js *JobScheduler) createCommitteeForProgram(ctx context.Context, programID, committeeType string) {
 	currentDate := time.Now()
-	
+
 	committee := &entities.Committee{
-		Name:        fmt.Sprintf("%s Committee %s - %s %d", committeeType, center, currentDate.Month(), currentDate.Year()),
-		Type:        entities.CommitteeType(committeeType),
-		SubType:     entities.CommitteeSubType(subType),
-		Center:      center,
-		Status:      entities.CommitteeStatusActive,
-		StartDate:   currentDate,
-		EndDate:     currentDate.AddDate(0, 1, 0), // One month duration
-		Description: fmt.Sprintf("Monthly %s committee for %s center", committeeType, center),
-		CreatedAt:   currentDate,
-		UpdatedAt:   currentDate,
+		CommitteeDate:  currentDate,
+		CommitteeType:  entities.CommitteeType(committeeType),
+		Status:         entities.CommitteeStatusScheduled,
+		AcademicPeriod: fmt.Sprintf("%d-%02d", currentDate.Year(), currentDate.Month()),
+		CreatedAt:      currentDate,
+		UpdatedAt:      currentDate,
 	}
 
 	if err := js.committeeRepo.Create(ctx, committee); err != nil {
-		log.Printf("Error creating %s committee for center %s: %v", committeeType, center, err)
+		log.Printf("Error creating %s committee: %v", committeeType, err)
 		return
 	}
 
-	log.Printf("Created %s committee for center %s", committeeType, center)
+	log.Printf("Created %s committee for period %s", committeeType, committee.AcademicPeriod)
 }
 
 // checkOverdueCases checks for overdue student cases and sends alerts
@@ -174,44 +173,35 @@ func (js *JobScheduler) checkOverdueCases() {
 	
 	log.Println("Checking for overdue student cases")
 
-	overdueCases, err := js.studentCaseRepo.GetOverdueCases(ctx)
+	// Get pending cases
+	pendingCases, err := js.studentCaseRepo.GetPendingCases(ctx)
 	if err != nil {
-		log.Printf("Error getting overdue cases: %v", err)
+		log.Printf("Error getting pending cases: %v", err)
 		return
 	}
 
-	if len(overdueCases) == 0 {
-		log.Println("No overdue cases found")
+	if len(pendingCases) == 0 {
+		log.Println("No pending cases found")
 		return
 	}
 
-	// Group cases by committee for better notification management
-	casesByCommittee := make(map[string][]*entities.StudentCase)
-	for _, studentCase := range overdueCases {
-		committeeID := studentCase.CommitteeID.String()
-		casesByCommittee[committeeID] = append(casesByCommittee[committeeID], studentCase)
+	// Send notification about pending cases
+	body := fmt.Sprintf("There are %d pending student cases that require attention.", len(pendingCases))
+	if err := js.notificationService.SendAlert(body, "MEDIUM"); err != nil {
+		log.Printf("Error sending pending case alert: %v", err)
 	}
 
-	// Send notifications for each committee
-	for committeeID, cases := range casesByCommittee {
-		js.sendOverdueCaseAlert(ctx, committeeID, cases)
-	}
-
-	log.Printf("Processed %d overdue cases", len(overdueCases))
+	log.Printf("Processed %d pending cases", len(pendingCases))
 }
 
 // sendOverdueCaseAlert sends alert for overdue cases
 func (js *JobScheduler) sendOverdueCaseAlert(ctx context.Context, committeeID string, cases []*entities.StudentCase) {
-	subject := fmt.Sprintf("ALERT: %d Overdue Student Cases", len(cases))
+	body := fmt.Sprintf("ALERT: %d cases require immediate attention for committee %s", len(cases), committeeID)
 	
-	body := "The following student cases are overdue and require immediate attention:\n\n"
 	for _, studentCase := range cases {
-		daysOverdue := int(time.Since(*studentCase.DueDate).Hours() / 24)
-		body += fmt.Sprintf("- Case #%s: %s (Overdue by %d days)\n", 
-			studentCase.CaseNumber, studentCase.Title, daysOverdue)
+		body += fmt.Sprintf("\n- Case ID: %s, Type: %s, Status: %s", 
+			studentCase.ID.String(), studentCase.CaseType, studentCase.CaseStatus)
 	}
-	
-	body += "\nPlease review and take appropriate action immediately."
 
 	if err := js.notificationService.SendAlert(body, "HIGH"); err != nil {
 		log.Printf("Error sending overdue case alert: %v", err)
@@ -225,7 +215,7 @@ func (js *JobScheduler) checkImprovementPlanProgress() {
 	log.Println("Checking improvement plan progress")
 
 	// Get all active improvement plans
-	plans, err := js.improvementPlanRepo.GetByStatus(ctx, string(entities.PlanStatusActive))
+	plans, err := js.improvementPlanRepo.GetActivePlans(ctx)
 	if err != nil {
 		log.Printf("Error getting active improvement plans: %v", err)
 		return
@@ -260,16 +250,13 @@ func (js *JobScheduler) checkImprovementPlanProgress() {
 
 // sendStagnantPlanAlert sends alert for stagnant improvement plans
 func (js *JobScheduler) sendStagnantPlanAlert(plans []*entities.ImprovementPlan) {
-	subject := fmt.Sprintf("ALERT: %d Stagnant Improvement Plans", len(plans))
+	body := fmt.Sprintf("ALERT: %d improvement plans have not been updated in over 7 days", len(plans))
 	
-	body := "The following improvement plans have not been updated in over 7 days:\n\n"
 	for _, plan := range plans {
 		daysStagnant := int(time.Since(plan.UpdatedAt).Hours() / 24)
-		body += fmt.Sprintf("- Plan #%s: %s (Last updated %d days ago)\n", 
-			plan.PlanNumber, plan.Title, daysStagnant)
+		body += fmt.Sprintf("\n- Plan ID: %s, Type: %s (Last updated %d days ago)", 
+			plan.ID.String(), plan.PlanType, daysStagnant)
 	}
-	
-	body += "\nPlease review and update progress immediately."
 
 	if err := js.notificationService.SendAlert(body, "MEDIUM"); err != nil {
 		log.Printf("Error sending stagnant plan alert: %v", err)
@@ -278,16 +265,13 @@ func (js *JobScheduler) sendStagnantPlanAlert(plans []*entities.ImprovementPlan)
 
 // sendNearDeadlinePlanAlert sends alert for plans nearing deadline
 func (js *JobScheduler) sendNearDeadlinePlanAlert(plans []*entities.ImprovementPlan) {
-	subject := fmt.Sprintf("REMINDER: %d Improvement Plans Nearing Deadline", len(plans))
+	body := fmt.Sprintf("REMINDER: %d improvement plans are nearing their deadline", len(plans))
 	
-	body := "The following improvement plans are nearing their deadline:\n\n"
 	for _, plan := range plans {
 		daysRemaining := int(plan.EndDate.Sub(time.Now()).Hours() / 24)
-		body += fmt.Sprintf("- Plan #%s: %s (%d days remaining)\n", 
-			plan.PlanNumber, plan.Title, daysRemaining)
+		body += fmt.Sprintf("\n- Plan ID: %s, Type: %s (%d days remaining)", 
+			plan.ID.String(), plan.PlanType, daysRemaining)
 	}
-	
-	body += "\nPlease ensure completion before the deadline."
 
 	if err := js.notificationService.SendAlert(body, "MEDIUM"); err != nil {
 		log.Printf("Error sending near deadline plan alert: %v", err)
@@ -301,7 +285,7 @@ func (js *JobScheduler) checkSanctionExpirations() {
 	log.Println("Checking sanction expirations")
 
 	// Get all active sanctions
-	sanctions, err := js.sanctionRepo.GetByStatus(ctx, string(entities.SanctionStatusActive))
+	sanctions, err := js.sanctionRepo.GetActiveSanctions(ctx)
 	if err != nil {
 		log.Printf("Error getting active sanctions: %v", err)
 		return
@@ -314,16 +298,16 @@ func (js *JobScheduler) checkSanctionExpirations() {
 		now := time.Now()
 		
 		// Check for expired sanctions
-		if sanction.EndDate.Before(now) {
+		if sanction.EndDate != nil && sanction.EndDate.Before(now) {
 			expiredSanctions = append(expiredSanctions, sanction)
 			
 			// Auto-complete expired sanctions
-			sanction.Status = entities.SanctionStatusCompleted
+			sanction.ComplianceStatus = entities.ComplianceStatusCompleted
 			sanction.UpdatedAt = now
 			if err := js.sanctionRepo.Update(ctx, sanction); err != nil {
-				log.Printf("Error auto-completing expired sanction %s: %v", sanction.SanctionNumber, err)
+				log.Printf("Error auto-completing expired sanction %s: %v", sanction.ID.String(), err)
 			}
-		} else if sanction.EndDate.Sub(now).Hours() < 72 { // Within 3 days
+		} else if sanction.EndDate != nil && sanction.EndDate.Sub(now).Hours() < 72 { // Within 3 days
 			expiringSanctions = append(expiringSanctions, sanction)
 		}
 	}
@@ -342,12 +326,15 @@ func (js *JobScheduler) checkSanctionExpirations() {
 
 // sendExpiredSanctionAlert sends alert for expired sanctions
 func (js *JobScheduler) sendExpiredSanctionAlert(sanctions []*entities.Sanction) {
-	subject := fmt.Sprintf("INFO: %d Sanctions Auto-Completed", len(sanctions))
+	body := fmt.Sprintf("INFO: %d sanctions have expired and were automatically completed", len(sanctions))
 	
-	body := "The following sanctions have expired and were automatically completed:\n\n"
 	for _, sanction := range sanctions {
-		body += fmt.Sprintf("- Sanction #%s: %s (Expired on %s)\n", 
-			sanction.SanctionNumber, sanction.Title, sanction.EndDate.Format("2006-01-02"))
+		endDate := "N/A"
+		if sanction.EndDate != nil {
+			endDate = sanction.EndDate.Format("2006-01-02")
+		}
+		body += fmt.Sprintf("\n- Sanction ID: %s, Type: %s (Expired on %s)", 
+			sanction.ID.String(), sanction.SanctionType, endDate)
 	}
 
 	if err := js.notificationService.SendAlert(body, "LOW"); err != nil {
@@ -357,16 +344,16 @@ func (js *JobScheduler) sendExpiredSanctionAlert(sanctions []*entities.Sanction)
 
 // sendExpiringSanctionAlert sends alert for sanctions expiring soon
 func (js *JobScheduler) sendExpiringSanctionAlert(sanctions []*entities.Sanction) {
-	subject := fmt.Sprintf("REMINDER: %d Sanctions Expiring Soon", len(sanctions))
+	body := fmt.Sprintf("REMINDER: %d sanctions will expire within 3 days", len(sanctions))
 	
-	body := "The following sanctions will expire within 3 days:\n\n"
 	for _, sanction := range sanctions {
-		daysRemaining := int(sanction.EndDate.Sub(time.Now()).Hours() / 24)
-		body += fmt.Sprintf("- Sanction #%s: %s (%d days remaining)\n", 
-			sanction.SanctionNumber, sanction.Title, daysRemaining)
+		daysRemaining := 0
+		if sanction.EndDate != nil {
+			daysRemaining = int(sanction.EndDate.Sub(time.Now()).Hours() / 24)
+		}
+		body += fmt.Sprintf("\n- Sanction ID: %s, Type: %s (%d days remaining)", 
+			sanction.ID.String(), sanction.SanctionType, daysRemaining)
 	}
-	
-	body += "\nPlease review completion status."
 
 	if err := js.notificationService.SendAlert(body, "LOW"); err != nil {
 		log.Printf("Error sending expiring sanction alert: %v", err)
@@ -379,10 +366,10 @@ func (js *JobScheduler) checkAppealDeadlines() {
 	
 	log.Println("Checking appeal deadlines")
 
-	// Get all submitted appeals
-	appeals, err := js.appealRepo.GetByStatus(ctx, string(entities.AppealStatusSubmitted))
+	// Get all pending appeals
+	appeals, err := js.appealRepo.GetPendingAppeals(ctx)
 	if err != nil {
-		log.Printf("Error getting submitted appeals: %v", err)
+		log.Printf("Error getting pending appeals: %v", err)
 		return
 	}
 
@@ -390,7 +377,7 @@ func (js *JobScheduler) checkAppealDeadlines() {
 
 	for _, appeal := range appeals {
 		// Appeals should be reviewed within 15 days of submission
-		daysSinceSubmission := int(time.Since(appeal.RequestDate).Hours() / 24)
+		daysSinceSubmission := int(time.Since(appeal.SubmissionDate).Hours() / 24)
 		
 		if daysSinceSubmission >= 12 { // 3 days before deadline
 			urgentAppeals = append(urgentAppeals, appeal)
@@ -406,17 +393,18 @@ func (js *JobScheduler) checkAppealDeadlines() {
 
 // sendUrgentAppealAlert sends alert for urgent appeals
 func (js *JobScheduler) sendUrgentAppealAlert(appeals []*entities.Appeal) {
-	subject := fmt.Sprintf("URGENT: %d Appeals Require Immediate Review", len(appeals))
+	body := fmt.Sprintf("URGENT: %d appeals require immediate review", len(appeals))
 	
-	body := "The following appeals are approaching the review deadline (15 days):\n\n"
 	for _, appeal := range appeals {
-		daysSinceSubmission := int(time.Since(appeal.RequestDate).Hours() / 24)
+		daysSinceSubmission := int(time.Since(appeal.SubmissionDate).Hours() / 24)
 		daysRemaining := 15 - daysSinceSubmission
-		body += fmt.Sprintf("- Appeal #%s: %s (%d days remaining)\n", 
-			appeal.AppealNumber, appeal.Reason[:50]+"...", daysRemaining)
+		groundsPreview := appeal.AppealGrounds
+		if len(groundsPreview) > 50 {
+			groundsPreview = groundsPreview[:50] + "..."
+		}
+		body += fmt.Sprintf("\n- Appeal ID: %s, Grounds: %s (%d days remaining)", 
+			appeal.ID.String(), groundsPreview, daysRemaining)
 	}
-	
-	body += "\nPlease review and process these appeals immediately to comply with regulations."
 
 	if err := js.notificationService.SendAlert(body, "HIGH"); err != nil {
 		log.Printf("Error sending urgent appeal alert: %v", err)
@@ -457,24 +445,22 @@ func (js *JobScheduler) generateMonthlyReports() {
 // generateCommitteeReport generates a performance report for a specific committee
 func (js *JobScheduler) generateCommitteeReport(ctx context.Context, committee *entities.Committee, startDate, endDate time.Time) {
 	// Get cases handled by this committee
-	cases, err := js.studentCaseRepo.GetByCommitteeAndDateRange(ctx, committee.ID, startDate, endDate)
+	cases, err := js.studentCaseRepo.GetByCommitteeID(ctx, committee.ID)
 	if err != nil {
-		log.Printf("Error getting cases for committee %s report: %v", committee.ID, err)
+		log.Printf("Error getting cases for committee %s report: %v", committee.ID.String(), err)
 		return
 	}
 
 	// Calculate metrics
 	totalCases := len(cases)
 	resolvedCases := 0
-	overdueCases := 0
+	pendingCases := 0
 	
 	for _, studentCase := range cases {
-		if studentCase.Status == entities.CaseStatusResolved || studentCase.Status == entities.CaseStatusClosed {
+		if studentCase.CaseStatus == entities.CaseStatusResolved {
 			resolvedCases++
-		}
-		if studentCase.DueDate != nil && studentCase.DueDate.Before(time.Now()) && 
-		   studentCase.Status != entities.CaseStatusResolved && studentCase.Status != entities.CaseStatusClosed {
-			overdueCases++
+		} else if studentCase.CaseStatus == entities.CaseStatusPending || studentCase.CaseStatus == entities.CaseStatusInReview {
+			pendingCases++
 		}
 	}
 
@@ -484,30 +470,32 @@ func (js *JobScheduler) generateCommitteeReport(ctx context.Context, committee *
 	}
 
 	// Generate report
-	subject := fmt.Sprintf("Monthly Report - %s Committee (%s %d)", 
-		committee.Name, endDate.Month(), endDate.Year())
+	subject := fmt.Sprintf("Monthly Report - Committee %s (%s %d)", 
+		committee.ID.String()[:8], endDate.Month(), endDate.Year())
 	
 	body := fmt.Sprintf(`Monthly Performance Report
 
-Committee: %s
+Committee ID: %s
+Committee Type: %s
 Period: %s to %s
 
 METRICS:
 - Total Cases Handled: %d
 - Cases Resolved: %d
-- Cases Overdue: %d
+- Cases Pending: %d
 - Resolution Rate: %.1f%%
 
-STATUS SUMMARY:
-`, committee.Name, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), 
-		totalCases, resolvedCases, overdueCases, resolutionRate)
+`, committee.ID.String(), committee.CommitteeType, 
+		startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), 
+		totalCases, resolvedCases, pendingCases, resolutionRate)
 
 	// Add case status breakdown
 	statusCount := make(map[entities.CaseStatus]int)
 	for _, studentCase := range cases {
-		statusCount[studentCase.Status]++
+		statusCount[studentCase.CaseStatus]++
 	}
 
+	body += "STATUS SUMMARY:\n"
 	for status, count := range statusCount {
 		body += fmt.Sprintf("- %s: %d\n", status, count)
 	}
@@ -515,6 +503,6 @@ STATUS SUMMARY:
 	body += "\nThis is an automated monthly report from MEvalService."
 
 	if err := js.notificationService.SendEmail([]string{"admin@sicora.edu"}, subject, body); err != nil {
-		log.Printf("Error sending monthly report for committee %s: %v", committee.ID, err)
+		log.Printf("Error sending monthly report for committee %s: %v", committee.ID.String(), err)
 	}
 }

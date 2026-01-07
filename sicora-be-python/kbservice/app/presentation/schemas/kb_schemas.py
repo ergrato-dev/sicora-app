@@ -45,7 +45,7 @@ class KnowledgeItemCreate(BaseModel):
         return [tag.strip().lower() for tag in v] if v else []
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "title": "Cómo registrar asistencia",
                 "content": "Para registrar asistencia, sigue estos pasos...",
@@ -79,7 +79,7 @@ class KnowledgeItemUpdate(BaseModel):
         return v
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "title": "Cómo registrar asistencia - Actualizado",
                 "status": "published"
@@ -108,7 +108,7 @@ class KnowledgeItemResponse(BaseModel):
     
     class Config:
         from_attributes = True
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "title": "Cómo registrar asistencia",
@@ -165,7 +165,7 @@ class CategoryCreate(BaseModel):
         return v.strip()
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "name": "Asistencia",
                 "description": "Información sobre registro y gestión de asistencia",
@@ -198,7 +198,7 @@ class SearchRequest(BaseModel):
     offset: int = Field(default=0, ge=0, description="Results offset")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "query": "cómo registrar asistencia",
                 "filters": {
@@ -232,7 +232,7 @@ class SearchResponse(BaseModel):
     
     class Config:
         from_attributes = True
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "results": [],
                 "total_count": 15,
@@ -261,7 +261,7 @@ class QueryRequest(BaseModel):
         return v
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "query": "¿Puedo faltar por motivos médicos?",
                 "context": {
@@ -283,7 +283,7 @@ class QueryResponse(BaseModel):
     
     class Config:
         from_attributes = True
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "answer": "Sí, puedes faltar por motivos médicos...",
                 "sources": [],
@@ -305,7 +305,7 @@ class Feedback(BaseModel):
     comment: Optional[str] = Field(None, max_length=500, description="Optional comment")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "item_id": "123e4567-e89b-12d3-a456-426614174000",
                 "feedback_type": "helpful",
@@ -321,7 +321,7 @@ class FeedbackCreateSchema(BaseModel):
     comment: Optional[str] = Field(None, max_length=500, description="Optional feedback comment")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "item_id": "123e4567-e89b-12d3-a456-426614174000",
                 "feedback_type": "helpful",
@@ -381,7 +381,7 @@ class AdminConfigUpdate(BaseModel):
     cache_ttl: Optional[int] = Field(None, ge=60, description="Cache TTL in seconds")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "similarity_threshold": 0.75,
                 "max_search_results": 25,
@@ -419,7 +419,7 @@ class AdminConfigRequest(BaseModel):
     config: Dict[str, Any]
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "config": {
                     "embeddings": {
@@ -442,7 +442,7 @@ class RegenerateEmbeddingsRequest(BaseModel):
     force_regeneration: bool = Field(False, description="Force regeneration even if embeddings exist")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "category": "procedures",
                 "force_regeneration": True
@@ -503,7 +503,7 @@ class RestoreRequest(BaseModel):
     overwrite_existing: bool = Field(False, description="Whether to overwrite existing data")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "backup_id": "backup_20241213_143022",
                 "overwrite_existing": False

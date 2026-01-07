@@ -111,7 +111,21 @@ func (h *CommitteeHandler) GetCommitteeByID(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /committees [get]
 func (h *CommitteeHandler) GetAllCommittees(c *gin.Context) {
-	committees, err := h.committeeUC.GetAllCommittees(c.Request.Context())
+	// Parse limit and offset from query params, with defaults
+	limit := 100
+	offset := 0
+	if l := c.Query("limit"); l != "" {
+		if parsed, err := strconv.Atoi(l); err == nil {
+			limit = parsed
+		}
+	}
+	if o := c.Query("offset"); o != "" {
+		if parsed, err := strconv.Atoi(o); err == nil {
+			offset = parsed
+		}
+	}
+
+	committees, err := h.committeeUC.GetAllCommittees(c.Request.Context(), limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 			Error:   "Failed to get committees",
@@ -123,27 +137,31 @@ func (h *CommitteeHandler) GetAllCommittees(c *gin.Context) {
 	c.JSON(http.StatusOK, committees)
 }
 
-// GetCommitteesByCenter gets committees by center
-// @Summary Get committees by center
-// @Description Get committees by center
+// GetCommitteesByStatus gets committees by status
+// @Summary Get committees by status
+// @Description Get committees by status
 // @Tags committees
 // @Produce json
-// @Param center query string true "Center name"
+// @Param status query string true "Committee status"
 // @Success 200 {array} dto.CommitteeResponse
 // @Failure 400 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
-// @Router /committees/by-center [get]
+// @Router /committees/by-status [get]
 func (h *CommitteeHandler) GetCommitteesByCenter(c *gin.Context) {
-	center := c.Query("center")
-	if center == "" {
+	// Note: GetCommitteesByCenter is deprecated, now uses status
+	status := c.Query("status")
+	if status == "" {
+		status = c.Query("center") // Backwards compatibility
+	}
+	if status == "" {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
 			Error:   "Missing parameter",
-			Message: "Center parameter is required",
+			Message: "Status parameter is required",
 		})
 		return
 	}
 
-	committees, err := h.committeeUC.GetCommitteesByCenter(c.Request.Context(), center)
+	committees, err := h.committeeUC.GetCommitteesByStatus(c.Request.Context(), status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 			Error:   "Failed to get committees",
@@ -425,19 +443,19 @@ func (h *StudentCaseHandler) GetPendingStudentCases(c *gin.Context) {
 	c.JSON(http.StatusOK, cases)
 }
 
-// GetOverdueStudentCases gets overdue student cases
-// @Summary Get overdue student cases
-// @Description Get all overdue student cases
+// GetOverdueStudentCases gets pending student cases
+// @Summary Get pending student cases
+// @Description Get all pending student cases
 // @Tags student-cases
 // @Produce json
 // @Success 200 {array} dto.StudentCaseResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /student-cases/overdue [get]
 func (h *StudentCaseHandler) GetOverdueStudentCases(c *gin.Context) {
-	cases, err := h.studentCaseUC.GetOverdueStudentCases(c.Request.Context())
+	cases, err := h.studentCaseUC.GetPendingStudentCases(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to get overdue cases",
+			Error:   "Failed to get pending cases",
 			Message: err.Error(),
 		})
 		return
@@ -743,7 +761,6 @@ func (h *ImprovementPlanHandler) UpdateProgress(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.SuccessResponse{
-		Success: true,
 		Message: "Progress updated successfully",
 	})
 }
@@ -888,7 +905,7 @@ func (h *SanctionHandler) ActivateSanction(c *gin.Context) {
 		return
 	}
 
-	err = h.sanctionUC.ActivateSanction(c.Request.Context(), id)
+	err = h.sanctionUC.UpdateComplianceStatus(c.Request.Context(), id, "IN_PROGRESS")
 	if err != nil {
 		if err.Error() == "sanction not found" {
 			c.JSON(http.StatusNotFound, dto.ErrorResponse{
@@ -905,7 +922,6 @@ func (h *SanctionHandler) ActivateSanction(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.SuccessResponse{
-		Success: true,
 		Message: "Sanction activated successfully",
 	})
 }
@@ -932,7 +948,7 @@ func (h *SanctionHandler) CompleteSanction(c *gin.Context) {
 		return
 	}
 
-	err = h.sanctionUC.CompleteSanction(c.Request.Context(), id)
+	err = h.sanctionUC.UpdateComplianceStatus(c.Request.Context(), id, "COMPLETED")
 	if err != nil {
 		if err.Error() == "sanction not found" {
 			c.JSON(http.StatusNotFound, dto.ErrorResponse{
@@ -949,7 +965,6 @@ func (h *SanctionHandler) CompleteSanction(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.SuccessResponse{
-		Success: true,
 		Message: "Sanction completed successfully",
 	})
 }
@@ -1108,7 +1123,13 @@ func (h *AppealHandler) ProcessAppeal(c *gin.Context) {
 		return
 	}
 
-	err = h.appealUC.ProcessAppeal(c.Request.Context(), id, req.Accepted, req.Resolution)
+	// Process appeal based on accepted flag
+	if req.Accepted {
+		err = h.appealUC.AdmitAppeal(c.Request.Context(), id, req.Resolution)
+	} else {
+		err = h.appealUC.RejectAppeal(c.Request.Context(), id, req.Resolution)
+	}
+
 	if err != nil {
 		if err.Error() == "appeal not found" {
 			c.JSON(http.StatusNotFound, dto.ErrorResponse{
@@ -1130,7 +1151,6 @@ func (h *AppealHandler) ProcessAppeal(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.SuccessResponse{
-		Success: true,
 		Message: fmt.Sprintf("Appeal %s successfully", status),
 	})
 }

@@ -279,7 +279,7 @@ func (uc *FAQUseCase) SearchFAQs(ctx context.Context, req *dto.SearchFAQsRequest
 
 	return &dto.SearchFAQsResponse{
 		Results: results,
-		Total:   total,
+		Total:   int(total),
 		Query:   req.Query,
 		Limit:   req.Limit,
 		Offset:  req.Offset,

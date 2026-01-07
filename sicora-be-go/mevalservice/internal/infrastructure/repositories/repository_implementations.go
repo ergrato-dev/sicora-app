@@ -2,9 +2,12 @@ package repositories
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 
 	"mevalservice/internal/domain/entities"
@@ -120,9 +123,115 @@ func (r *improvementPlanRepository) GetBySupervisorID(ctx context.Context, super
 	return plans, nil
 }
 
-func (r *improvementPlanRepository) GetByStatus(ctx context.Context, status string) ([]*entities.ImprovementPlan, error) {
+func (r *improvementPlanRepository) GetByStatus(ctx context.Context, status entities.PlanStatus) ([]*entities.ImprovementPlan, error) {
 	var models []database.ImprovementPlanModel
-	if err := r.db.WithContext(ctx).Where("status = ?", status).Find(&models).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("current_status = ?", string(status)).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	plans := make([]*entities.ImprovementPlan, len(models))
+	for i, model := range models {
+		plans[i] = r.toEntity(&model)
+	}
+	return plans, nil
+}
+
+func (r *improvementPlanRepository) GetAll(ctx context.Context, limit, offset int) ([]*entities.ImprovementPlan, error) {
+	var models []database.ImprovementPlanModel
+	query := r.db.WithContext(ctx)
+	if limit > 0 {
+		query = query.Limit(limit).Offset(offset)
+	}
+	if err := query.Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	plans := make([]*entities.ImprovementPlan, len(models))
+	for i, model := range models {
+		plans[i] = r.toEntity(&model)
+	}
+	return plans, nil
+}
+
+func (r *improvementPlanRepository) GetByType(ctx context.Context, planType entities.PlanType) ([]*entities.ImprovementPlan, error) {
+	var models []database.ImprovementPlanModel
+	if err := r.db.WithContext(ctx).Where("plan_type = ?", string(planType)).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	plans := make([]*entities.ImprovementPlan, len(models))
+	for i, model := range models {
+		plans[i] = r.toEntity(&model)
+	}
+	return plans, nil
+}
+
+func (r *improvementPlanRepository) GetByInstructor(ctx context.Context, instructorID uuid.UUID) ([]*entities.ImprovementPlan, error) {
+	var models []database.ImprovementPlanModel
+	if err := r.db.WithContext(ctx).Where("responsible_instructor_id = ?", instructorID).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	plans := make([]*entities.ImprovementPlan, len(models))
+	for i, model := range models {
+		plans[i] = r.toEntity(&model)
+	}
+	return plans, nil
+}
+
+func (r *improvementPlanRepository) GetActivePlans(ctx context.Context) ([]*entities.ImprovementPlan, error) {
+	return r.GetByStatus(ctx, entities.PlanStatusActive)
+}
+
+func (r *improvementPlanRepository) GetOverduePlans(ctx context.Context) ([]*entities.ImprovementPlan, error) {
+	var models []database.ImprovementPlanModel
+	now := time.Now()
+	if err := r.db.WithContext(ctx).Where("end_date < ? AND current_status = ?", now, string(entities.PlanStatusActive)).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	plans := make([]*entities.ImprovementPlan, len(models))
+	for i, model := range models {
+		plans[i] = r.toEntity(&model)
+	}
+	return plans, nil
+}
+
+func (r *improvementPlanRepository) GetPlansEndingSoon(ctx context.Context, days int) ([]*entities.ImprovementPlan, error) {
+	var models []database.ImprovementPlanModel
+	now := time.Now()
+	endDate := now.AddDate(0, 0, days)
+	if err := r.db.WithContext(ctx).Where("end_date BETWEEN ? AND ? AND current_status = ?", now, endDate, string(entities.PlanStatusActive)).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	plans := make([]*entities.ImprovementPlan, len(models))
+	for i, model := range models {
+		plans[i] = r.toEntity(&model)
+	}
+	return plans, nil
+}
+
+func (r *improvementPlanRepository) GetCompletedPlans(ctx context.Context) ([]*entities.ImprovementPlan, error) {
+	return r.GetByStatus(ctx, entities.PlanStatusCompleted)
+}
+
+func (r *improvementPlanRepository) GetPlansByComplianceRange(ctx context.Context, minCompliance, maxCompliance float64) ([]*entities.ImprovementPlan, error) {
+	var models []database.ImprovementPlanModel
+	if err := r.db.WithContext(ctx).Where("compliance_percentage BETWEEN ? AND ?", minCompliance, maxCompliance).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	plans := make([]*entities.ImprovementPlan, len(models))
+	for i, model := range models {
+		plans[i] = r.toEntity(&model)
+	}
+	return plans, nil
+}
+
+func (r *improvementPlanRepository) GetSuccessfulPlans(ctx context.Context, minCompliance float64) ([]*entities.ImprovementPlan, error) {
+	var models []database.ImprovementPlanModel
+	if err := r.db.WithContext(ctx).Where("compliance_percentage >= ? AND current_status = ?", minCompliance, string(entities.PlanStatusCompleted)).Find(&models).Error; err != nil {
 		return nil, err
 	}
 
@@ -143,48 +252,59 @@ func (r *improvementPlanRepository) Delete(ctx context.Context, id uuid.UUID) er
 }
 
 func (r *improvementPlanRepository) toModel(plan *entities.ImprovementPlan) *database.ImprovementPlanModel {
+	// Marshal Objectives to JSON
+	objectivesJSON, _ := json.Marshal(plan.Objectives)
+	// Marshal Activities to JSON
+	activitiesJSON, _ := json.Marshal(plan.Activities)
+	// Marshal SuccessCriteria to JSON
+	successCriteriaJSON, _ := json.Marshal(plan.SuccessCriteria)
+
 	return &database.ImprovementPlanModel{
-		ID:              plan.ID,
-		StudentCaseID:   plan.StudentCaseID,
-		StudentID:       plan.StudentID,
-		Title:           plan.Title,
-		Description:     plan.Description,
-		Objectives:      plan.Objectives,
-		Activities:      plan.Activities,
-		Resources:       plan.Resources,
-		Timeline:        plan.Timeline,
-		Status:          string(plan.Status),
-		StartDate:       plan.StartDate,
-		EndDate:         plan.EndDate,
-		CompletionDate:  plan.CompletionDate,
-		Progress:        plan.Progress,
-		SupervisorID:    plan.SupervisorID,
-		SupervisorNotes: plan.SupervisorNotes,
-		CreatedAt:       plan.CreatedAt,
-		UpdatedAt:       plan.UpdatedAt,
+		ID:                      plan.ID,
+		StudentCaseID:           plan.StudentCaseID,
+		StudentID:               plan.StudentID,
+		PlanType:                string(plan.PlanType),
+		StartDate:               plan.StartDate,
+		EndDate:                 plan.EndDate,
+		Objectives:              datatypes.JSON(objectivesJSON),
+		Activities:              datatypes.JSON(activitiesJSON),
+		SuccessCriteria:         datatypes.JSON(successCriteriaJSON),
+		ResponsibleInstructorID: plan.ResponsibleInstructorID,
+		CurrentStatus:           string(plan.CurrentStatus),
+		CompliancePercentage:    plan.CompliancePercentage,
+		FinalEvaluation:         plan.FinalEvaluation,
+		CreatedAt:               plan.CreatedAt,
+		UpdatedAt:               plan.UpdatedAt,
 	}
 }
 
 func (r *improvementPlanRepository) toEntity(model *database.ImprovementPlanModel) *entities.ImprovementPlan {
+	// Unmarshal Objectives from JSON
+	var objectives []entities.Objective
+	_ = json.Unmarshal(model.Objectives, &objectives)
+	// Unmarshal Activities from JSON
+	var activities []entities.Activity
+	_ = json.Unmarshal(model.Activities, &activities)
+	// Unmarshal SuccessCriteria from JSON
+	var successCriteria []entities.SuccessCriteria
+	_ = json.Unmarshal(model.SuccessCriteria, &successCriteria)
+
 	return &entities.ImprovementPlan{
-		ID:              model.ID,
-		StudentCaseID:   model.StudentCaseID,
-		StudentID:       model.StudentID,
-		Title:           model.Title,
-		Description:     model.Description,
-		Objectives:      model.Objectives,
-		Activities:      model.Activities,
-		Resources:       model.Resources,
-		Timeline:        model.Timeline,
-		Status:          entities.PlanStatus(model.Status),
-		StartDate:       model.StartDate,
-		EndDate:         model.EndDate,
-		CompletionDate:  model.CompletionDate,
-		Progress:        model.Progress,
-		SupervisorID:    model.SupervisorID,
-		SupervisorNotes: model.SupervisorNotes,
-		CreatedAt:       model.CreatedAt,
-		UpdatedAt:       model.UpdatedAt,
+		ID:                      model.ID,
+		StudentCaseID:           model.StudentCaseID,
+		StudentID:               model.StudentID,
+		PlanType:                entities.PlanType(model.PlanType),
+		StartDate:               model.StartDate,
+		EndDate:                 model.EndDate,
+		Objectives:              objectives,
+		Activities:              activities,
+		SuccessCriteria:         successCriteria,
+		ResponsibleInstructorID: model.ResponsibleInstructorID,
+		CurrentStatus:           entities.PlanStatus(model.CurrentStatus),
+		CompliancePercentage:    model.CompliancePercentage,
+		FinalEvaluation:         model.FinalEvaluation,
+		CreatedAt:               model.CreatedAt,
+		UpdatedAt:               model.UpdatedAt,
 	}
 }
 
@@ -250,30 +370,105 @@ func (r *committeeMemberRepository) Delete(ctx context.Context, id uuid.UUID) er
 
 func (r *committeeMemberRepository) toModel(member *entities.CommitteeMember) *database.CommitteeMemberModel {
 	return &database.CommitteeMemberModel{
-		ID:              member.ID,
-		CommitteeID:     member.CommitteeID,
-		UserID:          member.UserID,
-		Role:            string(member.Role),
-		Status:          string(member.Status),
-		AppointmentDate: member.AppointmentDate,
-		EndDate:         member.EndDate,
-		CreatedAt:       member.CreatedAt,
-		UpdatedAt:       member.UpdatedAt,
+		ID:          member.ID,
+		CommitteeID: member.CommitteeID,
+		UserID:      member.UserID,
+		MemberRole:  string(member.MemberRole),
+		Attended:    member.IsPresent,
+		VotingRights: member.VotePower > 0,
+		CreatedAt:   member.CreatedAt,
 	}
 }
 
 func (r *committeeMemberRepository) toEntity(model *database.CommitteeMemberModel) *entities.CommitteeMember {
-	return &entities.CommitteeMember{
-		ID:              model.ID,
-		CommitteeID:     model.CommitteeID,
-		UserID:          model.UserID,
-		Role:            entities.MemberRole(model.Role),
-		Status:          entities.MemberStatus(model.Status),
-		AppointmentDate: model.AppointmentDate,
-		EndDate:         model.EndDate,
-		CreatedAt:       model.CreatedAt,
-		UpdatedAt:       model.UpdatedAt,
+	votePower := 0
+	if model.VotingRights {
+		votePower = 1
 	}
+	return &entities.CommitteeMember{
+		ID:          model.ID,
+		CommitteeID: model.CommitteeID,
+		UserID:      model.UserID,
+		MemberRole:  entities.MemberRole(model.MemberRole),
+		IsPresent:   model.Attended,
+		VotePower:   votePower,
+		CreatedAt:   model.CreatedAt,
+	}
+}
+
+// CommitteeMember additional methods required by interface
+func (r *committeeMemberRepository) GetByRole(ctx context.Context, role entities.MemberRole) ([]*entities.CommitteeMember, error) {
+	var models []database.CommitteeMemberModel
+	if err := r.db.WithContext(ctx).Where("member_role = ?", string(role)).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	members := make([]*entities.CommitteeMember, len(models))
+	for i, model := range models {
+		members[i] = r.toEntity(&model)
+	}
+	return members, nil
+}
+
+func (r *committeeMemberRepository) GetPresentMembers(ctx context.Context, committeeID uuid.UUID) ([]*entities.CommitteeMember, error) {
+	var models []database.CommitteeMemberModel
+	if err := r.db.WithContext(ctx).Where("committee_id = ? AND attended = ?", committeeID, true).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	members := make([]*entities.CommitteeMember, len(models))
+	for i, model := range models {
+		members[i] = r.toEntity(&model)
+	}
+	return members, nil
+}
+
+func (r *committeeMemberRepository) GetAbsentMembers(ctx context.Context, committeeID uuid.UUID) ([]*entities.CommitteeMember, error) {
+	var models []database.CommitteeMemberModel
+	if err := r.db.WithContext(ctx).Where("committee_id = ? AND attended = ?", committeeID, false).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	members := make([]*entities.CommitteeMember, len(models))
+	for i, model := range models {
+		members[i] = r.toEntity(&model)
+	}
+	return members, nil
+}
+
+func (r *committeeMemberRepository) GetVotingMembers(ctx context.Context, committeeID uuid.UUID) ([]*entities.CommitteeMember, error) {
+	var models []database.CommitteeMemberModel
+	if err := r.db.WithContext(ctx).Where("committee_id = ? AND voting_rights = ?", committeeID, true).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	members := make([]*entities.CommitteeMember, len(models))
+	for i, model := range models {
+		members[i] = r.toEntity(&model)
+	}
+	return members, nil
+}
+
+func (r *committeeMemberRepository) GetMemberAttendanceRate(ctx context.Context, userID uuid.UUID) (float64, error) {
+	var total, attended int64
+	if err := r.db.WithContext(ctx).Model(&database.CommitteeMemberModel{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
+		return 0, err
+	}
+	if total == 0 {
+		return 0, nil
+	}
+	if err := r.db.WithContext(ctx).Model(&database.CommitteeMemberModel{}).Where("user_id = ? AND attended = ?", userID, true).Count(&attended).Error; err != nil {
+		return 0, err
+	}
+	return float64(attended) / float64(total) * 100, nil
+}
+
+func (r *committeeMemberRepository) GetQuorumCount(ctx context.Context, committeeID uuid.UUID) (int, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).Model(&database.CommitteeMemberModel{}).Where("committee_id = ? AND attended = ? AND voting_rights = ?", committeeID, true, true).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return int(count), nil
 }
 
 // Sanction Repository
@@ -327,9 +522,9 @@ func (r *sanctionRepository) GetByStudentID(ctx context.Context, studentID uuid.
 	return sanctions, nil
 }
 
-func (r *sanctionRepository) GetByType(ctx context.Context, sanctionType string) ([]*entities.Sanction, error) {
+func (r *sanctionRepository) GetByType(ctx context.Context, sanctionType entities.SanctionType) ([]*entities.Sanction, error) {
 	var models []database.SanctionModel
-	if err := r.db.WithContext(ctx).Where("type = ?", sanctionType).Find(&models).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("sanction_type = ?", string(sanctionType)).Find(&models).Error; err != nil {
 		return nil, err
 	}
 
@@ -342,7 +537,7 @@ func (r *sanctionRepository) GetByType(ctx context.Context, sanctionType string)
 
 func (r *sanctionRepository) GetByStatus(ctx context.Context, status string) ([]*entities.Sanction, error) {
 	var models []database.SanctionModel
-	if err := r.db.WithContext(ctx).Where("status = ?", status).Find(&models).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("compliance_status = ?", status).Find(&models).Error; err != nil {
 		return nil, err
 	}
 
@@ -351,6 +546,132 @@ func (r *sanctionRepository) GetByStatus(ctx context.Context, status string) ([]
 		sanctions[i] = r.toEntity(&model)
 	}
 	return sanctions, nil
+}
+
+func (r *sanctionRepository) GetAll(ctx context.Context, limit, offset int) ([]*entities.Sanction, error) {
+	var models []database.SanctionModel
+	query := r.db.WithContext(ctx)
+	if limit > 0 {
+		query = query.Limit(limit).Offset(offset)
+	}
+	if err := query.Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	sanctions := make([]*entities.Sanction, len(models))
+	for i, model := range models {
+		sanctions[i] = r.toEntity(&model)
+	}
+	return sanctions, nil
+}
+
+func (r *sanctionRepository) GetBySeverityLevel(ctx context.Context, level int) ([]*entities.Sanction, error) {
+	var models []database.SanctionModel
+	if err := r.db.WithContext(ctx).Where("severity_level = ?", level).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	sanctions := make([]*entities.Sanction, len(models))
+	for i, model := range models {
+		sanctions[i] = r.toEntity(&model)
+	}
+	return sanctions, nil
+}
+
+func (r *sanctionRepository) GetByDateRange(ctx context.Context, startDate, endDate time.Time) ([]*entities.Sanction, error) {
+	var models []database.SanctionModel
+	if err := r.db.WithContext(ctx).Where("start_date BETWEEN ? AND ?", startDate, endDate).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	sanctions := make([]*entities.Sanction, len(models))
+	for i, model := range models {
+		sanctions[i] = r.toEntity(&model)
+	}
+	return sanctions, nil
+}
+
+func (r *sanctionRepository) GetActiveSanctions(ctx context.Context) ([]*entities.Sanction, error) {
+	var models []database.SanctionModel
+	now := time.Now()
+	if err := r.db.WithContext(ctx).Where("start_date <= ? AND (end_date IS NULL OR end_date > ?)", now, now).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	sanctions := make([]*entities.Sanction, len(models))
+	for i, model := range models {
+		sanctions[i] = r.toEntity(&model)
+	}
+	return sanctions, nil
+}
+
+func (r *sanctionRepository) GetExpiredSanctions(ctx context.Context) ([]*entities.Sanction, error) {
+	var models []database.SanctionModel
+	now := time.Now()
+	if err := r.db.WithContext(ctx).Where("end_date IS NOT NULL AND end_date < ?", now).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	sanctions := make([]*entities.Sanction, len(models))
+	for i, model := range models {
+		sanctions[i] = r.toEntity(&model)
+	}
+	return sanctions, nil
+}
+
+func (r *sanctionRepository) GetAppealableSanctions(ctx context.Context) ([]*entities.Sanction, error) {
+	var models []database.SanctionModel
+	now := time.Now()
+	if err := r.db.WithContext(ctx).Where("appeal_deadline IS NOT NULL AND appeal_deadline > ? AND appealed = ?", now, false).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	sanctions := make([]*entities.Sanction, len(models))
+	for i, model := range models {
+		sanctions[i] = r.toEntity(&model)
+	}
+	return sanctions, nil
+}
+
+func (r *sanctionRepository) GetAppealedSanctions(ctx context.Context) ([]*entities.Sanction, error) {
+	var models []database.SanctionModel
+	if err := r.db.WithContext(ctx).Where("appealed = ?", true).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	sanctions := make([]*entities.Sanction, len(models))
+	for i, model := range models {
+		sanctions[i] = r.toEntity(&model)
+	}
+	return sanctions, nil
+}
+
+func (r *sanctionRepository) GetSanctionCountByType(ctx context.Context, sanctionType entities.SanctionType) (int64, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).Model(&database.SanctionModel{}).Where("sanction_type = ?", string(sanctionType)).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (r *sanctionRepository) GetSanctionCountByStudent(ctx context.Context, studentID uuid.UUID) (int64, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).Model(&database.SanctionModel{}).Where("student_id = ?", studentID).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (r *sanctionRepository) GetReincidenceCount(ctx context.Context, studentID uuid.UUID) (int64, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).Model(&database.SanctionModel{}).Where("student_id = ?", studentID).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	// Reincidence is count - 1 if count > 0
+	if count > 0 {
+		return count - 1, nil
+	}
+	return 0, nil
 }
 
 func (r *sanctionRepository) Update(ctx context.Context, sanction *entities.Sanction) error {
@@ -363,55 +684,62 @@ func (r *sanctionRepository) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 func (r *sanctionRepository) toModel(sanction *entities.Sanction) *database.SanctionModel {
+	var appealResult *string
+	if sanction.AppealResult != nil {
+		result := string(*sanction.AppealResult)
+		appealResult = &result
+	}
 	return &database.SanctionModel{
-		ID:              sanction.ID,
-		StudentCaseID:   sanction.StudentCaseID,
-		StudentID:       sanction.StudentID,
-		Type:            string(sanction.Type),
-		Severity:        string(sanction.Severity),
-		Status:          string(sanction.Status),
-		Title:           sanction.Title,
-		Description:     sanction.Description,
-		Justification:   sanction.Justification,
-		StartDate:       sanction.StartDate,
-		EndDate:         sanction.EndDate,
-		CompletionDate:  sanction.CompletionDate,
-		IsAppealable:    sanction.IsAppealable,
-		AppealDeadline:  sanction.AppealDeadline,
-		CreatedAt:       sanction.CreatedAt,
-		UpdatedAt:       sanction.UpdatedAt,
+		ID:                 sanction.ID,
+		StudentID:          sanction.StudentID,
+		StudentCaseID:      sanction.StudentCaseID,
+		SanctionType:       string(sanction.SanctionType),
+		SeverityLevel:      sanction.SeverityLevel,
+		Description:        sanction.Description,
+		StartDate:          sanction.StartDate,
+		EndDate:            sanction.EndDate,
+		ComplianceRequired: sanction.ComplianceRequired,
+		ComplianceStatus:   string(sanction.ComplianceStatus),
+		AppealDeadline:     sanction.AppealDeadline,
+		Appealed:           sanction.Appealed,
+		AppealResult:       appealResult,
+		CreatedAt:          sanction.CreatedAt,
+		UpdatedAt:          sanction.UpdatedAt,
 	}
 }
 
 func (r *sanctionRepository) toEntity(model *database.SanctionModel) *entities.Sanction {
+	var appealResult *entities.AppealResult
+	if model.AppealResult != nil {
+		result := entities.AppealResult(*model.AppealResult)
+		appealResult = &result
+	}
 	return &entities.Sanction{
-		ID:              model.ID,
-		StudentCaseID:   model.StudentCaseID,
-		StudentID:       model.StudentID,
-		Type:            entities.SanctionType(model.Type),
-		Severity:        entities.SanctionSeverity(model.Severity),
-		Status:          entities.SanctionStatus(model.Status),
-		Title:           model.Title,
-		Description:     model.Description,
-		Justification:   model.Justification,
-		StartDate:       model.StartDate,
-		EndDate:         model.EndDate,
-		CompletionDate:  model.CompletionDate,
-		IsAppealable:    model.IsAppealable,
-		AppealDeadline:  model.AppealDeadline,
-		CreatedAt:       model.CreatedAt,
-		UpdatedAt:       model.UpdatedAt,
+		ID:                 model.ID,
+		StudentID:          model.StudentID,
+		StudentCaseID:      model.StudentCaseID,
+		SanctionType:       entities.SanctionType(model.SanctionType),
+		SeverityLevel:      model.SeverityLevel,
+		Description:        model.Description,
+		StartDate:          model.StartDate,
+		EndDate:            model.EndDate,
+		ComplianceRequired: model.ComplianceRequired,
+		ComplianceStatus:   entities.ComplianceStatus(model.ComplianceStatus),
+		AppealDeadline:     model.AppealDeadline,
+		Appealed:           model.Appealed,
+		AppealResult:       appealResult,
+		CreatedAt:          model.CreatedAt,
+		UpdatedAt:          model.UpdatedAt,
 	}
 }
 
-// CommitteeDecision Repository (simplified implementation)
+// CommitteeDecision Repository
 func NewCommitteeDecisionRepository(db *database.Database) repositories.CommitteeDecisionRepository {
 	return &committeeDecisionRepository{db: db.DB}
 }
 
 func (r *committeeDecisionRepository) Create(ctx context.Context, decision *entities.CommitteeDecision) error {
-	// Implementation similar to others...
-	return nil
+	return nil // TODO: Implement
 }
 
 func (r *committeeDecisionRepository) GetByID(ctx context.Context, id uuid.UUID) (*entities.CommitteeDecision, error) {
@@ -434,25 +762,48 @@ func (r *committeeDecisionRepository) Delete(ctx context.Context, id uuid.UUID) 
 	return nil
 }
 
-func (r *committeeDecisionRepository) GenerateDecisionNumber(ctx context.Context, committeeID uuid.UUID) (string, error) {
-	return "", nil
+func (r *committeeDecisionRepository) GetAll(ctx context.Context, limit, offset int) ([]*entities.CommitteeDecision, error) {
+	return nil, nil
 }
 
-// Appeal Repository (simplified implementation)
+func (r *committeeDecisionRepository) GetByType(ctx context.Context, decisionType entities.DecisionType) ([]*entities.CommitteeDecision, error) {
+	return nil, nil
+}
+
+func (r *committeeDecisionRepository) GetByDateRange(ctx context.Context, startDate, endDate time.Time) ([]*entities.CommitteeDecision, error) {
+	return nil, nil
+}
+
+func (r *committeeDecisionRepository) GetUnanimousDecisions(ctx context.Context) ([]*entities.CommitteeDecision, error) {
+	return nil, nil
+}
+
+func (r *committeeDecisionRepository) GetApprovedDecisions(ctx context.Context) ([]*entities.CommitteeDecision, error) {
+	return nil, nil
+}
+
+func (r *committeeDecisionRepository) GetRejectedDecisions(ctx context.Context) ([]*entities.CommitteeDecision, error) {
+	return nil, nil
+}
+
+func (r *committeeDecisionRepository) GetDecisionCountByType(ctx context.Context, decisionType entities.DecisionType) (int64, error) {
+	return 0, nil
+}
+
+func (r *committeeDecisionRepository) GetApprovalRate(ctx context.Context) (float64, error) {
+	return 0, nil
+}
+
+// Appeal Repository
 func NewAppealRepository(db *database.Database) repositories.AppealRepository {
 	return &appealRepository{db: db.DB}
 }
 
 func (r *appealRepository) Create(ctx context.Context, appeal *entities.Appeal) error {
-	// Implementation similar to others...
-	return nil
+	return nil // TODO: Implement
 }
 
 func (r *appealRepository) GetByID(ctx context.Context, id uuid.UUID) (*entities.Appeal, error) {
-	return nil, nil
-}
-
-func (r *appealRepository) GetByStudentCaseID(ctx context.Context, studentCaseID uuid.UUID) ([]*entities.Appeal, error) {
 	return nil, nil
 }
 
@@ -460,7 +811,11 @@ func (r *appealRepository) GetByStudentID(ctx context.Context, studentID uuid.UU
 	return nil, nil
 }
 
-func (r *appealRepository) GetByStatus(ctx context.Context, status string) ([]*entities.Appeal, error) {
+func (r *appealRepository) GetBySanctionID(ctx context.Context, sanctionID uuid.UUID) ([]*entities.Appeal, error) {
+	return nil, nil
+}
+
+func (r *appealRepository) GetByStatus(ctx context.Context, status entities.AdmissibilityStatus) ([]*entities.Appeal, error) {
 	return nil, nil
 }
 
@@ -472,6 +827,30 @@ func (r *appealRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (r *appealRepository) GenerateAppealNumber(ctx context.Context) (string, error) {
-	return "", nil
+func (r *appealRepository) GetAll(ctx context.Context, limit, offset int) ([]*entities.Appeal, error) {
+	return nil, nil
+}
+
+func (r *appealRepository) GetPendingAppeals(ctx context.Context) ([]*entities.Appeal, error) {
+	return nil, nil
+}
+
+func (r *appealRepository) GetAdmittedAppeals(ctx context.Context) ([]*entities.Appeal, error) {
+	return nil, nil
+}
+
+func (r *appealRepository) GetRejectedAppeals(ctx context.Context) ([]*entities.Appeal, error) {
+	return nil, nil
+}
+
+func (r *appealRepository) GetAppealsWithFinalDecision(ctx context.Context) ([]*entities.Appeal, error) {
+	return nil, nil
+}
+
+func (r *appealRepository) GetAppealsNearDeadline(ctx context.Context, days int) ([]*entities.Appeal, error) {
+	return nil, nil
+}
+
+func (r *appealRepository) GetOverdueAppeals(ctx context.Context) ([]*entities.Appeal, error) {
+	return nil, nil
 }

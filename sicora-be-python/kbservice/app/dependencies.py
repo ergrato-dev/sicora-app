@@ -263,3 +263,49 @@ def get_query_analytics_service(
 ) -> QueryAnalyticsService:
     """Get query analytics service."""
     return QueryAnalyticsService(search_query_repo)
+
+
+# KB Use Cases Container for PDF Router
+class KBUseCases:
+    """Container for KB use cases used in PDF processing."""
+    
+    def __init__(
+        self,
+        create_use_case: CreateKnowledgeItemUseCase,
+        get_use_case: GetKnowledgeItemUseCase,
+        update_use_case: UpdateKnowledgeItemUseCase,
+        delete_use_case: DeleteKnowledgeItemUseCase
+    ):
+        self.create = create_use_case
+        self.get = get_use_case
+        self.update = update_use_case
+        self.delete = delete_use_case
+
+
+async def get_kb_use_cases(
+    session: AsyncSession = Depends(get_db_session)
+) -> KBUseCases:
+    """Get KB use cases container for PDF processing."""
+    # Create repositories
+    knowledge_item_repo = SQLAlchemyKnowledgeItemRepository(session)
+    
+    # Create services
+    embedding_service = OpenAIEmbeddingService()
+    validation_service = ContentValidationService()
+    
+    # Create use cases
+    create_use_case = CreateKnowledgeItemUseCase(
+        knowledge_item_repo, embedding_service, validation_service
+    )
+    get_use_case = GetKnowledgeItemUseCase(knowledge_item_repo)
+    update_use_case = UpdateKnowledgeItemUseCase(
+        knowledge_item_repo, embedding_service, validation_service
+    )
+    delete_use_case = DeleteKnowledgeItemUseCase(knowledge_item_repo)
+    
+    return KBUseCases(
+        create_use_case=create_use_case,
+        get_use_case=get_use_case,
+        update_use_case=update_use_case,
+        delete_use_case=delete_use_case
+    )
