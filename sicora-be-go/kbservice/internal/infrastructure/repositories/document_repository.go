@@ -11,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // DocumentRepositoryImpl implements the DocumentRepository interface
@@ -37,11 +38,11 @@ func (r *DocumentRepositoryImpl) GetByID(ctx context.Context, id uuid.UUID) (*en
 		Preload("Parent").
 		Where("id = ? AND deleted_at IS NULL", id).
 		First(&document).Error
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &document, nil
 }
 
@@ -54,11 +55,11 @@ func (r *DocumentRepositoryImpl) GetBySlug(ctx context.Context, slug string) (*e
 		Preload("Parent").
 		Where("slug = ? AND deleted_at IS NULL", slug).
 		First(&document).Error
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &document, nil
 }
 
@@ -135,7 +136,8 @@ func (r *DocumentRepositoryImpl) Search(ctx context.Context, criteria repositori
 
 	// Apply sorting (default to relevance if searching)
 	if criteria.Query != "" && criteria.SortBy == "" {
-		query = query.Order(fmt.Sprintf("ts_rank(search_vector, plainto_tsquery('english', '%s')) DESC", criteria.Query))
+		// SECURITY FIX: Usar parámetro preparado para prevenir SQL Injection
+		query = query.Order(gorm.Expr("ts_rank(search_vector, plainto_tsquery('english', ?)) DESC", criteria.Query))
 	} else {
 		query = r.applySorting(query, criteria.SortBy, criteria.SortOrder)
 	}
@@ -290,11 +292,11 @@ func (r *DocumentRepositoryImpl) GetParent(ctx context.Context, documentID uuid.
 		Where("child.id = ? AND kb_documents.deleted_at IS NULL", documentID).
 		Preload("Author").
 		First(&document).Error
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &document, nil
 }
 
@@ -321,11 +323,11 @@ func (r *DocumentRepositoryImpl) GetVersion(ctx context.Context, documentID uuid
 		Where("document_id = ? AND version = ?", documentID, version).
 		Preload("Author").
 		First(&docVersion).Error
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &docVersion, nil
 }
 
@@ -455,11 +457,11 @@ func (r *DocumentRepositoryImpl) GetRating(ctx context.Context, documentID, user
 	err := r.db.WithContext(ctx).
 		Where("document_id = ? AND user_id = ? AND deleted_at IS NULL", documentID, userID).
 		First(&rating).Error
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &rating, nil
 }
 
@@ -519,30 +521,32 @@ func (r *DocumentRepositoryImpl) applyFilters(query *gorm.DB, criteria repositor
 }
 
 func (r *DocumentRepositoryImpl) applySorting(query *gorm.DB, sortBy, sortOrder string) *gorm.DB {
-	if sortBy == "" {
-		sortBy = "created_at"
-	}
-	if sortOrder == "" {
-		sortOrder = "desc"
-	}
-
-	validSortFields := map[string]bool{
-		"title":      true,
-		"created_at": true,
-		"updated_at": true,
-		"view_count": true,
-		"like_count": true,
+	// SECURITY FIX: Whitelist estricta de campos permitidos para prevenir SQL Injection
+	validSortFields := map[string]string{
+		"title":      "title",
+		"created_at": "created_at",
+		"updated_at": "updated_at",
+		"view_count": "view_count",
+		"like_count": "like_count",
 	}
 
-	if !validSortFields[sortBy] {
-		sortBy = "created_at"
+	// Validar campo - usar default si no está en whitelist
+	column, ok := validSortFields[sortBy]
+	if !ok {
+		column = "created_at"
 	}
 
-	if sortOrder != "asc" && sortOrder != "desc" {
-		sortOrder = "desc"
+	// Validar dirección - solo ASC o DESC
+	descending := true
+	if strings.ToLower(sortOrder) == "asc" {
+		descending = false
 	}
 
-	return query.Order(fmt.Sprintf("%s %s", sortBy, sortOrder))
+	// SECURITY: Usar GORM clause en lugar de interpolación de strings
+	return query.Order(clause.OrderByColumn{
+		Column: clause.Column{Name: column},
+		Desc:   descending,
+	})
 }
 
 // Additional methods for workflow operations, analytics, etc.
@@ -554,10 +558,10 @@ func (r *DocumentRepositoryImpl) SubmitForReview(ctx context.Context, documentID
 	return r.db.WithContext(ctx).Model(&entities.Document{}).
 		Where("id = ?", documentID).
 		Updates(map[string]interface{}{
-			"status":                   entities.DocumentStatusReview,
-			"reviewer_id":              reviewerID,
-			"submitted_for_review_at":  now,
-			"updated_at":               now,
+			"status":                  entities.DocumentStatusReview,
+			"reviewer_id":             reviewerID,
+			"submitted_for_review_at": now,
+			"updated_at":              now,
 		}).Error
 }
 
@@ -699,7 +703,7 @@ func (r *DocumentRepositoryImpl) GetRelatedDocuments(ctx context.Context, docume
 	}
 
 	var documents []entities.Document
-	
+
 	// Find documents with similar tags or in the same category
 	query := r.db.WithContext(ctx).
 		Where("id != ? AND deleted_at IS NULL AND status = ?", documentID, entities.DocumentStatusPublished).
@@ -724,7 +728,7 @@ func (r *DocumentRepositoryImpl) GetSimilarDocuments(ctx context.Context, embedd
 	}(), ","))
 
 	var documents []entities.Document
-	
+
 	query := r.db.WithContext(ctx).
 		Where("id != ? AND deleted_at IS NULL AND status = ?", excludeID, entities.DocumentStatusPublished).
 		Select("*, (1 - (embedding <=> ?::vector)) as similarity", embeddingStr).

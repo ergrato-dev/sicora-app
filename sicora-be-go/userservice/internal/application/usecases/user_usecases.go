@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"userservice/internal/application/dtos"
+	"userservice/internal/application/security"
 	"userservice/internal/domain/entities"
 	"userservice/internal/domain/repositories"
 
@@ -105,7 +106,7 @@ func (uc *CreateUserUseCase) Execute(ctx context.Context, request dtos.CreateUse
 		return nil, err
 	}
 
-	uc.logger.Printf("User created successfully: %s (%s)", user.Email, user.ID)
+	uc.logger.Printf("User created successfully: %s (%s)", security.MaskEmail(user.Email), security.MaskUUID(user.ID.String()))
 
 	return dtos.NewUserDTOFromEntity(user), nil
 }
@@ -232,7 +233,7 @@ func (uc *AuthenticateUserUseCase) Execute(ctx context.Context, request dtos.Aut
 	// 1. Buscar usuario por email
 	user, err := uc.userRepo.GetByEmail(ctx, request.Email)
 	if err != nil {
-		uc.logger.Printf("Error getting user by email %s: %v", request.Email, err)
+		uc.logger.Printf("Error getting user by email %s: %v", security.MaskEmail(request.Email), err)
 		return nil, err
 	}
 
@@ -248,7 +249,8 @@ func (uc *AuthenticateUserUseCase) Execute(ctx context.Context, request dtos.Aut
 	// 3. Verificar contraseña
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
 	if err != nil {
-		uc.logger.Printf("Invalid password for user %s: %v", request.Email, err)
+		// SECURITY: No loguear detalles del error de bcrypt
+		uc.logger.Printf("Invalid password attempt for user %s", security.MaskEmail(request.Email))
 		return nil, entities.NewDomainError("credenciales inválidas")
 	}
 
@@ -381,13 +383,13 @@ func (uc *ForgotPasswordUseCase) Execute(ctx context.Context, email string) erro
 	// 1. Verificar que el usuario existe
 	user, err := uc.userRepo.GetByEmail(ctx, email)
 	if err != nil {
-		uc.logger.Printf("Error getting user by email %s: %v", email, err)
+		uc.logger.Printf("Error getting user by email %s: %v", security.MaskEmail(email), err)
 		return err
 	}
 
 	if user == nil {
 		// Por seguridad, no revelamos si el email existe o no
-		uc.logger.Printf("Forgot password requested for non-existent email: %s", email)
+		uc.logger.Printf("Forgot password requested for email: %s", security.MaskEmail(email))
 		return nil
 	}
 
@@ -400,13 +402,14 @@ func (uc *ForgotPasswordUseCase) Execute(ctx context.Context, email string) erro
 	// 3. Almacenar el token en la base de datos
 	// En una implementación real, esto se haría en un repositorio específico
 	// Por simplicidad, asumimos que esto se hace correctamente
-	uc.logger.Printf("Reset token generated for user %s: %s (expires: %v)", user.ID, resetToken, expirationTime)
+	// SECURITY: NUNCA loguear tokens completos
+	uc.logger.Printf("Reset token generated for user %s (expires: %v)", security.MaskUUID(user.ID.String()), expirationTime)
 
 	// 4. Enviar email con el link de restablecimiento
 	// En una implementación real, esto se haría con un servicio de email
-	// Por simplicidad, solo lo registramos
-	resetLink := fmt.Sprintf("https://sicora.app/reset-password?token=%s", resetToken)
-	uc.logger.Printf("Reset link for user %s: %s", user.ID, resetLink)
+	// SECURITY: No loguear el link con token - solo confirmar envío
+	_ = fmt.Sprintf("https://sicora.app/reset-password?token=%s", resetToken)
+	uc.logger.Printf("Reset link sent to user %s", security.MaskUUID(user.ID.String()))
 
 	return nil
 }

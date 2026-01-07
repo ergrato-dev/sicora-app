@@ -1,12 +1,13 @@
 package main
 
 import (
-	_ "scheduleservice/docs"
 	"context"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	_ "scheduleservice/docs"
+	"strings"
 	"syscall"
 	"time"
 
@@ -126,23 +127,26 @@ func main() {
 	// Setup router
 	router := gin.New()
 
-	// Global middleware
+	// SECURITY: Rate limiting - 30 req/min por IP
+	rateLimiter := middleware.NewRateLimiter(30, time.Minute)
+
+	// Global middleware - SECURITY FIRST
+	router.Use(middleware.RequestIDMiddleware())
+	router.Use(middleware.SecurityHeadersMiddleware())
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	router.Use(rateLimiter.RateLimitMiddleware())
 
-	// CORS middleware
-	router.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-
-		c.Next()
-	})
+	// CORS middleware - SECURITY: Origen específico en producción
+	allowedOrigins := []string{
+		"http://localhost:3000",
+		"http://localhost:5173",
+	}
+	if os.Getenv("ALLOWED_ORIGINS") != "" {
+		// En producción, usar orígenes configurados
+		allowedOrigins = strings.Split(os.Getenv("ALLOWED_ORIGINS"), ",")
+	}
+	router.Use(middleware.SecureCORSMiddleware(allowedOrigins))
 
 	// Setup health routes
 	routes.SetupHealthRoutes(router)

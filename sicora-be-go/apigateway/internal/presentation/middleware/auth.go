@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"strings"
 
 	"apigateway/internal/infrastructure/config"
@@ -46,6 +47,11 @@ func Auth(cfg *config.Config) gin.HandlerFunc {
 		// Parse and validate token
 		claims := &Claims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			// SECURITY: Validar explícitamente el algoritmo de firma
+			// Previene ataques de "algorithm confusion" (CVE-2015-9235)
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
 			return []byte(cfg.JWTSecret), nil
 		})
 

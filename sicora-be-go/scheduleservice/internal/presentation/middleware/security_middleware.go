@@ -3,8 +3,6 @@ package middleware
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -38,7 +36,7 @@ func (rl *RateLimiter) RateLimitMiddleware() gin.HandlerFunc {
 
 		now := time.Now()
 
-		// Limpiar requests antiguos
+		// Limpiar requests antiguos fuera de la ventana de tiempo
 		if requests, exists := rl.requests[clientIP]; exists {
 			var validRequests []time.Time
 			cutoff := now.Add(-rl.window)
@@ -62,61 +60,47 @@ func (rl *RateLimiter) RateLimitMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		// Agregar request actual
 		rl.requests[clientIP] = append(rl.requests[clientIP], now)
+
 		c.Next()
 	}
 }
 
-// SecurityHeaders agrega headers de seguridad HTTP
-func SecurityHeaders() gin.HandlerFunc {
+// SecurityHeadersMiddleware agrega headers de seguridad HTTP
+func SecurityHeadersMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Previene MIME-sniffing
 		c.Header("X-Content-Type-Options", "nosniff")
+		// Previene clickjacking
 		c.Header("X-Frame-Options", "DENY")
+		// Activa protección XSS del navegador
 		c.Header("X-XSS-Protection", "1; mode=block")
+		// Fuerza HTTPS
 		c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		// Controla información del referrer
 		c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
+		// Política de contenido base
 		c.Header("Content-Security-Policy", "default-src 'self'")
+		// Previene acceso entre dominios Flash/PDF
 		c.Header("X-Permitted-Cross-Domain-Policies", "none")
+		// Cache control para datos sensibles
 		c.Header("Cache-Control", "no-store, no-cache, must-revalidate")
 		c.Header("Pragma", "no-cache")
+
 		c.Next()
 	}
 }
 
-// RequestLogger logs incoming requests
-func RequestLogger() gin.HandlerFunc {
-	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
-			param.ClientIP,
-			param.TimeStamp.Format(time.RFC1123),
-			param.Method,
-			param.Path,
-			param.Request.Proto,
-			param.StatusCode,
-			param.Latency,
-			param.Request.UserAgent(),
-			param.ErrorMessage,
-		)
-	})
-}
-
-// SecureCORS middleware para CORS con orígenes específicos
-func SecureCORS() gin.HandlerFunc {
-	// Orígenes permitidos por defecto (desarrollo)
-	allowedOrigins := []string{
-		"http://localhost:3000",
-		"http://localhost:5173",
-	}
-	if envOrigins := os.Getenv("ALLOWED_ORIGINS"); envOrigins != "" {
-		allowedOrigins = strings.Split(envOrigins, ",")
-	}
-
+// SecureCORSMiddleware CORS seguro sin wildcard
+func SecureCORSMiddleware(allowedOrigins []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		origin := c.GetHeader("Origin")
 
+		// Verificar si el origin está permitido
 		allowed := false
 		for _, o := range allowedOrigins {
-			if strings.TrimSpace(o) == origin {
+			if o == origin {
 				allowed = true
 				break
 			}
@@ -124,13 +108,13 @@ func SecureCORS() gin.HandlerFunc {
 
 		if allowed {
 			c.Header("Access-Control-Allow-Origin", origin)
+			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, X-Request-ID")
 			c.Header("Access-Control-Allow-Credentials", "true")
-			c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-			c.Header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
 		}
 
 		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
+			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
 
@@ -138,30 +122,14 @@ func SecureCORS() gin.HandlerFunc {
 	}
 }
 
-// CORS middleware inseguro - DEPRECADO, usar SecureCORS
-// Mantenido para compatibilidad temporal
-func CORS() gin.HandlerFunc {
-	return SecureCORS()
-}
-
-// ErrorHandler middleware for centralized error handling
-func ErrorHandler() gin.HandlerFunc {
-	return gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
-		c.JSON(500, gin.H{
-			"error":   "Internal Server Error",
-			"message": "An unexpected error occurred",
-		})
-		c.Abort()
-	})
-}
-
-// RequestID agrega un ID único a cada request
-func RequestID() gin.HandlerFunc {
+// RequestIDMiddleware agrega un ID único a cada request
+func RequestIDMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestID := c.GetHeader("X-Request-ID")
 		if requestID == "" {
 			requestID = fmt.Sprintf("req_%d", time.Now().UnixNano())
 		}
+
 		c.Header("X-Request-ID", requestID)
 		c.Set("request_id", requestID)
 		c.Next()

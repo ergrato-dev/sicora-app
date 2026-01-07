@@ -200,9 +200,11 @@ func RequireAdmin() gin.HandlerFunc {
 // Helper functions
 
 // shouldSkipAuth verifica si una ruta debe ser omitida de la autenticación
+// SECURITY: Usa exact matching para prevenir bypass de autenticación
 func shouldSkipAuth(path string, skipPaths []string) bool {
 	for _, skipPath := range skipPaths {
-		if strings.HasPrefix(path, skipPath) {
+		// Exact match o subruta válida (path == "/api/auth" o path == "/api/auth/...")
+		if path == skipPath || strings.HasPrefix(path, skipPath+"/") {
 			return true
 		}
 	}

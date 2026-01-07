@@ -37,6 +37,7 @@ import (
 	"mevalservice/internal/infrastructure/repositories"
 	"mevalservice/internal/jobs"
 	"mevalservice/internal/presentation/handlers"
+	"mevalservice/internal/presentation/middleware"
 	"mevalservice/internal/presentation/routes"
 	"mevalservice/internal/services"
 )
@@ -85,9 +86,19 @@ func main() {
 	if os.Getenv("APP_ENV") == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	
+
 	router := gin.New()
+
+	// SECURITY: Rate limiting - 30 req/min por IP
+	rateLimiter := middleware.NewRateLimiter(30, time.Minute)
+
+	// SECURITY: Middleware en orden correcto
+	router.Use(middleware.RequestID())
+	router.Use(middleware.SecurityHeaders())
 	router.Use(gin.Recovery())
+	router.Use(middleware.RequestLogger())
+	router.Use(rateLimiter.RateLimitMiddleware())
+	router.Use(middleware.SecureCORS())
 
 	// Setup routes
 	routes.SetupRoutes(router, committeeHandler, studentCaseHandler, improvementPlanHandler, sanctionHandler, appealHandler, healthHandler)
@@ -143,7 +154,7 @@ func main() {
 	// Give the server 5 seconds to finish requests
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	
+
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatalf("Server forced to shutdown: %v", err)
 	}

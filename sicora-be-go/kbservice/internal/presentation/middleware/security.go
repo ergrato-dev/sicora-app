@@ -8,8 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"projectevalservice/internal/infrastructure/auth"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,11 +38,9 @@ func (rl *RateLimiter) RateLimitMiddleware() gin.HandlerFunc {
 
 		now := time.Now()
 
-		// Limpiar requests antiguos
 		if requests, exists := rl.requests[clientIP]; exists {
 			var validRequests []time.Time
 			cutoff := now.Add(-rl.window)
-
 			for _, reqTime := range requests {
 				if reqTime.After(cutoff) {
 					validRequests = append(validRequests, reqTime)
@@ -53,7 +49,6 @@ func (rl *RateLimiter) RateLimitMiddleware() gin.HandlerFunc {
 			rl.requests[clientIP] = validRequests
 		}
 
-		// Verificar límite
 		if len(rl.requests[clientIP]) >= rl.limit {
 			c.JSON(http.StatusTooManyRequests, gin.H{
 				"error":       "RATE_LIMIT_EXCEEDED",
@@ -85,7 +80,7 @@ func SecurityHeaders() gin.HandlerFunc {
 	}
 }
 
-// RequestID agrega un ID único a cada request
+// RequestID agrega un ID unico a cada request
 func RequestID() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestID := c.GetHeader("X-Request-ID")
@@ -98,62 +93,7 @@ func RequestID() gin.HandlerFunc {
 	}
 }
 
-func JWTAuth(jwtService *auth.JWTService) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
-			c.Abort()
-			return
-		}
-
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if tokenString == authHeader {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Bearer token required"})
-			c.Abort()
-			return
-		}
-
-		claims, err := jwtService.ValidateToken(tokenString)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-			c.Abort()
-			return
-		}
-
-		c.Set("user_id", claims.UserID)
-		c.Set("user_email", claims.Email)
-		c.Set("user_role", claims.Role)
-		c.Set("is_active", claims.IsActive)
-		c.Set("must_change_password", claims.MustChangePassword)
-
-		c.Next()
-	}
-}
-
-func RequireRole(roles ...string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		userRole, exists := c.Get("user_role")
-		if !exists {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "No role found in token"})
-			c.Abort()
-			return
-		}
-
-		role := userRole.(string)
-		for _, requiredRole := range roles {
-			if role == requiredRole {
-				c.Next()
-				return
-			}
-		}
-
-		c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient permissions"})
-		c.Abort()
-	}
-}
-
-// SecureCORS middleware para CORS con orígenes específicos
+// SecureCORS middleware para CORS con origenes especificos
 func SecureCORS() gin.HandlerFunc {
 	allowedOrigins := []string{
 		"http://localhost:3000",
@@ -182,15 +122,10 @@ func SecureCORS() gin.HandlerFunc {
 		}
 
 		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
+			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
 
 		c.Next()
 	}
-}
-
-// CORS - DEPRECADO, usar SecureCORS
-func CORS() gin.HandlerFunc {
-	return SecureCORS()
 }

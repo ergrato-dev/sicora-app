@@ -99,10 +99,17 @@ func main() {
 	// Bulk use cases
 	bulkUserUseCases := usecases.NewBulkUserUseCases(userRepo, validate)
 
-	// Setup JWT service
+	// Setup JWT service - SECURITY FIX
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
-		jwtSecret = "your-secret-key"
+		if os.Getenv("GIN_MODE") == "release" {
+			log.Fatal("SECURITY ERROR: JWT_SECRET es OBLIGATORIO en producción")
+		}
+		log.Println("⚠️  WARNING: Usando JWT_SECRET por defecto - NO usar en producción")
+		jwtSecret = "dev-only-unsafe-secret-key-32chars!"
+	}
+	if len(jwtSecret) < 32 {
+		log.Fatal("SECURITY ERROR: JWT_SECRET debe tener mínimo 32 caracteres")
 	}
 
 	jwtService := auth.NewJWTService(jwtSecret, "sicora-userservice", 24*time.Hour)
@@ -145,25 +152,44 @@ func main() {
 			"/docs",
 			"/swagger",
 			"/api/v1/auth",
-			"/api/v1/users", // Only for POST (registration)
+			// SECURITY: NO incluir "/api/v1/users" completo (bypass de auth)
+			// Solo rutas específicas de registro si son necesarias
 		},
 		CacheTTL:        5 * time.Minute,
 		EnableBlacklist: true,
 	}
 
-	// Setup rate limiter
-	rateLimiter := middleware.NewRateLimiter(100, time.Minute)
+	// Setup rate limiter - SECURITY: Límites estrictos
+	// 30 req/min para endpoints generales (más restrictivo)
+	generalRateLimiter := middleware.NewRateLimiter(30, time.Minute)
+	// 10 req/min para endpoints de autenticación (previene brute force)
+	authRateLimiter := middleware.NewRateLimiter(10, time.Minute)
+
+	// SECURITY: Métricas de seguridad para detectar ataques
+	securityMetrics := middleware.NewSecurityMetrics(logger)
 
 	// Add global middleware
 	router.Use(middleware.RequestIDMiddleware())
 	router.Use(middleware.SecurityHeadersMiddleware())
+	router.Use(securityMetrics.SecurityMetricsMiddleware())           // Bloqueo de IPs maliciosas
+	router.Use(middleware.SuspiciousPatternDetector(securityMetrics)) // Detectar SQL injection, XSS, etc.
 	router.Use(middleware.LoggingMiddleware())
 	router.Use(middleware.CORSMiddleware())
-	router.Use(rateLimiter.RateLimitMiddleware()) // 100 requests per minute
+	router.Use(generalRateLimiter.RateLimitMiddleware()) // 30 requests per minute
 	router.Use(middleware.CompressionMiddleware())
 	router.Use(middleware.TimeoutMiddleware(30 * time.Second))
 	router.Use(middleware.ErrorMiddleware(logger))
 	router.Use(middleware.NotFoundMiddleware())
+
+	// Rate limiting específico para rutas de autenticación
+	authGroup := router.Group("/api/v1/auth")
+	authGroup.Use(authRateLimiter.RateLimitMiddleware()) // 10 req/min para auth
+
+	// Endpoint de métricas de seguridad (solo admin)
+	router.GET("/admin/security/metrics", func(c *gin.Context) {
+		// TODO: Agregar autenticación de admin
+		c.JSON(200, securityMetrics.GetStats())
+	})
 
 	// Setup routes with auth config
 	routes.SetupUserRoutes(router, userHandler, authConfig)

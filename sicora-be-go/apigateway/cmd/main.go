@@ -64,19 +64,35 @@ func main() {
 	// Add recovery middleware
 	router.Use(gin.Recovery())
 
-	// Configure CORS
+	// Configure CORS - SECURITY FIX: No permitir credentials con wildcard
+	allowCredentials := true
+	for _, origin := range cfg.CORSOrigins {
+		if origin == "*" {
+			// SECURITY: Wildcard + credentials = CSRF vulnerability
+			allowCredentials = false
+			log.Println("⚠️  WARNING: CORS wildcard detectado - deshabilitando credentials")
+			break
+		}
+	}
+
+	// SECURITY: Validar que hay origins configurados en producción
+	if cfg.Environment == "production" && len(cfg.CORSOrigins) == 0 {
+		log.Fatal("SECURITY ERROR: CORS_ORIGINS debe configurarse en producción")
+	}
+
 	corsConfig := cors.Config{
 		AllowOrigins:     cfg.CORSOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Request-ID"},
 		ExposeHeaders:    []string{"Content-Length", "X-Request-ID"},
-		AllowCredentials: true,
+		AllowCredentials: allowCredentials,
 		MaxAge:           12 * time.Hour,
 	}
 	router.Use(cors.New(corsConfig))
 
 	// Add custom middleware
 	router.Use(middleware.RequestID())
+	router.Use(middleware.SecurityHeaders())
 	router.Use(middleware.Logger(zapLogger))
 	router.Use(middleware.RateLimiter(cfg.RateLimit))
 

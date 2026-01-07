@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -38,16 +40,40 @@ func Load() (*Config, error) {
 	// Load .env file if exists
 	_ = godotenv.Load()
 
+	environment := getEnv("ENVIRONMENT", "development")
+
+	// SECURITY FIX: JWT_SECRET obligatorio en producción
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		if environment == "production" {
+			return nil, fmt.Errorf("SECURITY ERROR: JWT_SECRET es OBLIGATORIO en producción")
+		}
+		// Solo en desarrollo usar default con warning
+		log.Println("⚠️  WARNING: Usando JWT_SECRET por defecto - NO usar en producción")
+		jwtSecret = "dev-only-unsafe-secret-key-32chars!"
+	}
+
+	// SECURITY: Validar longitud mínima del secret (32 caracteres)
+	if len(jwtSecret) < 32 {
+		return nil, fmt.Errorf("SECURITY ERROR: JWT_SECRET debe tener mínimo 32 caracteres (actual: %d)", len(jwtSecret))
+	}
+
+	// SECURITY FIX: CORS restrictivo en producción
+	defaultCORS := []string{"http://localhost:3000", "http://localhost:5173"}
+	if environment == "production" {
+		defaultCORS = []string{} // En producción DEBE configurarse explícitamente
+	}
+
 	cfg := &Config{
 		Port:          getEnv("PORT", "8000"),
-		Environment:   getEnv("ENVIRONMENT", "development"),
+		Environment:   environment,
 		LogLevel:      getEnv("LOG_LEVEL", "info"),
 		ReadTimeout:   getDurationEnv("READ_TIMEOUT", 30*time.Second),
 		WriteTimeout:  getDurationEnv("WRITE_TIMEOUT", 30*time.Second),
 		IdleTimeout:   getDurationEnv("IDLE_TIMEOUT", 60*time.Second),
-		CORSOrigins:   getSliceEnv("CORS_ORIGINS", []string{"*"}),
+		CORSOrigins:   getSliceEnv("CORS_ORIGINS", defaultCORS),
 		RateLimit:     getIntEnv("RATE_LIMIT", 100),
-		JWTSecret:     getEnv("JWT_SECRET", "sicora-secret-key-change-in-production"),
+		JWTSecret:     jwtSecret,
 		JWTExpiration: getDurationEnv("JWT_EXPIRATION", 24*time.Hour),
 		Services:      loadServiceURLs(),
 	}

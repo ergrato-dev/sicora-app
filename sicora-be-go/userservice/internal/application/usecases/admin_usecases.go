@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"userservice/internal/application/dtos"
+	"userservice/internal/application/security"
 	"userservice/internal/domain/entities"
 	"userservice/internal/domain/repositories"
 
@@ -108,11 +109,11 @@ func (uc *DeleteUserUseCase) Execute(ctx context.Context, userID uuid.UUID) erro
 	// 3. Actualizar en el repositorio
 	err = uc.userRepo.Update(ctx, user)
 	if err != nil {
-		uc.logger.Printf("Error deactivating user %s: %v", userID, err)
+		uc.logger.Printf("Error deactivating user %s: %v", security.MaskUUID(userID.String()), err)
 		return err
 	}
 
-	uc.logger.Printf("User deactivated successfully: %s (%s)", user.Email, user.ID)
+	uc.logger.Printf("User deactivated successfully: %s (%s)", security.MaskEmail(user.Email), security.MaskUUID(user.ID.String()))
 
 	return nil
 }
@@ -411,11 +412,11 @@ func (uc *UpdateUserUseCase) Execute(ctx context.Context, userID uuid.UUID, requ
 	// 9. Guardar en el repositorio
 	err = uc.userRepo.Update(ctx, user)
 	if err != nil {
-		uc.logger.Printf("Error updating user %s: %v", user.ID, err)
+		uc.logger.Printf("Error updating user %s: %v", security.MaskUUID(user.ID.String()), err)
 		return nil, err
 	}
 
-	uc.logger.Printf("User updated successfully by admin: %s (%s)", user.Email, user.ID)
+	uc.logger.Printf("User updated successfully by admin: %s (%s)", security.MaskEmail(user.Email), security.MaskUUID(user.ID.String()))
 
 	return dtos.NewUserDTOFromEntity(user), nil
 }

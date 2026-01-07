@@ -276,7 +276,9 @@ func extractTokenFromHeader(c *gin.Context) (string, error) {
 
 func shouldSkipAuth(path string, skipPaths []string) bool {
 	for _, skipPath := range skipPaths {
-		if strings.HasPrefix(path, skipPath) {
+		// SECURITY: Usar exact matching para prevenir bypass
+		// Ejemplo: "/api/v1/auth" NO debe matchear "/api/v1/auth-bypass"
+		if path == skipPath || strings.HasPrefix(path, skipPath+"/") {
 			return true
 		}
 	}

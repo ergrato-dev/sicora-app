@@ -35,6 +35,7 @@ import (
 	"projectevalservice/internal/infrastructure/database"
 	"projectevalservice/internal/infrastructure/database/repositories"
 	"projectevalservice/internal/presentation/handlers"
+	"projectevalservice/internal/presentation/middleware"
 	"projectevalservice/internal/presentation/routes"
 
 	"github.com/gin-gonic/gin"
@@ -76,10 +77,17 @@ func main() {
 	submissionHandler := handlers.NewSubmissionHandler(submissionUseCase)
 	evaluationHandler := handlers.NewEvaluationHandler(evaluationUseCase)
 
-	// Initialize JWT service
+	// Initialize JWT service - SECURITY FIX
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
-		jwtSecret = "your-super-secret-jwt-key-change-in-production"
+		if os.Getenv("GIN_MODE") == "release" {
+			log.Fatal("SECURITY ERROR: JWT_SECRET es OBLIGATORIO en producción")
+		}
+		log.Println("⚠️  WARNING: Usando JWT_SECRET por defecto - NO usar en producción")
+		jwtSecret = "dev-only-unsafe-secret-key-32chars!"
+	}
+	if len(jwtSecret) < 32 {
+		log.Fatal("SECURITY ERROR: JWT_SECRET debe tener mínimo 32 caracteres")
 	}
 
 	jwtService := auth.NewJWTService(
@@ -94,8 +102,17 @@ func main() {
 	}
 
 	router := gin.New()
+
+	// SECURITY: Rate limiting - 30 req/min por IP
+	rateLimiter := middleware.NewRateLimiter(30, time.Minute)
+
+	// SECURITY: Middleware en orden correcto
+	router.Use(middleware.RequestID())
+	router.Use(middleware.SecurityHeaders())
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	router.Use(rateLimiter.RateLimitMiddleware())
+	router.Use(middleware.SecureCORS())
 
 	// Setup routes
 	routes.SetupRoutes(router, projectHandler, submissionHandler, evaluationHandler, jwtService)

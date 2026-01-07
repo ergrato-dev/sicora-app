@@ -1,4 +1,5 @@
 package main
+
 // @title           SICORA kbservice API
 // @version         1.0
 // @description     Microservicio kbservice del Sistema de Información de Coordinación Académica (SICORA) - SENA
@@ -18,10 +19,9 @@ package main
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 
-
 import (
-	_ "kbservice/docs"
 	"context"
+	_ "kbservice/docs"
 	"log"
 	"net/http"
 	"os"
@@ -33,6 +33,7 @@ import (
 	"kbservice/internal/infrastructure/database"
 	"kbservice/internal/infrastructure/repositories"
 	"kbservice/internal/presentation/handlers"
+	"kbservice/internal/presentation/middleware"
 	"kbservice/internal/presentation/routes"
 
 	"github.com/gin-gonic/gin"
@@ -138,23 +139,19 @@ func setupRouter() *gin.Engine {
 
 	router := gin.New()
 
-	// Middleware
+	// SECURITY: Rate limiting - 30 req/min por IP
+	rateLimiter := middleware.NewRateLimiter(30, time.Minute)
+
+	// SECURITY: Middleware en orden correcto
+	router.Use(middleware.RequestID())
+	router.Use(middleware.SecurityHeaders())
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	router.Use(rateLimiter.RateLimitMiddleware())
 
-	// CORS middleware
-	router.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(200)
-			return
-		}
-
-		c.Next()
-	})
+	// CORS middleware - SECURITY: Origen específico en producción
+	// SecureCORS lee ALLOWED_ORIGINS de env automáticamente
+	router.Use(middleware.SecureCORS())
 
 	// Health check endpoint
 	router.GET("/health", func(c *gin.Context) {

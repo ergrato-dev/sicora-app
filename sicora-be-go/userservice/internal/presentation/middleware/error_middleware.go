@@ -3,7 +3,6 @@ package middleware
 import (
 	"log"
 	"net/http"
-	"runtime/debug"
 	"time"
 
 	"userservice/internal/domain/errors"
@@ -40,8 +39,8 @@ func ErrorMiddleware(logger *log.Logger) gin.HandlerFunc {
 
 		case error:
 			// Handle generic Go errors
+			// SECURITY: No exponer stack traces en logs (información sensible)
 			logger.Printf("[%s] Generic error: %v", correlationID, err)
-			logger.Printf("[%s] Stack trace: %s", correlationID, debug.Stack())
 
 			errorResponse = errors.ErrorResponse{
 				Error: errors.ErrorDetails{
@@ -57,8 +56,8 @@ func ErrorMiddleware(logger *log.Logger) gin.HandlerFunc {
 
 		default:
 			// Handle unknown panic types
+			// SECURITY: No exponer stack traces en logs (información sensible)
 			logger.Printf("[%s] Unknown panic: %v", correlationID, recovered)
-			logger.Printf("[%s] Stack trace: %s", correlationID, debug.Stack())
 
 			errorResponse = errors.ErrorResponse{
 				Error: errors.ErrorDetails{
