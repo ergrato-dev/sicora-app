@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,8 +12,11 @@ import (
 	"syscall"
 	"time"
 
+	"sicora-be-go/pkg/cache"
+
 	"scheduleservice/configs"
 	"scheduleservice/internal/application/usecases"
+	infraCache "scheduleservice/internal/infrastructure/cache"
 	"scheduleservice/internal/infrastructure/database"
 	"scheduleservice/internal/infrastructure/database/repositories"
 	"scheduleservice/internal/presentation/middleware"
@@ -64,16 +68,47 @@ func main() {
 		logger.Fatalf("Failed to run migrations: %v", err)
 	}
 
+	// Initialize Redis cache (if enabled)
+	var serviceCache *infraCache.ScheduleServiceCache
+	if config.Redis.Enabled {
+		redisAddr := fmt.Sprintf("%s:%s", config.Redis.Host, config.Redis.Port)
+		cacheConfig := &cache.CacheConfig{
+			Addr:         redisAddr,
+			Password:     config.Redis.Password,
+			DB:           config.Redis.DB,
+			KeyPrefix:    "scheduleservice",
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 5 * time.Second,
+		}
+
+		cacheClient, err := cache.NewRedisClient(cacheConfig)
+		if err != nil {
+			logger.Printf("⚠️ Failed to connect to Redis: %v. Cache disabled.", err)
+			config.Redis.Enabled = false
+		} else {
+			serviceCache = infraCache.NewScheduleServiceCache(cacheClient, logger)
+			logger.Printf("✅ Redis cache connected successfully at %s", redisAddr)
+		}
+	}
+
 	// Initialize validator
 	validator := validator.New()
 
 	// Initialize repositories
 	scheduleRepo := repositories.NewScheduleRepository(db.DB)
-	// TODO: Implement master data use cases
-	// academicProgramRepo := repositories.NewAcademicProgramRepository(db.DB)
 	academicGroupRepo := repositories.NewAcademicGroupRepository(db.DB)
 	venueRepo := repositories.NewVenueRepository(db.DB)
-	// campusRepo := repositories.NewCampusRepository(db.DB)
+	campusRepo := repositories.NewCampusRepository(db.DB)
+	academicProgramRepo := repositories.NewAcademicProgramRepository(db.DB)
+
+	// Wrap with cached repositories if cache is enabled
+	if config.Redis.Enabled && serviceCache != nil {
+		campusRepo = infraCache.NewCachedCampusRepository(campusRepo, serviceCache, logger)
+		academicProgramRepo = infraCache.NewCachedAcademicProgramRepository(academicProgramRepo, serviceCache, logger)
+		academicGroupRepo = infraCache.NewCachedAcademicGroupRepository(academicGroupRepo, serviceCache, logger)
+		venueRepo = infraCache.NewCachedVenueRepository(venueRepo, serviceCache, logger)
+		logger.Printf("✅ Cached repositories enabled for master data")
+	}
 
 	// Initialize use cases
 	createScheduleUseCase := usecases.NewCreateScheduleUseCase(

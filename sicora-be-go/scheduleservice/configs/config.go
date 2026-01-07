@@ -3,6 +3,7 @@ package configs
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -12,6 +13,16 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	JWT      JWTConfig
+	Redis    RedisConfig
+}
+
+// RedisConfig holds Redis cache configuration
+type RedisConfig struct {
+	Host     string
+	Port     string
+	Password string
+	DB       int
+	Enabled  bool
 }
 
 // ServerConfig holds server configuration
@@ -66,6 +77,13 @@ func LoadConfig() *Config {
 			SecretKey:      getEnvOrDefault("JWT_SECRET_KEY", "your-256-bit-secret"),
 			ExpirationTime: 24, // 24 hours
 		},
+		Redis: RedisConfig{
+			Host:     getEnvOrDefault("REDIS_HOST", "localhost"),
+			Port:     getEnvOrDefault("REDIS_PORT", "6379"),
+			Password: getEnvOrDefault("REDIS_PASSWORD", ""),
+			DB:       getEnvInt("REDIS_DB", 0),
+			Enabled:  getEnvBool("REDIS_ENABLED", true),
+		},
 	}
 }
 
@@ -73,6 +91,30 @@ func LoadConfig() *Config {
 func getEnvOrDefault(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
+	}
+	return defaultValue
+}
+
+// getEnvBool gets environment variable as bool
+func getEnvBool(key string, defaultValue bool) bool {
+	if value := os.Getenv(key); value != "" {
+		b, err := strconv.ParseBool(value)
+		if err != nil {
+			return defaultValue
+		}
+		return b
+	}
+	return defaultValue
+}
+
+// getEnvInt gets environment variable as int
+func getEnvInt(key string, defaultValue int) int {
+	if value := os.Getenv(key); value != "" {
+		i, err := strconv.Atoi(value)
+		if err != nil {
+			return defaultValue
+		}
+		return i
 	}
 	return defaultValue
 }
