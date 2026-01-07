@@ -74,7 +74,7 @@ Para documentación detallada, consulta la [documentación organizada](./_docs/)
 
 ### Prerrequisitos
 
-- Python 3.11 o superior
+- **Python 3.14+** (requerido desde Enero 2026)
 - PostgreSQL 15 (con pgvector)
 - Redis
 - Docker y Docker Compose

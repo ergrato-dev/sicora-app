@@ -1,9 +1,9 @@
-version: '3.9'
+version: "3.9"
 
 services:
   # PostgreSQL 15 - Base de datos principal
   postgres:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     container_name: sicora-postgres
     restart: unless-stopped
     environment:
@@ -76,12 +76,12 @@ services:
     networks:
       - sicora-network
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
 
   # Grafana - Dashboards
   grafana:

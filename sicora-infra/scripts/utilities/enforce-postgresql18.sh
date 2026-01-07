@@ -1,26 +1,26 @@
 #!/bin/bash
 
 # =============================================================================
-# POSTGRESQL 15 ENFORCEMENT SCRIPT
+# POSTGRESQL 18 ENFORCEMENT SCRIPT
 # =============================================================================
-# Actualiza todas las referencias a PostgreSQL para garantizar versión 15
+# Actualiza todas las referencias a PostgreSQL para garantizar versión 18
 # =============================================================================
 
-echo "🔧 Enforcing PostgreSQL 15 across the project..."
+echo "🔧 Enforcing PostgreSQL 18 across the project..."
 
 # Función para actualizar archivos
 update_postgres_refs() {
     local file="$1"
     if [ -f "$file" ]; then
         # Reemplazar referencias genéricas
-        sed -i 's/PostgreSQL/PostgreSQL 15/g' "$file" 2>/dev/null || true
-        sed -i 's/postgresql/postgresql-15/g' "$file" 2>/dev/null || true
-        sed -i 's/postgres:/postgres:15/g' "$file" 2>/dev/null || true
+        sed -i 's/PostgreSQL/PostgreSQL 18/g' "$file" 2>/dev/null || true
+        sed -i 's/postgresql/postgresql-18/g' "$file" 2>/dev/null || true
+        sed -i 's/postgres:/postgres:18/g' "$file" 2>/dev/null || true
         
         # Evitar duplicados
-        sed -i 's/PostgreSQL 15 15/PostgreSQL 15/g' "$file" 2>/dev/null || true
-        sed -i 's/postgresql-15-15/postgresql-15/g' "$file" 2>/dev/null || true
-        sed -i 's/postgres:15:15/postgres:15/g' "$file" 2>/dev/null || true
+        sed -i 's/PostgreSQL 18 18/PostgreSQL 18/g' "$file" 2>/dev/null || true
+        sed -i 's/postgresql-18-18/postgresql-18/g' "$file" 2>/dev/null || true
+        sed -i 's/postgres:18:18/postgres:18/g' "$file" 2>/dev/null || true
         
         echo "✅ Updated: $file"
     fi
@@ -54,20 +54,20 @@ find . -name "*.md" -not -path "./.git/*" -not -path "./venv*/*" | while read fi
 done
 
 echo ""
-echo "✅ PostgreSQL 15 enforcement completed!"
+echo "✅ PostgreSQL 18 enforcement completed!"
 echo "🔍 Verifying docker-compose.yml..."
 
 # Verificar docker-compose.yml
-if grep -q "postgres:15" docker-compose.yml; then
-    echo "✅ docker-compose.yml already uses postgres:15"
+if grep -q "postgres:18" docker-compose.yml; then
+    echo "✅ docker-compose.yml already uses postgres:18"
 else
     echo "⚠️  WARNING: docker-compose.yml needs manual verification"
 fi
 
 echo ""
 echo "📊 Summary:"
-echo "- All documentation updated to PostgreSQL 15"
+echo "- All documentation updated to PostgreSQL 18"
 echo "- README files standardized"
 echo "- Technical docs aligned"
 echo ""
-echo "🚀 Ready to proceed with Next.js implementation!"
+echo "🚀 PostgreSQL 18 enforcement complete!"

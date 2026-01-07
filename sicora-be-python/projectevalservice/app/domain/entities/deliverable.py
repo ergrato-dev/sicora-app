@@ -29,18 +29,28 @@ class DeliverableStatus(Enum):
 
 @dataclass
 class Deliverable:
+    # Required fields first
     id: UUID
     project_id: UUID
-    evaluation_id: Optional[UUID]
 
-    # Deliverable details
+    # Deliverable details - required
     name: str
     description: str
     deliverable_type: DeliverableType
     status: DeliverableStatus
 
-    # Timing
+    # Timing - required
     due_date: datetime
+
+    # Metadata - required
+    created_at: datetime
+    updated_at: datetime
+    created_by: UUID
+
+    # Optional fields with defaults
+    evaluation_id: Optional[UUID] = None
+
+    # Timing - optional
     submitted_date: Optional[datetime] = None
     reviewed_date: Optional[datetime] = None
 
@@ -58,11 +68,6 @@ class Deliverable:
     # Version control
     version: int = 1
     previous_version_id: Optional[UUID] = None
-
-    # Metadata
-    created_at: datetime
-    updated_at: datetime
-    created_by: UUID
 
     def submit_deliverable(
         self, file_path: str, file_name: str, file_size: int, file_type: str

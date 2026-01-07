@@ -32,6 +32,21 @@ from .criteria_use_cases import (
     DeactivateCriterionUseCase,
 )
 
+from .stakeholder_use_cases import (
+    CreateStakeholderUseCase,
+    GetStakeholderUseCase,
+    UpdateStakeholderUseCase,
+    ListStakeholdersUseCase,
+    DocumentExpectationsUseCase,
+    AcknowledgeLimitationsUseCase,
+    EstablishCommunicationChannelUseCase,
+    RecordScopeChangeRequestUseCase,
+    SuspendStakeholderUseCase,
+    ReactivateStakeholderUseCase,
+    CheckCollaborationReadinessUseCase,
+    GetStakeholderStatsUseCase,
+)
+
 __all__ = [
     # Project use cases
     "CreateProjectUseCase",
@@ -52,4 +67,26 @@ __all__ = [
     "GetScheduledEvaluationsUseCase",
     "GetEvaluationsByPeriodUseCase",
     "RescheduleEvaluationUseCase",
+    # Criteria use cases
+    "CreateCriterionUseCase",
+    "SubmitCriterionForApprovalUseCase",
+    "ApproveCriterionUseCase",
+    "RejectCriterionUseCase",
+    "GetCriterionUseCase",
+    "GetCriteriaUseCase",
+    "GetCriterionHistoryUseCase",
+    "DeactivateCriterionUseCase",
+    # Stakeholder use cases
+    "CreateStakeholderUseCase",
+    "GetStakeholderUseCase",
+    "UpdateStakeholderUseCase",
+    "ListStakeholdersUseCase",
+    "DocumentExpectationsUseCase",
+    "AcknowledgeLimitationsUseCase",
+    "EstablishCommunicationChannelUseCase",
+    "RecordScopeChangeRequestUseCase",
+    "SuspendStakeholderUseCase",
+    "ReactivateStakeholderUseCase",
+    "CheckCollaborationReadinessUseCase",
+    "GetStakeholderStatsUseCase",
 ]

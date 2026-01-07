@@ -5,7 +5,6 @@ from ..entities import Stakeholder, StakeholderStatus, StakeholderType
 
 
 class StakeholderRepository(ABC):
-
     @abstractmethod
     async def create(self, stakeholder: Stakeholder) -> Stakeholder:
         """Create a new stakeholder"""
@@ -44,6 +43,16 @@ class StakeholderRepository(ABC):
     @abstractmethod
     async def delete(self, stakeholder_id: UUID) -> bool:
         """Delete stakeholder"""
+        pass
+
+    @abstractmethod
+    async def get_all(
+        self,
+        status: Optional[StakeholderStatus] = None,
+        stakeholder_type: Optional[StakeholderType] = None,
+        collaboration_ready: Optional[bool] = None,
+    ) -> List[Stakeholder]:
+        """Get all stakeholders with optional filters"""
         pass
 
     @abstractmethod

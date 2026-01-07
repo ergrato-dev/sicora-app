@@ -134,7 +134,7 @@ version: '3.9'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     container_name: sicora_postgres_prod
     restart: unless-stopped
     environment:
@@ -887,7 +887,7 @@ version: '3.9'
 services:
   # Base de datos y Redis
   postgres:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     container_name: sicora_postgres_prod
     restart: unless-stopped
     environment:

@@ -18,9 +18,21 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - Configuración Git progresiva (mínima a estricta)
 - Servidor MCP completamente funcional
 - 389 endpoints de API distribuidos entre Go y Python
+- ProjectEvalService Python completado al 100% (41 endpoints, 62 tests)
+- SVG de arquitectura para ProjectEvalService
 
 ### Cambiado
 
+- **PostgreSQL 18 como versión unificada** para toda la infraestructura SICORA
+- Todos los docker-compose actualizados a `postgres:18-alpine`
+- CI/CD workflows actualizados para usar PostgreSQL 18
+- Scripts de enforcement renombrados a `enforce-postgresql18.sh`
+- **Python 3.14+ como versión mínima requerida** para sicora-be-python
+- Todos los Dockerfiles Python actualizados a `python:3.14-slim`
+- pyproject.toml actualizado con `requires-python = ">=3.14"`
+- Herramientas (black, isort, mypy) configuradas para Python 3.14
+- requirements.txt con versiones flexibles (`>=`) para mejor compatibilidad
+- Dataclasses corregidos para compatibilidad Python 3.14 (orden de campos)
 - Migración completa de SENA a OneVision branding
 - Reorganización de documentación en estructura `_docs/`
 - Mejora en la organización de assets con subcarpetas temáticas

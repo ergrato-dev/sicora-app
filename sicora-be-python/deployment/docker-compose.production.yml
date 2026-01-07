@@ -1,19 +1,19 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: sicora_production
       POSTGRES_USER: sicora_user
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sicora_password}
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - postgres_data_production:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U sicora_user -d sicora_production']
+      test: ["CMD-SHELL", "pg_isready -U sicora_user -d sicora_production"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -21,12 +21,12 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - '6379:6379'
+      - "6379:6379"
     restart: unless-stopped
     volumes:
       - redis_data_production:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ["CMD", "redis-cli", "ping"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -42,13 +42,13 @@ services:
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY:-your-secret-key-here}
     ports:
-      - '8000:8000'
+      - "8000:8000"
     depends_on:
       - postgres
       - redis
     restart: unless-stopped
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -64,13 +64,13 @@ services:
       REDIS_URL: redis://redis:6379/1
       SECRET_KEY: ${SECRET_KEY:-your-secret-key-here}
     ports:
-      - '8001:8001'
+      - "8001:8001"
     depends_on:
       - postgres
       - redis
     restart: unless-stopped
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8001/health']
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s
       timeout: 10s
       retries: 5

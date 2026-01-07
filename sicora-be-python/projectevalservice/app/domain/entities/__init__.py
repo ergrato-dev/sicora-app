@@ -1,24 +1,43 @@
 # Entities package
-# Temporarily commenting out imports until classes are fully implemented
-
-# from .project import Project, ProjectStatus, ProjectType
-# from .evaluation import Evaluation, EvaluationStatus, EvaluationType
-# from .stakeholder import Stakeholder, StakeholderType, StakeholderStatus
-# from .change_request import (
-#     ChangeRequest,
-#     ChangeRequestType,
-#     ChangeRequestStatus,
-#     ChangeRequestPriority,
-# )
-# from .deliverable import Deliverable, DeliverableType, DeliverableStatus
+from .project import Project, ProjectStatus, ProjectType
+from .evaluation import (
+    EvaluationSession,
+    EvaluationStatus,
+    EvaluationResult,
+    EvaluationSummary,
+    TrimesterType,
+    ProjectIdea,
+    StudentGroup,
+)
+from .stakeholder import Stakeholder, StakeholderType, StakeholderStatus
+from .change_request import (
+    ChangeRequest,
+    ChangeRequestType,
+    ChangeRequestStatus,
+    ChangeRequestPriority,
+)
+from .deliverable import Deliverable, DeliverableType, DeliverableStatus
+from .evaluation_criterion import (
+    EvaluationCriterion,
+    CriterionStatus,
+    CriterionCategory,
+    CriterionApproval,
+    ApprovalStatus,
+    CriterionChangeHistory,
+)
+from .voice_note import VoiceNote
 
 __all__ = [
     "Project",
     "ProjectStatus",
     "ProjectType",
-    "Evaluation",
+    "EvaluationSession",
     "EvaluationStatus",
-    "EvaluationType",
+    "EvaluationResult",
+    "EvaluationSummary",
+    "TrimesterType",
+    "ProjectIdea",
+    "StudentGroup",
     "Stakeholder",
     "StakeholderType",
     "StakeholderStatus",
@@ -29,4 +48,11 @@ __all__ = [
     "Deliverable",
     "DeliverableType",
     "DeliverableStatus",
+    "EvaluationCriterion",
+    "CriterionStatus",
+    "CriterionCategory",
+    "CriterionApproval",
+    "ApprovalStatus",
+    "CriterionChangeHistory",
+    "VoiceNote",
 ]

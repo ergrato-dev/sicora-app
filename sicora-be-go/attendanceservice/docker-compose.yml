@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   attendanceservice:
@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: attendanceservice
     ports:
-      - '8003:8003'
+      - "8003:8003"
     environment:
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=8003
@@ -28,12 +28,12 @@ services:
     healthcheck:
       test:
         [
-          'CMD',
-          'wget',
-          '--no-verbose',
-          '--tries=1',
-          '--spider',
-          'http://localhost:8003/health',
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8003/health",
         ]
       interval: 30s
       timeout: 10s
@@ -44,22 +44,22 @@ services:
       - attendanceservice-network
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     container_name: attendanceservice-postgres
     environment:
       - POSTGRES_DB=sicora_multistack
       - POSTGRES_USER=attendanceservice_user
       - POSTGRES_PASSWORD=attendanceservice_password_secure_2024
     ports:
-      - '5433:5432' # Puerto diferente para evitar conflictos
+      - "5433:5432" # Puerto diferente para evitar conflictos
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init:/docker-entrypoint-initdb.d
     healthcheck:
       test:
         [
-          'CMD-SHELL',
-          'pg_isready -U attendanceservice_user -d sicora_multistack',
+          "CMD-SHELL",
+          "pg_isready -U attendanceservice_user -d sicora_multistack",
         ]
       interval: 10s
       timeout: 5s

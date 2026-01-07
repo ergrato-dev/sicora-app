@@ -12,7 +12,7 @@ docker run --name postgres-user-db \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=postgres \
   -p 5432:5432 \
-  -d postgres:15
+  -d postgres:18
 
 # Esperar a que PostgreSQL esté listo
 echo "⏳ Esperando que PostgreSQL UserDB esté listo..."

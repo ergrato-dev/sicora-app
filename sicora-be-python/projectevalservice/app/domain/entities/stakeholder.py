@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 from uuid import UUID
 from enum import Enum
 
@@ -23,6 +23,7 @@ class StakeholderStatus(Enum):
 
 @dataclass
 class Stakeholder:
+    # Required fields (no defaults) must come first
     id: UUID
     name: str
     stakeholder_type: StakeholderType
@@ -31,24 +32,26 @@ class Stakeholder:
     # Contact information
     contact_person: str
     email: str
-    phone: Optional[str]
-    address: Optional[str]
+
+    # Metadata - required
+    created_at: datetime
+    updated_at: datetime
+    created_by: UUID
+
+    # Optional fields with defaults
+    phone: Optional[str] = None
+    address: Optional[str] = None
 
     # Organization details
-    organization_size: Optional[str]  # small, medium, large, enterprise
-    sector: Optional[str]
-    website: Optional[str]
+    organization_size: Optional[str] = None  # small, medium, large, enterprise
+    sector: Optional[str] = None
+    website: Optional[str] = None
 
-    # SENA collaboration
+    # OneVision collaboration
     previous_collaborations: int = 0
     expectations_documented: bool = False
     limitations_acknowledged: bool = False
     communication_channel_established: bool = False
-
-    # Metadata
-    created_at: datetime
-    updated_at: datetime
-    created_by: UUID
 
     # Governance and limitations
     scope_change_requests: int = 0

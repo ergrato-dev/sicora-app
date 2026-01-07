@@ -165,14 +165,14 @@ version: '3.8'
 services:
   # PostgreSQL instances per microservice
   user-db:
-    image: postgres:15
+    image: postgres:18
     environment:
       POSTGRES_DB: user_db
     volumes:
       - user_data:/var/lib/postgresql/data
 
   attendance-db:
-    image: postgres:15
+    image: postgres:18
     environment:
       POSTGRES_DB: attendance_db
     volumes:

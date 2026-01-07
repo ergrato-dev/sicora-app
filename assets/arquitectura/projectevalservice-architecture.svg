@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" style="background-color: #1a1a2e">
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" fill="#e94560" font-family="Arial, sans-serif" font-size="24" font-weight="bold">
+    ProjectEvalService - Clean Architecture
+  </text>
+  <text x="450" y="65" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="14">
+    FastAPI + SQLAlchemy + PostgreSQL | Port 8008 | 41 Endpoints | 62 Tests
+  </text>
+
+  <!-- Presentation Layer -->
+  <rect x="50" y="100" width="800" height="130" rx="10" fill="none" stroke="#e94560" stroke-width="2"/>
+  <text x="60" y="120" fill="#e94560" font-family="Arial, sans-serif" font-size="14" font-weight="bold">PRESENTATION LAYER</text>
+  
+  <!-- Controllers -->
+  <rect x="70" y="135" width="170" height="80" rx="5" fill="#16213e"/>
+  <text x="155" y="155" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="12" font-weight="bold">project_controller</text>
+  <text x="155" y="175" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">8 endpoints</text>
+  <text x="155" y="190" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">RF-01, RF-02</text>
+  <text x="155" y="205" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="10">✓ 100%</text>
+
+  <rect x="260" y="135" width="170" height="80" rx="5" fill="#16213e"/>
+  <text x="345" y="155" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="12" font-weight="bold">evaluation_controller</text>
+  <text x="345" y="175" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">10 endpoints</text>
+  <text x="345" y="190" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">RF-08 to RF-12</text>
+  <text x="345" y="205" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="10">✓ 100%</text>
+
+  <rect x="450" y="135" width="170" height="80" rx="5" fill="#16213e"/>
+  <text x="535" y="155" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="12" font-weight="bold">criterion_controller</text>
+  <text x="535" y="175" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">9 endpoints</text>
+  <text x="535" y="190" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">RF-13</text>
+  <text x="535" y="205" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="10">✓ 100%</text>
+
+  <rect x="640" y="135" width="190" height="80" rx="5" fill="#16213e"/>
+  <text x="735" y="155" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="12" font-weight="bold">stakeholder_controller</text>
+  <text x="735" y="175" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">14 endpoints</text>
+  <text x="735" y="190" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">RF-06, RF-07</text>
+  <text x="735" y="205" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="10">✓ 100%</text>
+
+  <!-- Application Layer -->
+  <rect x="50" y="250" width="800" height="130" rx="10" fill="none" stroke="#0f4c75" stroke-width="2"/>
+  <text x="60" y="270" fill="#0f4c75" font-family="Arial, sans-serif" font-size="14" font-weight="bold">APPLICATION LAYER (Use Cases)</text>
+  
+  <rect x="70" y="285" width="170" height="80" rx="5" fill="#16213e"/>
+  <text x="155" y="305" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="11" font-weight="bold">project_use_cases</text>
+  <text x="155" y="325" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">8 use cases</text>
+  <text x="155" y="345" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">CRUD + workflow</text>
+  <text x="155" y="360" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="10">✓ Implemented</text>
+
+  <rect x="260" y="285" width="170" height="80" rx="5" fill="#16213e"/>
+  <text x="345" y="305" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="11" font-weight="bold">evaluation_use_cases</text>
+  <text x="345" y="325" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">17 use cases</text>
+  <text x="345" y="345" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">Full evaluation flow</text>
+  <text x="345" y="360" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="10">✓ Implemented</text>
+
+  <rect x="450" y="285" width="170" height="80" rx="5" fill="#16213e"/>
+  <text x="535" y="305" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="11" font-weight="bold">criteria_use_cases</text>
+  <text x="535" y="325" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">8 use cases</text>
+  <text x="535" y="345" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">Approval workflow</text>
+  <text x="535" y="360" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="10">✓ Implemented</text>
+
+  <rect x="640" y="285" width="190" height="80" rx="5" fill="#16213e"/>
+  <text x="735" y="305" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="11" font-weight="bold">stakeholder_use_cases</text>
+  <text x="735" y="325" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">12 use cases</text>
+  <text x="735" y="345" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="10">Onboarding + mgmt</text>
+  <text x="735" y="360" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="10">✓ Implemented</text>
+
+  <!-- Domain Layer -->
+  <rect x="50" y="400" width="800" height="100" rx="10" fill="none" stroke="#00cec9" stroke-width="2"/>
+  <text x="60" y="420" fill="#00cec9" font-family="Arial, sans-serif" font-size="14" font-weight="bold">DOMAIN LAYER (Entities &amp; Repositories)</text>
+  
+  <rect x="70" y="435" width="120" height="50" rx="5" fill="#16213e"/>
+  <text x="130" y="455" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="10" font-weight="bold">Project</text>
+  <text x="130" y="470" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="9">✓ Entity</text>
+
+  <rect x="200" y="435" width="120" height="50" rx="5" fill="#16213e"/>
+  <text x="260" y="455" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="10" font-weight="bold">Evaluation</text>
+  <text x="260" y="470" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="9">✓ Entity</text>
+
+  <rect x="330" y="435" width="120" height="50" rx="5" fill="#16213e"/>
+  <text x="390" y="455" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="10" font-weight="bold">Stakeholder</text>
+  <text x="390" y="470" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="9">✓ Entity</text>
+
+  <rect x="460" y="435" width="130" height="50" rx="5" fill="#16213e"/>
+  <text x="525" y="455" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="10" font-weight="bold">EvaluationCriterion</text>
+  <text x="525" y="470" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="9">✓ Entity</text>
+
+  <rect x="600" y="435" width="120" height="50" rx="5" fill="#16213e"/>
+  <text x="660" y="455" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="10" font-weight="bold">Deliverable</text>
+  <text x="660" y="470" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="9">✓ Entity</text>
+
+  <rect x="730" y="435" width="110" height="50" rx="5" fill="#16213e"/>
+  <text x="785" y="455" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="10" font-weight="bold">VoiceNote</text>
+  <text x="785" y="470" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="9">✓ Entity</text>
+
+  <!-- Infrastructure Layer -->
+  <rect x="50" y="520" width="800" height="100" rx="10" fill="none" stroke="#6c5ce7" stroke-width="2"/>
+  <text x="60" y="540" fill="#6c5ce7" font-family="Arial, sans-serif" font-size="14" font-weight="bold">INFRASTRUCTURE LAYER</text>
+  
+  <rect x="70" y="555" width="170" height="50" rx="5" fill="#16213e"/>
+  <text x="155" y="575" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="10" font-weight="bold">SQLAlchemy Models</text>
+  <text x="155" y="590" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="9">6 models + 3 criterion</text>
+
+  <rect x="260" y="555" width="180" height="50" rx="5" fill="#16213e"/>
+  <text x="350" y="575" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="10" font-weight="bold">SQLAlchemy Repositories</text>
+  <text x="350" y="590" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="9">4 implementations</text>
+
+  <rect x="460" y="555" width="170" height="50" rx="5" fill="#16213e"/>
+  <text x="545" y="575" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="10" font-weight="bold">Alembic Migrations</text>
+  <text x="545" y="590" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="9">Database versioning</text>
+
+  <rect x="650" y="555" width="190" height="50" rx="5" fill="#16213e"/>
+  <text x="745" y="575" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="10" font-weight="bold">Dependencies (DI)</text>
+  <text x="745" y="590" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="9">FastAPI injection</text>
+
+  <!-- Database -->
+  <rect x="350" y="640" width="200" height="45" rx="10" fill="#16213e" stroke="#f1c40f" stroke-width="2"/>
+  <text x="450" y="665" text-anchor="middle" fill="#f1c40f" font-family="Arial, sans-serif" font-size="12" font-weight="bold">PostgreSQL 18</text>
+  <text x="450" y="680" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="9">projectevalservice_schema</text>
+
+  <!-- Flow arrows -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  
+  <line x1="450" y1="230" x2="450" y2="250" stroke="#9ca3af" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <line x1="450" y1="380" x2="450" y2="400" stroke="#9ca3af" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <line x1="450" y1="500" x2="450" y2="520" stroke="#9ca3af" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <line x1="450" y1="620" x2="450" y2="640" stroke="#9ca3af" stroke-width="1" marker-end="url(#arrowhead)"/>
+
+  <!-- Stats box -->
+  <rect x="700" y="640" width="150" height="55" rx="5" fill="#16213e" stroke="#22c55e" stroke-width="1"/>
+  <text x="775" y="658" text-anchor="middle" fill="#22c55e" font-family="Arial, sans-serif" font-size="11" font-weight="bold">STATS</text>
+  <text x="775" y="673" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="9">Controllers: 4</text>
+  <text x="775" y="685" text-anchor="middle" fill="#eaeaea" font-family="Arial, sans-serif" font-size="9">Endpoints: 41 | Tests: 62</text>
+</svg>

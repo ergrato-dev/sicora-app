@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   # API Gateway
@@ -175,7 +175,7 @@ services:
 
   # Servicios de infraestructura (referencia a sicora-infra)
   postgres:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     container_name: sicora-postgres
     restart: unless-stopped
     environment:

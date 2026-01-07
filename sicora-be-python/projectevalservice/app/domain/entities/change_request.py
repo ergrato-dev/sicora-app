@@ -30,12 +30,13 @@ class ChangeRequestPriority(Enum):
 
 @dataclass
 class ChangeRequest:
+    # Required fields first
     id: UUID
     project_id: UUID
     requester_id: UUID  # Could be stakeholder, instructor, or student
     requester_type: str  # "stakeholder", "instructor", "student"
 
-    # Request details
+    # Request details - required
     change_type: ChangeRequestType
     title: str
     description: str
@@ -43,6 +44,11 @@ class ChangeRequest:
     priority: ChangeRequestPriority
     status: ChangeRequestStatus
 
+    # Metadata - required
+    created_at: datetime
+    updated_at: datetime
+
+    # Optional fields with defaults
     # Impact analysis
     estimated_effort_hours: Optional[int] = None
     impact_on_timeline: Optional[str] = None
@@ -59,10 +65,6 @@ class ChangeRequest:
     decision_maker_id: Optional[UUID] = None
     decision_date: Optional[datetime] = None
     decision_reason: Optional[str] = None
-
-    # Metadata
-    created_at: datetime
-    updated_at: datetime
 
     def submit_for_review(self, reviewer_id: UUID) -> None:
         """Submit change request for academic review"""

@@ -1,5 +1,5 @@
 # Utilizar una imagen base ligera de Python
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 # Establecer variables de entorno
 ENV PYTHONDONTWRITEBYTECODE 1

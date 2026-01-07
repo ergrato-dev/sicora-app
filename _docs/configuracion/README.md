@@ -20,6 +20,11 @@
 - [Configuración de Docker](./CONFIGURACION_DOCKER.md)
 - [Configuración de CI/CD](./CONFIGURACION_CICD.md)
 
+### Configuración de Lenguajes
+
+- [**Configuración Python 3.14+**](./CONFIGURACION_PYTHON_314.md) - Requisitos y migración a Python 3.14
+- [**Configuración PostgreSQL 18**](./CONFIGURACION_POSTGRESQL_18.md) - Base de datos unificada
+
 ## 🎯 Propósito
 
 Esta sección contiene toda la documentación relacionada con la configuración del proyecto SICORA, incluyendo:
@@ -38,4 +43,4 @@ Esta sección contiene toda la documentación relacionada con la configuración 
 
 ---
 
-**Última actualización**: 3 de julio de 2025
+**Última actualización**: 6 de Enero de 2026
