@@ -2,6 +2,14 @@
 
 ## 📋 Documentos en esta Sección
 
+### 📱 Frontend Next.js
+
+- [📋 **PLAN DE DESARROLLO FRONTEND NEXT.JS**](./PLAN_DESARROLLO_FRONTEND_NEXTJS.md) - **NUEVO**
+  - Mapeo completo HU → Endpoints → Páginas
+  - Inventario de 85+ endpoints backend
+  - Cronograma de 12 sprints
+  - ![Diagrama](../assets/arquitectura/plan-desarrollo-frontend-dark.svg)
+
 ### Guías de Desarrollo
 
 - [Guía de Desarrollo Frontend](./GUIA_DESARROLLO_FRONTEND.md)

@@ -1,0 +1,353 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#39a900"/>
+    </marker>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#39a900"/>
+      <stop offset="100%" style="stop-color:#2d8400"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#0d1117"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" font-family="Segoe UI, Arial" font-size="24" font-weight="bold" fill="#ffffff" text-anchor="middle">SICORA - Plan de Desarrollo Frontend Next.js</text>
+  <text x="600" y="65" font-family="Segoe UI, Arial" font-size="14" fill="#8b949e" text-anchor="middle">Mapeo HU → Backend Endpoints → Páginas Frontend</text>
+
+  <!-- Legend -->
+  <g transform="translate(900, 85)">
+    <rect x="0" y="0" width="280" height="90" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="140" y="20" font-family="Segoe UI, Arial" font-size="12" font-weight="bold" fill="#8b949e" text-anchor="middle">LEYENDA</text>
+    <circle cx="20" cy="40" r="8" fill="#39a900"/>
+    <text x="35" y="44" font-family="Segoe UI, Arial" font-size="11" fill="#c9d1d9">Completado (15%)</text>
+    <circle cx="150" cy="40" r="8" fill="#f0883e"/>
+    <text x="165" y="44" font-family="Segoe UI, Arial" font-size="11" fill="#c9d1d9">En desarrollo (5%)</text>
+    <circle cx="20" cy="65" r="8" fill="#484f58"/>
+    <text x="35" y="69" font-family="Segoe UI, Arial" font-size="11" fill="#c9d1d9">Pendiente (80%)</text>
+    <circle cx="150" cy="65" r="8" fill="#8957e5"/>
+    <text x="165" y="69" font-family="Segoe UI, Arial" font-size="11" fill="#c9d1d9">Backend Ready</text>
+  </g>
+
+  <!-- Progress Bar -->
+  <g transform="translate(30, 85)">
+    <rect x="0" y="0" width="850" height="40" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="20" y="26" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#c9d1d9">Progreso Global: 6/39 HUs (15%)</text>
+    <rect x="280" y="12" width="400" height="16" rx="4" fill="#21262d"/>
+    <rect x="280" y="12" width="60" height="16" rx="4" fill="#39a900"/>
+    <rect x="340" y="12" width="20" height="16" fill="#f0883e"/>
+    <text x="700" y="26" font-family="Segoe UI, Arial" font-size="11" fill="#8b949e">85+ endpoints backend disponibles</text>
+  </g>
+
+  <!-- Phase 1: Auth - COMPLETED -->
+  <g transform="translate(30, 145)">
+    <rect x="0" y="0" width="220" height="180" rx="12" fill="#0d1117" stroke="#39a900" stroke-width="2"/>
+    <rect x="0" y="0" width="220" height="35" rx="12" fill="url(#headerGrad)"/>
+    <rect x="0" y="20" width="220" height="15" fill="url(#headerGrad)"/>
+    <text x="110" y="24" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FASE 1: Autenticación</text>
+    <text x="200" y="24" font-family="Segoe UI, Arial" font-size="11" fill="#ffffff">✅</text>
+    
+    <g transform="translate(15, 50)">
+      <circle cx="8" cy="8" r="6" fill="#39a900"/>
+      <text x="20" y="12" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-001: Login</text>
+      <circle cx="8" cy="28" r="6" fill="#39a900"/>
+      <text x="20" y="32" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-002: Logout</text>
+      <circle cx="8" cy="48" r="6" fill="#39a900"/>
+      <text x="20" y="52" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-003: Forgot Password</text>
+      <circle cx="8" cy="68" r="6" fill="#39a900"/>
+      <text x="20" y="72" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-004: Change Password</text>
+      <circle cx="8" cy="88" r="6" fill="#39a900"/>
+      <text x="20" y="92" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-029: Reset Password</text>
+      <circle cx="8" cy="108" r="6" fill="#39a900"/>
+      <text x="20" y="112" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-030: AuthContext</text>
+    </g>
+  </g>
+
+  <!-- Phase 2: Dashboard -->
+  <g transform="translate(270, 145)">
+    <rect x="0" y="0" width="220" height="180" rx="12" fill="#0d1117" stroke="#f0883e" stroke-width="2"/>
+    <rect x="0" y="0" width="220" height="35" rx="12" fill="#f0883e"/>
+    <rect x="0" y="20" width="220" height="15" fill="#f0883e"/>
+    <text x="110" y="24" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FASE 2: Dashboard</text>
+    <text x="200" y="24" font-family="Segoe UI, Arial" font-size="11" fill="#ffffff">🚧</text>
+    
+    <g transform="translate(15, 50)">
+      <circle cx="8" cy="8" r="6" fill="#f0883e"/>
+      <text x="20" y="12" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-005: Dashboard Aprendiz</text>
+      <circle cx="8" cy="28" r="6" fill="#39a900"/>
+      <text x="20" y="32" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-006: Saludo Personal</text>
+      <circle cx="8" cy="48" r="6" fill="#484f58"/>
+      <text x="20" y="52" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-007-010: Widgets Aprendiz</text>
+      <circle cx="8" cy="68" r="6" fill="#f0883e"/>
+      <text x="20" y="72" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-011: Dashboard Instructor</text>
+      <circle cx="8" cy="88" r="6" fill="#484f58"/>
+      <text x="20" y="92" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-012-015: Widgets Instructor</text>
+      <circle cx="8" cy="108" r="6" fill="#484f58"/>
+      <text x="20" y="112" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-016: Dashboard Admin</text>
+    </g>
+  </g>
+
+  <!-- Phase 3: Users -->
+  <g transform="translate(510, 145)">
+    <rect x="0" y="0" width="220" height="180" rx="12" fill="#0d1117" stroke="#484f58" stroke-width="2"/>
+    <rect x="0" y="0" width="220" height="35" rx="12" fill="#484f58"/>
+    <rect x="0" y="20" width="220" height="15" fill="#484f58"/>
+    <text x="110" y="24" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FASE 3: Usuarios</text>
+    <text x="200" y="24" font-family="Segoe UI, Arial" font-size="11" fill="#ffffff">📋</text>
+    
+    <g transform="translate(15, 50)">
+      <circle cx="8" cy="8" r="6" fill="#484f58"/>
+      <text x="20" y="12" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-017: Gestión Usuarios</text>
+      <circle cx="8" cy="28" r="6" fill="#484f58"/>
+      <text x="20" y="32" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-022: Ver Perfil</text>
+      <circle cx="8" cy="48" r="6" fill="#484f58"/>
+      <text x="20" y="52" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-025: Editar Perfil</text>
+      <circle cx="8" cy="68" r="6" fill="#484f58"/>
+      <text x="20" y="72" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-028: CRUD Usuarios</text>
+      <circle cx="8" cy="88" r="6" fill="#484f58"/>
+      <text x="20" y="92" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Carga Masiva Usuarios</text>
+    </g>
+    <rect x="10" y="140" width="200" height="30" rx="4" fill="#161b22" stroke="#8957e5" stroke-dasharray="3"/>
+    <text x="110" y="160" font-family="Segoe UI, Arial" font-size="10" fill="#8957e5" text-anchor="middle">Backend: 22 endpoints UserService</text>
+  </g>
+
+  <!-- Phase 4: Schedules -->
+  <g transform="translate(750, 145)">
+    <rect x="0" y="0" width="220" height="180" rx="12" fill="#0d1117" stroke="#484f58" stroke-width="2"/>
+    <rect x="0" y="0" width="220" height="35" rx="12" fill="#484f58"/>
+    <rect x="0" y="20" width="220" height="15" fill="#484f58"/>
+    <text x="110" y="24" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FASE 4: Horarios</text>
+    <text x="200" y="24" font-family="Segoe UI, Arial" font-size="11" fill="#ffffff">📋</text>
+    
+    <g transform="translate(15, 50)">
+      <circle cx="8" cy="8" r="6" fill="#484f58"/>
+      <text x="20" y="12" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-018: Gestión Horarios</text>
+      <circle cx="8" cy="28" r="6" fill="#484f58"/>
+      <text x="20" y="32" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Ver Horarios por Ficha</text>
+      <circle cx="8" cy="48" r="6" fill="#484f58"/>
+      <text x="20" y="52" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Crear/Editar Horario</text>
+      <circle cx="8" cy="68" r="6" fill="#484f58"/>
+      <text x="20" y="72" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Gestión Programas/Fichas</text>
+      <circle cx="8" cy="88" r="6" fill="#484f58"/>
+      <text x="20" y="92" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-019: Carga Masiva</text>
+    </g>
+    <rect x="10" y="140" width="200" height="30" rx="4" fill="#161b22" stroke="#8957e5" stroke-dasharray="3"/>
+    <text x="110" y="160" font-family="Segoe UI, Arial" font-size="10" fill="#8957e5" text-anchor="middle">Backend: 12 endpoints Schedule</text>
+  </g>
+
+  <!-- Phase 5: Attendance -->
+  <g transform="translate(30, 345)">
+    <rect x="0" y="0" width="220" height="180" rx="12" fill="#0d1117" stroke="#484f58" stroke-width="2"/>
+    <rect x="0" y="0" width="220" height="35" rx="12" fill="#484f58"/>
+    <rect x="0" y="20" width="220" height="15" fill="#484f58"/>
+    <text x="110" y="24" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FASE 5: Asistencia</text>
+    <text x="200" y="24" font-family="Segoe UI, Arial" font-size="11" fill="#ffffff">📋</text>
+    
+    <g transform="translate(15, 50)">
+      <circle cx="8" cy="8" r="6" fill="#484f58"/>
+      <text x="20" y="12" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Registrar Asistencia</text>
+      <circle cx="8" cy="28" r="6" fill="#484f58"/>
+      <text x="20" y="32" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Registro Masivo</text>
+      <circle cx="8" cy="48" r="6" fill="#484f58"/>
+      <text x="20" y="52" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-026: Historial</text>
+      <circle cx="8" cy="68" r="6" fill="#484f58"/>
+      <text x="20" y="72" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-027: Justificaciones</text>
+      <circle cx="8" cy="88" r="6" fill="#484f58"/>
+      <text x="20" y="92" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Sistema de Alertas</text>
+    </g>
+    <rect x="10" y="140" width="200" height="30" rx="4" fill="#161b22" stroke="#8957e5" stroke-dasharray="3"/>
+    <text x="110" y="160" font-family="Segoe UI, Arial" font-size="10" fill="#8957e5" text-anchor="middle">Backend: 15 endpoints Attendance</text>
+  </g>
+
+  <!-- Phase 6: Evaluations -->
+  <g transform="translate(270, 345)">
+    <rect x="0" y="0" width="220" height="180" rx="12" fill="#0d1117" stroke="#484f58" stroke-width="2"/>
+    <rect x="0" y="0" width="220" height="35" rx="12" fill="#484f58"/>
+    <rect x="0" y="20" width="220" height="15" fill="#484f58"/>
+    <text x="110" y="24" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FASE 6: Evaluaciones</text>
+    <text x="200" y="24" font-family="Segoe UI, Arial" font-size="11" fill="#ffffff">📋</text>
+    
+    <g transform="translate(15, 50)">
+      <circle cx="8" cy="8" r="6" fill="#484f58"/>
+      <text x="20" y="12" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Lista Evaluaciones</text>
+      <circle cx="8" cy="28" r="6" fill="#484f58"/>
+      <text x="20" y="32" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Responder Evaluación</text>
+      <circle cx="8" cy="48" r="6" fill="#484f58"/>
+      <text x="20" y="52" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Gestión Cuestionarios</text>
+      <circle cx="8" cy="68" r="6" fill="#484f58"/>
+      <text x="20" y="72" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Reportes Instructor/Periodo</text>
+      <circle cx="8" cy="88" r="6" fill="#484f58"/>
+      <text x="20" y="92" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Dashboard Analítico</text>
+    </g>
+    <rect x="10" y="140" width="200" height="30" rx="4" fill="#161b22" stroke="#8957e5" stroke-dasharray="3"/>
+    <text x="110" y="160" font-family="Segoe UI, Arial" font-size="10" fill="#8957e5" text-anchor="middle">Backend: 39 endpoints EvalinService</text>
+  </g>
+
+  <!-- Phase 7: Knowledge Base -->
+  <g transform="translate(510, 345)">
+    <rect x="0" y="0" width="220" height="180" rx="12" fill="#0d1117" stroke="#484f58" stroke-width="2"/>
+    <rect x="0" y="0" width="220" height="35" rx="12" fill="#484f58"/>
+    <rect x="0" y="20" width="220" height="15" fill="#484f58"/>
+    <text x="110" y="24" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FASE 7: Knowledge Base</text>
+    <text x="200" y="24" font-family="Segoe UI, Arial" font-size="11" fill="#ffffff">📋</text>
+    
+    <g transform="translate(15, 50)">
+      <circle cx="8" cy="8" r="6" fill="#484f58"/>
+      <text x="20" y="12" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Búsqueda Artículos</text>
+      <circle cx="8" cy="28" r="6" fill="#484f58"/>
+      <text x="20" y="32" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Ver/Crear Artículo</text>
+      <circle cx="8" cy="48" r="6" fill="#484f58"/>
+      <text x="20" y="52" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Subir PDFs</text>
+      <circle cx="8" cy="68" r="6" fill="#484f58"/>
+      <text x="20" y="72" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">Query Natural Language</text>
+    </g>
+    <rect x="10" y="140" width="200" height="30" rx="4" fill="#161b22" stroke="#8957e5" stroke-dasharray="3"/>
+    <text x="110" y="160" font-family="Segoe UI, Arial" font-size="10" fill="#8957e5" text-anchor="middle">Backend: 18 endpoints KbService</text>
+  </g>
+
+  <!-- Phase 8: AI -->
+  <g transform="translate(750, 345)">
+    <rect x="0" y="0" width="220" height="180" rx="12" fill="#0d1117" stroke="#484f58" stroke-width="2"/>
+    <rect x="0" y="0" width="220" height="35" rx="12" fill="#484f58"/>
+    <rect x="0" y="20" width="220" height="15" fill="#484f58"/>
+    <text x="110" y="24" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FASE 8: IA y Asistente</text>
+    <text x="200" y="24" font-family="Segoe UI, Arial" font-size="11" fill="#ffffff">📋</text>
+    
+    <g transform="translate(15, 50)">
+      <circle cx="8" cy="8" r="6" fill="#484f58"/>
+      <text x="20" y="12" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-031: Predictivo Deserción</text>
+      <circle cx="8" cy="28" r="6" fill="#484f58"/>
+      <text x="20" y="32" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-032: Optimizador Horarios</text>
+      <circle cx="8" cy="48" r="6" fill="#484f58"/>
+      <text x="20" y="52" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-033: Consultas NLP</text>
+      <circle cx="8" cy="68" r="6" fill="#484f58"/>
+      <text x="20" y="72" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-FE-034-038: Features IA</text>
+    </g>
+    <rect x="10" y="140" width="200" height="30" rx="4" fill="#161b22" stroke="#8957e5" stroke-dasharray="3"/>
+    <text x="110" y="160" font-family="Segoe UI, Arial" font-size="10" fill="#8957e5" text-anchor="middle">Backend: 6 endpoints AIService</text>
+  </g>
+
+  <!-- Phase 9: Offline -->
+  <g transform="translate(30, 545)">
+    <rect x="0" y="0" width="460" height="140" rx="12" fill="#0d1117" stroke="#484f58" stroke-width="2"/>
+    <rect x="0" y="0" width="460" height="35" rx="12" fill="#484f58"/>
+    <rect x="0" y="20" width="460" height="15" fill="#484f58"/>
+    <text x="230" y="24" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FASE 9: Funcionalidad Offline (PWA)</text>
+    <text x="440" y="24" font-family="Segoe UI, Arial" font-size="11" fill="#ffffff">📋</text>
+    
+    <g transform="translate(15, 50)">
+      <circle cx="8" cy="8" r="6" fill="#484f58"/>
+      <text x="20" y="12" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-OFFLINE-CONFIG: Preferencias Sync</text>
+      <circle cx="8" cy="28" r="6" fill="#484f58"/>
+      <text x="20" y="32" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-OFFLINE-STATUS: Indicador Conexión</text>
+      <circle cx="8" cy="48" r="6" fill="#484f58"/>
+      <text x="20" y="52" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-OFFLINE-REG: Asistencia Offline</text>
+      <circle cx="230" cy="8" r="6" fill="#484f58"/>
+      <text x="245" y="12" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-OFFLINE-JUST: Justificación Offline</text>
+      <circle cx="230" cy="28" r="6" fill="#484f58"/>
+      <text x="245" y="32" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-OFFLINE-SCHEDULE: Horario Offline</text>
+      <circle cx="230" cy="48" r="6" fill="#484f58"/>
+      <text x="245" y="52" font-family="Segoe UI, Arial" font-size="10" fill="#c9d1d9">HU-OFFLINE-CONFLICT: Manejo Conflictos</text>
+    </g>
+    <rect x="10" y="100" width="440" height="30" rx="4" fill="#161b22" stroke="#8957e5" stroke-dasharray="3"/>
+    <text x="230" y="120" font-family="Segoe UI, Arial" font-size="10" fill="#8957e5" text-anchor="middle">Implementación: Service Worker + IndexedDB + Cache API</text>
+  </g>
+
+  <!-- Backend Services Summary -->
+  <g transform="translate(510, 545)">
+    <rect x="0" y="0" width="460" height="140" rx="12" fill="#0d1117" stroke="#8957e5" stroke-width="2"/>
+    <rect x="0" y="0" width="460" height="35" rx="12" fill="#8957e5"/>
+    <rect x="0" y="20" width="460" height="15" fill="#8957e5"/>
+    <text x="230" y="24" font-family="Segoe UI, Arial" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">Backend Microservicios - 85+ Endpoints Listos</text>
+    
+    <g transform="translate(15, 50)">
+      <rect x="0" y="0" width="130" height="20" rx="4" fill="#39a900"/>
+      <text x="65" y="14" font-family="Segoe UI, Arial" font-size="9" fill="#ffffff" text-anchor="middle">UserService 22 ep</text>
+      
+      <rect x="140" y="0" width="130" height="20" rx="4" fill="#39a900"/>
+      <text x="205" y="14" font-family="Segoe UI, Arial" font-size="9" fill="#ffffff" text-anchor="middle">ScheduleService 12 ep</text>
+      
+      <rect x="280" y="0" width="130" height="20" rx="4" fill="#39a900"/>
+      <text x="345" y="14" font-family="Segoe UI, Arial" font-size="9" fill="#ffffff" text-anchor="middle">AttendanceService 15 ep</text>
+      
+      <rect x="0" y="30" width="130" height="20" rx="4" fill="#39a900"/>
+      <text x="65" y="44" font-family="Segoe UI, Arial" font-size="9" fill="#ffffff" text-anchor="middle">EvalinService 39 ep</text>
+      
+      <rect x="140" y="30" width="130" height="20" rx="4" fill="#39a900"/>
+      <text x="205" y="44" font-family="Segoe UI, Arial" font-size="9" fill="#ffffff" text-anchor="middle">KbService 18 ep</text>
+      
+      <rect x="280" y="30" width="130" height="20" rx="4" fill="#f0883e"/>
+      <text x="345" y="44" font-family="Segoe UI, Arial" font-size="9" fill="#ffffff" text-anchor="middle">AIService 6 ep</text>
+      
+      <rect x="0" y="60" width="130" height="20" rx="4" fill="#39a900"/>
+      <text x="65" y="74" font-family="Segoe UI, Arial" font-size="9" fill="#ffffff" text-anchor="middle">MevalService 12 ep</text>
+      
+      <rect x="140" y="60" width="130" height="20" rx="4" fill="#39a900"/>
+      <text x="205" y="74" font-family="Segoe UI, Arial" font-size="9" fill="#ffffff" text-anchor="middle">ProjectEvalService 8 ep</text>
+      
+      <rect x="280" y="60" width="130" height="20" rx="4" fill="#39a900"/>
+      <text x="345" y="74" font-family="Segoe UI, Arial" font-size="9" fill="#ffffff" text-anchor="middle">APIGateway (Proxy)</text>
+    </g>
+  </g>
+
+  <!-- Timeline -->
+  <g transform="translate(30, 710)">
+    <rect x="0" y="0" width="940" height="80" rx="12" fill="#161b22" stroke="#30363d"/>
+    <text x="470" y="25" font-family="Segoe UI, Arial" font-size="14" font-weight="bold" fill="#c9d1d9" text-anchor="middle">CRONOGRAMA: 12 Sprints (~24 semanas)</text>
+    
+    <!-- Timeline bar -->
+    <rect x="20" y="45" width="900" height="8" rx="4" fill="#21262d"/>
+    
+    <!-- Sprint markers -->
+    <rect x="20" y="45" width="150" height="8" rx="4" fill="#39a900"/>
+    <text x="95" y="68" font-family="Segoe UI, Arial" font-size="9" fill="#39a900" text-anchor="middle">Sprint 1-2: Auth ✅</text>
+    
+    <rect x="170" y="45" width="150" height="8" fill="#f0883e"/>
+    <text x="245" y="68" font-family="Segoe UI, Arial" font-size="9" fill="#f0883e" text-anchor="middle">Sprint 3-4: Dashboard</text>
+    
+    <rect x="320" y="45" width="150" height="8" fill="#484f58"/>
+    <text x="395" y="68" font-family="Segoe UI, Arial" font-size="9" fill="#8b949e" text-anchor="middle">Sprint 5-6: Horarios</text>
+    
+    <rect x="470" y="45" width="150" height="8" fill="#484f58"/>
+    <text x="545" y="68" font-family="Segoe UI, Arial" font-size="9" fill="#8b949e" text-anchor="middle">Sprint 7-8: Eval</text>
+    
+    <rect x="620" y="45" width="150" height="8" fill="#484f58"/>
+    <text x="695" y="68" font-family="Segoe UI, Arial" font-size="9" fill="#8b949e" text-anchor="middle">Sprint 9-10: KB+AI</text>
+    
+    <rect x="770" y="45" width="150" height="8" rx="4" fill="#484f58"/>
+    <text x="845" y="68" font-family="Segoe UI, Arial" font-size="9" fill="#8b949e" text-anchor="middle">Sprint 11-12: PWA</text>
+  </g>
+
+  <!-- Tech Stack -->
+  <g transform="translate(30, 810)">
+    <rect x="0" y="0" width="940" height="60" rx="12" fill="#161b22" stroke="#30363d"/>
+    <text x="30" y="25" font-family="Segoe UI, Arial" font-size="12" font-weight="bold" fill="#c9d1d9">Stack Técnico:</text>
+    
+    <rect x="140" y="10" width="90" height="24" rx="4" fill="#000000" stroke="#ffffff"/>
+    <text x="185" y="27" font-family="Segoe UI, Arial" font-size="10" fill="#ffffff" text-anchor="middle">Next.js 16</text>
+    
+    <rect x="240" y="10" width="80" height="24" rx="4" fill="#087ea4"/>
+    <text x="280" y="27" font-family="Segoe UI, Arial" font-size="10" fill="#ffffff" text-anchor="middle">React 19</text>
+    
+    <rect x="330" y="10" width="90" height="24" rx="4" fill="#06b6d4"/>
+    <text x="375" y="27" font-family="Segoe UI, Arial" font-size="10" fill="#ffffff" text-anchor="middle">Tailwind v4</text>
+    
+    <rect x="430" y="10" width="90" height="24" rx="4" fill="#ff4154"/>
+    <text x="475" y="27" font-family="Segoe UI, Arial" font-size="10" fill="#ffffff" text-anchor="middle">TanStack Query</text>
+    
+    <rect x="530" y="10" width="70" height="24" rx="4" fill="#764abc"/>
+    <text x="565" y="27" font-family="Segoe UI, Arial" font-size="10" fill="#ffffff" text-anchor="middle">Zustand</text>
+    
+    <rect x="610" y="10" width="70" height="24" rx="4" fill="#3178c6"/>
+    <text x="645" y="27" font-family="Segoe UI, Arial" font-size="10" fill="#ffffff" text-anchor="middle">TypeScript</text>
+    
+    <rect x="690" y="10" width="60" height="24" rx="4" fill="#5a29e4"/>
+    <text x="720" y="27" font-family="Segoe UI, Arial" font-size="10" fill="#ffffff" text-anchor="middle">Zod</text>
+    
+    <text x="30" y="50" font-family="Segoe UI, Arial" font-size="11" fill="#8b949e">Objetivo: 39 HUs completadas | 100% cobertura backend | Lighthouse > 90 | PWA instalable</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="600" y="885" font-family="Segoe UI, Arial" font-size="11" fill="#484f58" text-anchor="middle">SICORA © 2025 - Plan de Desarrollo Frontend Next.js - OneVision Open Source</text>
+</svg>
