@@ -18,6 +18,7 @@ func SetupRoutes(
 	log *logger.Logger,
 	healthHandler *handlers.HealthHandler,
 	proxyHandler *handlers.ProxyHandler,
+	mm *middleware.MiddlewareManager, // Redis middleware manager (optional)
 ) {
 	// Health check endpoints (no auth required)
 	router.GET("/health", healthHandler.Health)
@@ -43,9 +44,22 @@ func SetupRoutes(
 		}
 
 		// Protected routes (auth required)
+		// Use Redis-based auth with blacklist if available, otherwise use simple auth
 		protected := v1.Group("")
-		protected.Use(middleware.Auth(cfg))
+		if mm != nil {
+			protected.Use(mm.AuthWithBlacklist())
+			protected.Use(mm.SessionManager())
+			log.Info("Using Redis-based authentication with token blacklist and sessions")
+		} else {
+			protected.Use(middleware.Auth(cfg))
+			log.Info("Using simple JWT authentication (no blacklist support)")
+		}
 		{
+			// Logout endpoint (requires auth)
+			if mm != nil {
+				protected.POST("/auth/logout", mm.Logout())
+			}
+
 			// User routes
 			users := protected.Group("/users")
 			{

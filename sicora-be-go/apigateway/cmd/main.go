@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"apigateway/internal/infrastructure/cache"
 	"apigateway/internal/infrastructure/config"
 	"apigateway/internal/infrastructure/logger"
 	"apigateway/internal/presentation/handlers"
@@ -58,6 +59,24 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	// Initialize Redis cache for distributed rate limiting and sessions
+	stdLogger := log.New(os.Stdout, "[apigateway-cache] ", log.LstdFlags)
+	gatewayCache, err := cache.NewAPIGatewayCacheFromEnv(stdLogger)
+	if err != nil {
+		// Log warning but continue - fall back to in-memory rate limiting
+		zapLogger.Warn("Failed to initialize Redis cache, using in-memory fallback", "error", err)
+		gatewayCache = nil
+	} else {
+		defer gatewayCache.Close()
+		zapLogger.Info("Redis cache initialized for API Gateway")
+	}
+
+	// Create middleware manager with cache
+	var middlewareManager *middleware.MiddlewareManager
+	if gatewayCache != nil {
+		middlewareManager = middleware.NewMiddlewareManager(gatewayCache, cfg)
+	}
+
 	// Create Gin router
 	router := gin.New()
 
@@ -94,14 +113,22 @@ func main() {
 	router.Use(middleware.RequestID())
 	router.Use(middleware.SecurityHeaders())
 	router.Use(middleware.Logger(zapLogger))
-	router.Use(middleware.RateLimiter(cfg.RateLimit))
+
+	// Use Redis-based rate limiting if available, otherwise fall back to in-memory
+	if middlewareManager != nil {
+		router.Use(middlewareManager.RateLimiterRedis(cfg.RateLimit, 1*time.Minute))
+		zapLogger.Info("Using Redis-based distributed rate limiting")
+	} else {
+		router.Use(middleware.RateLimiter(cfg.RateLimit))
+		zapLogger.Info("Using in-memory rate limiting (single instance only)")
+	}
 
 	// Create handlers
 	healthHandler := handlers.NewHealthHandler(cfg)
 	proxyHandler := handlers.NewProxyHandler(cfg, zapLogger)
 
-	// Setup routes
-	routes.SetupRoutes(router, cfg, zapLogger, healthHandler, proxyHandler)
+	// Setup routes with middleware manager for Redis-based auth
+	routes.SetupRoutes(router, cfg, zapLogger, healthHandler, proxyHandler, middlewareManager)
 
 	// Create HTTP server
 	srv := &http.Server{
