@@ -2,14 +2,14 @@
 
 ## 🏛️ Sistema de Información de Coordinación Académica
 
-Backend de SICORA implementado en Go con arquitectura de microservicios para gestión de usuarios, horarios, asistencia y evaluación de proyectos. Desarrollado para el SENA con enfoque en alta concurrencia y rendimiento.
+Backend de SICORA implementado en Go con arquitectura de microservicios para gestión de usuarios, horarios, asistencia y evaluación de proyectos. Desarrollado para OneVision con enfoque en alta concurrencia y rendimiento.
 
 ## 🚀 Tecnologías Principales
 
-- **Go 1.21+** - Lenguaje principal con tipado fuerte
+- **Go 1.25+** - Lenguaje principal con tipado fuerte (actualizado Enero 2026)
 - **Gin** - Framework web de alto rendimiento
 - **GORM** - ORM con soporte completo para PostgreSQL
-- **PostgreSQL 15** - Base de datos principal
+- **PostgreSQL 18** - Base de datos principal
 - **Redis** - Cache y gestión de sesiones
 - **Docker & Docker Compose** - Containerización
 - **Swagger** - Documentación automática de APIs
@@ -17,36 +17,40 @@ Backend de SICORA implementado en Go con arquitectura de microservicios para ges
 
 ## 🏗️ Arquitectura de Microservicios
 
-### Servicios Implementados
+### Servicios Implementados (8/8 ✅)
 
-- **🔐 userservice** - Gestión de usuarios, autenticación JWT
-- **📅 scheduleservice** - Gestión de horarios y calendarios
-- **✅ attendanceservice** - Control de asistencia
-- **📊 projectevalservice** - Evaluación de proyectos
-- **👤 evalinservice** - Evaluación individual
-- **🧠 kbservice** - Base de conocimiento
-- **🤖 aiservice** - Servicios de IA
-- **🛠️ softwarefactoryservice** - Gestión de proyectos
-- **📱 mevalservice** - Evaluación móvil
+| Servicio                  | Puerto | Estado      | Descripción                                    |
+| ------------------------- | ------ | ----------- | ---------------------------------------------- |
+| **🌐 apigateway**         | 8000   | ✅ Completo | Gateway centralizado, proxy reverso, JWT, CORS |
+| **🔐 userservice**        | 8001   | ✅ Completo | Gestión de usuarios, autenticación JWT         |
+| **📅 scheduleservice**    | 8002   | ✅ Completo | Gestión de horarios y calendarios              |
+| **✅ attendanceservice**  | 8003   | ✅ Completo | Control de asistencia                          |
+| **📊 evalinservice**      | 8004   | ✅ Completo | Evaluación individual                          |
+| **🧠 kbservice**          | 8005   | ✅ Completo | Base de conocimiento                           |
+| **🎯 projectevalservice** | 8007   | ✅ Completo | Evaluación de proyectos                        |
+| **📱 mevalservice**       | 8008   | ✅ Completo | Evaluación móvil                               |
+
+> **Nota**: AIService (:8006) solo existe en Python debido a requisitos específicos de ML/LLM.
 
 ### Estructura del Proyecto
 
 ```
 sicora-be-go/
+├── apigateway/             # ✅ Gateway centralizado (NUEVO)
+├── userservice/            # ✅ Servicio de usuarios
+├── scheduleservice/        # ✅ Servicio de horarios
+├── attendanceservice/      # ✅ Servicio de asistencia
+├── evalinservice/          # ✅ Servicio de evaluación individual
+├── kbservice/              # ✅ Servicio de base de conocimiento
+├── projectevalservice/     # ✅ Servicio de evaluación de proyectos
+├── mevalservice/           # ✅ Servicio de evaluación móvil
 ├── shared/                 # Submódulo sicora-shared
 ├── infra/                  # Submódulo sicora-infra
-├── userservice/            # ✅ Servicio de usuarios (COMPLETADO)
-├── scheduleservice/        # Servicio de horarios
-├── attendanceservice/      # Servicio de asistencia
-├── projectevalservice/     # Servicio de evaluación de proyectos
-├── evalinservice/          # Servicio de evaluación individual
-├── kbservice/              # Servicio de base de conocimiento
-├── mevalservice/           # Servicio de evaluación móvil
-├── softwarefactoryservice/ # Servicio de gestión de proyectos
 ├── _docs/                  # Documentación organizada
 ├── scripts/                # Scripts de automatización
 ├── go.mod                  # Dependencias principales
 ├── go.sum                  # Checksums de dependencias
+├── go.work                 # Workspace Go multi-módulo
 ├── docker-compose.yml      # Configuración Docker local
 └── Makefile               # Comandos de automatización
 ```
@@ -66,9 +70,9 @@ Para documentación detallada, consulta la [documentación organizada](./_docs/)
 
 ### Prerrequisitos
 
-- Go 1.21 o superior
+- Go 1.25 o superior
 - Docker y Docker Compose
-- PostgreSQL 15 (o via Docker)
+- PostgreSQL 18 (o via Docker)
 - Redis (opcional, para cache)
 
 ### Configuración Inicial
@@ -81,7 +85,7 @@ git submodule update --init --recursive
 cp .env.example .env
 
 # Levantar infraestructura
-docker-compose -f docker-compose.infra.yml up -d
+docker compose -f docker-compose.infra.yml up -d
 
 # Instalar dependencias
 go mod tidy

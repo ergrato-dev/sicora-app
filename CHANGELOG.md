@@ -9,6 +9,14 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Añadido
 
+- **API Gateway Go (apigateway)** - Gateway centralizado con:
+  - Proxy reverso a todos los microservicios
+  - Autenticación JWT con validación de roles
+  - Rate limiting configurable
+  - CORS configurable
+  - Logging estructurado con zap
+  - Health checks para todos los servicios
+  - Documentación Swagger
 - Sistema completo de templates para issues y pull requests
 - Código de conducta para la comunidad
 - Documentación open source completa
@@ -23,6 +31,11 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Cambiado
 
+- **8/8 servicios Go completos** (userservice, scheduleservice, attendanceservice, evalinservice, kbservice, projectevalservice, mevalservice, apigateway)
+- go.work actualizado para incluir apigateway
+- **Go 1.25 como versión unificada** para sicora-be-go
+- Todos los go.mod actualizados a `go 1.25` con `toolchain go1.25.5`
+- Dependencias Go actualizadas (go mod tidy)
 - **PostgreSQL 18 como versión unificada** para toda la infraestructura SICORA
 - Todos los docker-compose actualizados a `postgres:18-alpine`
 - CI/CD workflows actualizados para usar PostgreSQL 18
@@ -40,6 +53,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Reparado
 
+- Archivo de test corrupto en projectevalservice (entities_test.go)
 - Problemas de red Docker con scripts automáticos de reparación
 - Conflictos de puertos PostgreSQL (5432 → 5433)
 - Referencias rotas en documentación

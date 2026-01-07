@@ -1,16 +1,7 @@
 package tests
 
-import func TestProject_IsDeliveryDatePassed(t *testing.T) {
-	project := &entities.Project{
-		Status:       entities.ProjectStatusActive,
-		DeliveryDate: time.Now().Add(-24 * time.Hour), // 1 day ago
-	}
-
-	assert.True(t, project.IsDeliveryDatePassed())
-
-	project.DeliveryDate = time.Now().Add(24 * time.Hour) // 1 day in the future
-	assert.False(t, project.IsDeliveryDatePassed())
-}g"
+import (
+	"testing"
 	"time"
 
 	"projectevalservice/internal/domain/entities"

@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#888"/>
+    </marker>
+    <linearGradient id="gatewayGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="700" fill="#0d1117"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" fill="#58a6ff" font-family="Arial, sans-serif" font-size="24" font-weight="bold">API Gateway - SICORA Go</text>
+  <text x="450" y="55" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="12">Puerto 8000 | Proxy Reverso | JWT Auth | Rate Limiting</text>
+  
+  <!-- Client -->
+  <rect x="370" y="75" width="160" height="45" rx="5" fill="#238636" stroke="#3fb950" stroke-width="2"/>
+  <text x="450" y="100" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="13" font-weight="bold">🖥️ Clientes</text>
+  <text x="450" y="114" text-anchor="middle" fill="#d3f0d3" font-family="Arial, sans-serif" font-size="10">Web / Mobile / API</text>
+  
+  <!-- Arrow to Gateway -->
+  <line x1="450" y1="120" x2="450" y2="145" stroke="#888" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- API Gateway Box -->
+  <rect x="100" y="150" width="700" height="200" rx="10" fill="url(#gatewayGrad)" stroke="#58a6ff" stroke-width="2"/>
+  <text x="450" y="175" text-anchor="middle" fill="#58a6ff" font-family="Arial, sans-serif" font-size="16" font-weight="bold">🌐 API Gateway (Go/Gin)</text>
+  
+  <!-- Middleware Pipeline -->
+  <rect x="120" y="195" width="660" height="60" rx="5" fill="#21262d" stroke="#484f58" stroke-width="1"/>
+  <text x="450" y="215" text-anchor="middle" fill="#c9d1d9" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Middleware Pipeline</text>
+  
+  <!-- Middleware components -->
+  <rect x="135" y="225" width="80" height="25" rx="3" fill="#3d1c02" stroke="#d29922" stroke-width="1"/>
+  <text x="175" y="242" text-anchor="middle" fill="#d29922" font-family="Arial, sans-serif" font-size="9">Recovery</text>
+  
+  <rect x="225" y="225" width="80" height="25" rx="3" fill="#1c3d1c" stroke="#3fb950" stroke-width="1"/>
+  <text x="265" y="242" text-anchor="middle" fill="#3fb950" font-family="Arial, sans-serif" font-size="9">CORS</text>
+  
+  <rect x="315" y="225" width="80" height="25" rx="3" fill="#1c2a3d" stroke="#58a6ff" stroke-width="1"/>
+  <text x="355" y="242" text-anchor="middle" fill="#58a6ff" font-family="Arial, sans-serif" font-size="9">RequestID</text>
+  
+  <rect x="405" y="225" width="80" height="25" rx="3" fill="#2a1c3d" stroke="#a371f7" stroke-width="1"/>
+  <text x="445" y="242" text-anchor="middle" fill="#a371f7" font-family="Arial, sans-serif" font-size="9">Logger (zap)</text>
+  
+  <rect x="495" y="225" width="80" height="25" rx="3" fill="#3d1c1c" stroke="#f85149" stroke-width="1"/>
+  <text x="535" y="242" text-anchor="middle" fill="#f85149" font-family="Arial, sans-serif" font-size="9">RateLimiter</text>
+  
+  <rect x="585" y="225" width="80" height="25" rx="3" fill="#3d3d1c" stroke="#d4a72c" stroke-width="1"/>
+  <text x="625" y="242" text-anchor="middle" fill="#d4a72c" font-family="Arial, sans-serif" font-size="9">JWT Auth</text>
+  
+  <rect x="675" y="225" width="95" height="25" rx="3" fill="#1c3d3d" stroke="#56d4dd" stroke-width="1"/>
+  <text x="722" y="242" text-anchor="middle" fill="#56d4dd" font-family="Arial, sans-serif" font-size="9">RequireRole</text>
+  
+  <!-- Handlers -->
+  <rect x="120" y="270" width="150" height="70" rx="5" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="195" y="290" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="10" font-weight="bold">Health Handler</text>
+  <text x="195" y="305" text-anchor="middle" fill="#7ee787" font-family="Arial, sans-serif" font-size="9">/health /ready /live</text>
+  <text x="195" y="320" text-anchor="middle" fill="#7ee787" font-family="Arial, sans-serif" font-size="9">/services /swagger</text>
+  
+  <rect x="290" y="270" width="320" height="70" rx="5" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="450" y="290" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="10" font-weight="bold">Proxy Handler (Reverse Proxy)</text>
+  <text x="450" y="305" text-anchor="middle" fill="#79c0ff" font-family="Arial, sans-serif" font-size="9">httputil.ReverseProxy → Backend Services</text>
+  <text x="450" y="320" text-anchor="middle" fill="#79c0ff" font-family="Arial, sans-serif" font-size="9">X-Forwarded-For | X-User-ID | X-User-Role</text>
+  
+  <rect x="630" y="270" width="150" height="70" rx="5" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="705" y="290" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="10" font-weight="bold">Routes Setup</text>
+  <text x="705" y="305" text-anchor="middle" fill="#a5d6ff" font-family="Arial, sans-serif" font-size="9">/api/v1/* routes</text>
+  <text x="705" y="320" text-anchor="middle" fill="#a5d6ff" font-family="Arial, sans-serif" font-size="9">Public + Protected</text>
+  
+  <!-- Arrow to Services -->
+  <line x1="450" y1="350" x2="450" y2="380" stroke="#888" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Backend Services -->
+  <text x="450" y="400" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="12" font-weight="bold">Backend Microservices</text>
+  
+  <!-- Row 1 -->
+  <rect x="40" y="415" width="100" height="55" rx="5" fill="#0d1117" stroke="#f85149" stroke-width="2"/>
+  <text x="90" y="438" text-anchor="middle" fill="#f85149" font-family="Arial, sans-serif" font-size="10" font-weight="bold">🔐 userservice</text>
+  <text x="90" y="455" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="9">:8001</text>
+  
+  <rect x="155" y="415" width="100" height="55" rx="5" fill="#0d1117" stroke="#3fb950" stroke-width="2"/>
+  <text x="205" y="438" text-anchor="middle" fill="#3fb950" font-family="Arial, sans-serif" font-size="9" font-weight="bold">📅 scheduleservice</text>
+  <text x="205" y="455" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="9">:8002</text>
+  
+  <rect x="270" y="415" width="110" height="55" rx="5" fill="#0d1117" stroke="#58a6ff" stroke-width="2"/>
+  <text x="325" y="438" text-anchor="middle" fill="#58a6ff" font-family="Arial, sans-serif" font-size="9" font-weight="bold">✅ attendanceservice</text>
+  <text x="325" y="455" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="9">:8003</text>
+  
+  <rect x="395" y="415" width="100" height="55" rx="5" fill="#0d1117" stroke="#a371f7" stroke-width="2"/>
+  <text x="445" y="438" text-anchor="middle" fill="#a371f7" font-family="Arial, sans-serif" font-size="10" font-weight="bold">📊 evalinservice</text>
+  <text x="445" y="455" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="9">:8004</text>
+  
+  <rect x="510" y="415" width="100" height="55" rx="5" fill="#0d1117" stroke="#d29922" stroke-width="2"/>
+  <text x="560" y="438" text-anchor="middle" fill="#d29922" font-family="Arial, sans-serif" font-size="10" font-weight="bold">🧠 kbservice</text>
+  <text x="560" y="455" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="9">:8005</text>
+  
+  <rect x="625" y="415" width="100" height="55" rx="5" fill="#0d1117" stroke="#f778ba" stroke-width="2"/>
+  <text x="675" y="438" text-anchor="middle" fill="#f778ba" font-family="Arial, sans-serif" font-size="10" font-weight="bold">🤖 aiservice</text>
+  <text x="675" y="455" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="9">:8006 (Python)</text>
+  
+  <rect x="740" y="415" width="110" height="55" rx="5" fill="#0d1117" stroke="#56d4dd" stroke-width="2"/>
+  <text x="795" y="433" text-anchor="middle" fill="#56d4dd" font-family="Arial, sans-serif" font-size="9" font-weight="bold">🎯 projecteval</text>
+  <text x="795" y="448" text-anchor="middle" fill="#56d4dd" font-family="Arial, sans-serif" font-size="9" font-weight="bold">service</text>
+  <text x="795" y="462" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="9">:8007</text>
+  
+  <!-- Row 2 - mevalservice -->
+  <rect x="370" y="485" width="110" height="55" rx="5" fill="#0d1117" stroke="#7ee787" stroke-width="2"/>
+  <text x="425" y="508" text-anchor="middle" fill="#7ee787" font-family="Arial, sans-serif" font-size="10" font-weight="bold">📱 mevalservice</text>
+  <text x="425" y="525" text-anchor="middle" fill="#8b949e" font-family="Arial, sans-serif" font-size="9">:8008</text>
+  
+  <!-- Config Section -->
+  <rect x="50" y="555" width="380" height="130" rx="5" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="240" y="575" text-anchor="middle" fill="#58a6ff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">⚙️ Configuración</text>
+  
+  <text x="70" y="595" fill="#8b949e" font-family="monospace" font-size="9">PORT=8000</text>
+  <text x="70" y="610" fill="#8b949e" font-family="monospace" font-size="9">ENVIRONMENT=development</text>
+  <text x="70" y="625" fill="#8b949e" font-family="monospace" font-size="9">JWT_SECRET=***</text>
+  <text x="70" y="640" fill="#8b949e" font-family="monospace" font-size="9">CORS_ORIGINS=http://localhost:3000</text>
+  <text x="70" y="655" fill="#8b949e" font-family="monospace" font-size="9">RATE_LIMIT=100</text>
+  <text x="70" y="670" fill="#8b949e" font-family="monospace" font-size="9">LOG_LEVEL=info</text>
+  
+  <!-- Tech Stack -->
+  <rect x="470" y="555" width="380" height="130" rx="5" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="660" y="575" text-anchor="middle" fill="#3fb950" font-family="Arial, sans-serif" font-size="12" font-weight="bold">🔧 Stack Técnico</text>
+  
+  <rect x="485" y="590" width="70" height="25" rx="3" fill="#1c2a3d" stroke="#58a6ff" stroke-width="1"/>
+  <text x="520" y="607" text-anchor="middle" fill="#58a6ff" font-family="Arial, sans-serif" font-size="9">Go 1.25</text>
+  
+  <rect x="565" y="590" width="70" height="25" rx="3" fill="#1c3d1c" stroke="#3fb950" stroke-width="1"/>
+  <text x="600" y="607" text-anchor="middle" fill="#3fb950" font-family="Arial, sans-serif" font-size="9">Gin</text>
+  
+  <rect x="645" y="590" width="70" height="25" rx="3" fill="#2a1c3d" stroke="#a371f7" stroke-width="1"/>
+  <text x="680" y="607" text-anchor="middle" fill="#a371f7" font-family="Arial, sans-serif" font-size="9">zap Logger</text>
+  
+  <rect x="725" y="590" width="70" height="25" rx="3" fill="#3d3d1c" stroke="#d4a72c" stroke-width="1"/>
+  <text x="760" y="607" text-anchor="middle" fill="#d4a72c" font-family="Arial, sans-serif" font-size="9">JWT v5</text>
+  
+  <rect x="485" y="625" width="100" height="25" rx="3" fill="#3d1c1c" stroke="#f85149" stroke-width="1"/>
+  <text x="535" y="642" text-anchor="middle" fill="#f85149" font-family="Arial, sans-serif" font-size="9">httputil Proxy</text>
+  
+  <rect x="595" y="625" width="100" height="25" rx="3" fill="#1c3d3d" stroke="#56d4dd" stroke-width="1"/>
+  <text x="645" y="642" text-anchor="middle" fill="#56d4dd" font-family="Arial, sans-serif" font-size="9">gin-swagger</text>
+  
+  <rect x="705" y="625" width="90" height="25" rx="3" fill="#3d2a1c" stroke="#d29922" stroke-width="1"/>
+  <text x="750" y="642" text-anchor="middle" fill="#d29922" font-family="Arial, sans-serif" font-size="9">UUID</text>
+  
+  <text x="660" y="670" text-anchor="middle" fill="#7ee787" font-family="Arial, sans-serif" font-size="10">✅ 8/8 Servicios Go Completos</text>
+</svg>

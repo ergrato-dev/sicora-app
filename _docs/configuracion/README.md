@@ -22,6 +22,7 @@
 
 ### Configuración de Lenguajes
 
+- [**Configuración Go 1.25+**](./CONFIGURACION_GO_125.md) - Backend Go actualizado a Go 1.25
 - [**Configuración Python 3.14+**](./CONFIGURACION_PYTHON_314.md) - Requisitos y migración a Python 3.14
 - [**Configuración PostgreSQL 18**](./CONFIGURACION_POSTGRESQL_18.md) - Base de datos unificada
 
