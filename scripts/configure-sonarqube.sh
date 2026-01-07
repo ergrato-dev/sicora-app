@@ -1,9 +1,9 @@
 #!/bin/bash
 
+# =============================================================================
 # Script para configurar SonarQube en todos los servicios SICORA
-# Fase 3: Unificar configuración de análisis de calidad de código
-# Versión: 1.0
-# Fecha: 4 de julio de 2025
+# Versión: 2.0 - Enero 2026
+# =============================================================================
 
 set -e
 
@@ -14,14 +14,15 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Configuración de rutas
-PROJECT_ROOT="/home/epti/Documentos/epti-dev/sicora-app"
+# Detectar directorio raíz del proyecto
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 GO_BACKEND_DIR="$PROJECT_ROOT/sicora-be-go"
 PYTHON_BACKEND_DIR="$PROJECT_ROOT/sicora-be-python"
 
 # Servicios
-GO_SERVICES=("userservice" "scheduleservice" "kbservice" "evalinservice" "mevalservice" "projectevalservice" "attendanceservice" "softwarefactoryservice")
-PYTHON_SERVICES=("userservice" "scheduleservice" "evalinservice" "attendanceservice" "kbservice" "projectevalservice" "apigateway")
+GO_SERVICES=("userservice" "scheduleservice" "kbservice" "evalinservice" "mevalservice" "projectevalservice" "attendanceservice" "apigateway")
+PYTHON_SERVICES=("userservice" "scheduleservice" "evalinservice" "attendanceservice" "kbservice" "projectevalservice" "apigateway" "aiservice" "mevalservice" "softwarefactoryservice")
 
 # Función para mostrar encabezado
 show_header() {
