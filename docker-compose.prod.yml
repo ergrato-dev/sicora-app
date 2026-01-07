@@ -1,11 +1,54 @@
 # =============================================================================
 # SICORA - Production Docker Compose
 # Stack completo para VPS Hostinger KVM1 (4GB RAM, 1 vCPU)
+# Usa Traefik como reverse proxy (ver ADR: _docs/configuracion/ADR_TRAEFIK_REVERSE_PROXY.md)
 # =============================================================================
 
 services:
   # ==========================================================================
-  # Frontend - Nginx serving React SPA
+  # Traefik - Reverse Proxy & Load Balancer
+  # ==========================================================================
+  traefik:
+    image: traefik:v3.2
+    container_name: sicora-traefik
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=sicora-network"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-admin@example.com}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=INFO"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+    networks:
+      - sicora-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH:-admin:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/}"
+
+  # ==========================================================================
+  # Frontend - Nginx serving React SPA (behind Traefik)
   # ==========================================================================
   frontend:
     build:
@@ -13,13 +56,10 @@ services:
       dockerfile: Dockerfile
     container_name: sicora-frontend
     restart: unless-stopped
-    ports:
-      - "80:80"
     depends_on:
-      backend-go:
-        condition: service_healthy
-      backend-python:
-        condition: service_healthy
+      - traefik
+      - backend-go
+      - backend-python
     networks:
       - sicora-network
     deploy:
@@ -29,6 +69,11 @@ services:
         reservations:
           memory: 32M
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN:-localhost}`) || Host(`app.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
       - "com.sicora.service=frontend"
 
   # ==========================================================================
@@ -78,6 +123,11 @@ services:
       retries: 3
       start_period: 15s
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-go.rule=Host(`api.${DOMAIN:-localhost}`) && PathPrefix(`/go`)"
+      - "traefik.http.routers.backend-go.entrypoints=websecure"
+      - "traefik.http.routers.backend-go.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend-go.loadbalancer.server.port=8080"
       - "com.sicora.service=backend-go"
 
   # ==========================================================================
@@ -115,6 +165,11 @@ services:
       retries: 3
       start_period: 15s
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-python.rule=Host(`api.${DOMAIN:-localhost}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend-python.entrypoints=websecure"
+      - "traefik.http.routers.backend-python.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend-python.loadbalancer.server.port=8000"
       - "com.sicora.service=backend-python"
 
   # ==========================================================================
@@ -195,3 +250,5 @@ volumes:
     name: sicora-postgres-data
   redis_data:
     name: sicora-redis-data
+  traefik_letsencrypt:
+    name: sicora-traefik-letsencrypt

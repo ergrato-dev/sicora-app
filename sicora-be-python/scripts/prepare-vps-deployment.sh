@@ -201,88 +201,83 @@ EOF
     log_success "Dockerfiles creados"
 }
 
-# Función para crear configuración de Nginx
-create_nginx_config() {
-    log "🌐 Creando configuración de Nginx..."
+# Función para crear configuración de Traefik (reemplaza Nginx)
+create_traefik_config() {
+    log "🔀 Creando configuración de Traefik..."
 
-    cat > "$PROJECT_ROOT/deployment/nginx-sicora.conf" << 'EOF'
-server {
-    listen 80;
-    server_name _;  # Cambiar por tu dominio
+    mkdir -p "$PROJECT_ROOT/deployment/traefik"
+    mkdir -p "$PROJECT_ROOT/deployment/traefik/dynamic"
 
-    # Configuración de logs
-    access_log /var/log/nginx/sicora_access.log;
-    error_log /var/log/nginx/sicora_error.log;
+    # Traefik static config
+    cat > "$PROJECT_ROOT/deployment/traefik/traefik.yml" << 'EOF'
+# =============================================================================
+# SICORA - Traefik Static Configuration (VPS Deployment)
+# =============================================================================
+api:
+  dashboard: true
+  insecure: false
 
-    # Configuración general
-    client_max_body_size 10M;
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
 
-    # API Gateway
-    location /api/ {
-        proxy_pass http://localhost:8000/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: sicora-network
+  file:
+    directory: "/etc/traefik/dynamic"
+    watch: true
 
-        # Configuración de timeouts
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
-    }
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "admin@tudominio.com"  # CAMBIAR
+      storage: "/letsencrypt/acme.json"
+      httpChallenge:
+        entryPoint: web
 
-    # Notification Service
-    location /notifications/ {
-        proxy_pass http://localhost:8001/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+log:
+  level: INFO
+  filePath: "/var/log/traefik/traefik.log"
 
-        # Configuración de timeouts
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
-    }
-
-    # Health checks
-    location /health/api {
-        proxy_pass http://localhost:8000/health;
-        access_log off;
-    }
-
-    location /health/notification {
-        proxy_pass http://localhost:8001/health;
-        access_log off;
-    }
-
-    # Documentación Swagger
-    location /api/docs {
-        proxy_pass http://localhost:8000/docs;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    location /notifications/docs {
-        proxy_pass http://localhost:8001/docs;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # Página de estado básica
-    location /status {
-        access_log off;
-        return 200 "SICORA Backend OK\n";
-        add_header Content-Type text/plain;
-    }
-}
+accessLog:
+  filePath: "/var/log/traefik/access.log"
 EOF
 
-    log_success "Configuración de Nginx creada"
+    # Traefik dynamic middlewares
+    cat > "$PROJECT_ROOT/deployment/traefik/dynamic/middlewares.yml" << 'EOF'
+http:
+  middlewares:
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+        period: 1m
+    secure-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"
+        frameDeny: true
+    compress:
+      compress: {}
+EOF
+
+    log_success "Configuración de Traefik creada en deployment/traefik/"
+    log_info "📚 Referencia completa: sicora-infra/traefik/"
 }
 
 # Función para crear scripts de monitoreo
@@ -343,7 +338,7 @@ docker logs --tail 5 sicora-backend_postgres_1 2>/dev/null || echo "Container no
 
 echo ""
 echo "=== Network Status ==="
-echo "Nginx Status: $(systemctl is-active nginx 2>/dev/null || echo 'not-running')"
+echo "Traefik Status: $(docker ps --filter name=traefik --format '{{.Status}}' 2>/dev/null || echo 'not-running')"
 echo "Listening Ports:"
 netstat -tlnp 2>/dev/null | grep -E ':(80|443|8000|8001|5432|6379)' || ss -tlnp | grep -E ':(80|443|8000|8001|5432|6379)'
 EOF
@@ -484,7 +479,7 @@ create_deployment_docs() {
 - [ ] Ubuntu actualizado
 - [ ] Docker instalado
 - [ ] Docker Compose instalado
-- [ ] Nginx instalado
+- [ ] Traefik configurado (via Docker)
 - [ ] Firewall configurado (puertos 22, 80, 443)
 - [ ] Usuario con permisos docker
 
@@ -492,8 +487,8 @@ create_deployment_docs() {
 - [ ] Archivos transferidos al VPS
 - [ ] Variables de entorno configuradas
 - [ ] Servicios desplegados con docker-compose
-- [ ] Nginx configurado
-- [ ] SSL configurado (opcional)
+- [ ] Traefik configurado (SSL automático con Let's Encrypt)
+- [ ] Dashboard Traefik accesible
 
 ## Validation
 - [ ] Health checks responden
@@ -568,8 +563,8 @@ Este paquete contiene todos los archivos necesarios para desplegar SICORA Backen
 ## Deployment Rápido
 1. Extraer este paquete en el VPS
 2. Editar `.env.production` con valores reales
-3. Ejecutar: `./deployment/deploy.sh production`
-4. Configurar Nginx con `deployment/nginx-sicora.conf`
+3. Configurar Traefik: editar `deployment/traefik/traefik.yml` (email SSL)
+4. Ejecutar: `docker compose -f docker-compose.traefik.yml up -d`
 
 ## Documentación Completa
 Ver el archivo `deployment/DEPLOYMENT_CHECKLIST.md` para instrucciones detalladas.
@@ -602,10 +597,9 @@ show_final_instructions() {
     echo "   nano .env.production  # Editar variables de entorno"
     echo "   ./deployment/deploy.sh production"
     echo ""
-    echo "3. Configurar Nginx:"
-    echo "   sudo cp deployment/nginx-sicora.conf /etc/nginx/sites-available/sicora"
-    echo "   sudo ln -s /etc/nginx/sites-available/sicora /etc/nginx/sites-enabled/"
-    echo "   sudo nginx -t && sudo systemctl restart nginx"
+    echo "3. Configurar Traefik:"
+    echo "   nano deployment/traefik/traefik.yml  # Editar email para SSL"
+    echo "   docker compose -f docker-compose.traefik.yml up -d"
     echo ""
     echo "4. Validar endpoints:"
     echo "   curl http://TU_IP/health/api"
@@ -625,7 +619,7 @@ main() {
     run_tests
     validate_configs
     create_dockerfiles
-    create_nginx_config
+    create_traefik_config
     create_monitoring_scripts
     create_env_template
     create_deployment_docs

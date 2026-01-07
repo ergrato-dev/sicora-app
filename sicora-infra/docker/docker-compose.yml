@@ -223,9 +223,16 @@ services:
     env_file:
       - .env
 
+  # ==========================================================================
+  # ⚠️  DEPRECADO: Nginx como reverse proxy
+  # Usar Traefik en su lugar: sicora-infra/docker-compose.traefik.yml
+  # ADR: _docs/configuracion/ADR_TRAEFIK_REVERSE_PROXY.md
+  # ==========================================================================
   nginx:
     image: nginx:alpine
     container_name: sicora_nginx
+    profiles:
+      - legacy # Solo se inicia con: docker compose --profile legacy up
     ports:
       - "80:80"
       - "443:443"
@@ -237,7 +244,38 @@ services:
     networks:
       - sicora_network
     restart: unless-stopped
-    # Nginx no necesita acceso directo a .env usualmente, a menos que se use para generar configs dinámicas (no es el caso aquí)
+
+  # ==========================================================================
+  # ✅ RECOMENDADO: Traefik como reverse proxy
+  # ==========================================================================
+  traefik:
+    image: traefik:v3.2
+    container_name: sicora_traefik
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=sicora_network"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8082:8080" # Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ../traefik/dynamic:/etc/traefik/dynamic:ro
+    networks:
+      - sicora_network
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.traefik.service=api@internal"
 
 volumes:
   postgres_data:
