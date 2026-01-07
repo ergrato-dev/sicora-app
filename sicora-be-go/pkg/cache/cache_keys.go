@@ -104,6 +104,22 @@ func (MevalKeys) FaultType(id string) string { return fmt.Sprintf("fault:type:%s
 func (MevalKeys) Config() string             { return "config" }
 func (MevalKeys) SanctionTypes() string      { return "sanction:types" }
 
+// GatewayKeys provides key builders for API Gateway.
+type GatewayKeys struct{}
+
+func Gateway() GatewayKeys { return GatewayKeys{} }
+
+func (GatewayKeys) RateLimit(clientIP string) string { return fmt.Sprintf("ratelimit:%s", clientIP) }
+func (GatewayKeys) RateLimitUser(userID string) string {
+	return fmt.Sprintf("ratelimit:user:%s", userID)
+}
+func (GatewayKeys) Session(sessionID string) string     { return fmt.Sprintf("session:%s", sessionID) }
+func (GatewayKeys) UserSessions(userID string) string   { return fmt.Sprintf("sessions:user:%s", userID) }
+func (GatewayKeys) TokenBlacklist(jti string) string    { return fmt.Sprintf("blacklist:%s", jti) }
+func (GatewayKeys) RefreshToken(tokenID string) string  { return fmt.Sprintf("refresh:%s", tokenID) }
+func (GatewayKeys) APIKey(keyHash string) string        { return fmt.Sprintf("apikey:%s", keyHash) }
+func (GatewayKeys) ServiceHealth(service string) string { return fmt.Sprintf("health:%s", service) }
+
 // Patterns for bulk operations
 type Patterns struct{}
 
