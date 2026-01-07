@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" width="900" height="650">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#10b981"/>
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6"/>
+    </marker>
+    <marker id="arrowhead-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f97316"/>
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="650" fill="#1a1a2e"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="22" font-weight="bold">Sistema de Colas de Trabajo - Redis Job Queue</text>
+  <text x="450" y="55" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="12">Procesamiento asíncrono para SICORA (alternativa ligera a RabbitMQ)</text>
+  
+  <!-- API Layer -->
+  <rect x="40" y="80" width="180" height="140" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="130" y="105" text-anchor="middle" fill="#3b82f6" font-family="Arial, sans-serif" font-size="14" font-weight="bold">API Endpoints</text>
+  
+  <rect x="55" y="120" width="150" height="25" rx="4" fill="#334155"/>
+  <text x="130" y="137" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="11">POST /notifications</text>
+  
+  <rect x="55" y="150" width="150" height="25" rx="4" fill="#334155"/>
+  <text x="130" y="167" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="11">POST /imports</text>
+  
+  <rect x="55" y="180" width="150" height="25" rx="4" fill="#334155"/>
+  <text x="130" y="197" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="11">POST /reports</text>
+  
+  <!-- Queue Component -->
+  <rect x="280" y="80" width="200" height="180" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+  <text x="380" y="105" text-anchor="middle" fill="#10b981" font-family="Arial, sans-serif" font-size="14" font-weight="bold">pkg/jobs/Queue</text>
+  
+  <rect x="295" y="120" width="170" height="35" rx="4" fill="#334155"/>
+  <text x="380" y="142" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="11">Enqueue()</text>
+  <text x="380" y="152" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="9">EnqueueNotification/Import/Report</text>
+  
+  <rect x="295" y="160" width="170" height="35" rx="4" fill="#334155"/>
+  <text x="380" y="182" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="11">EnqueueDelayed()</text>
+  <text x="380" y="192" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="9">ZSET score=timestamp</text>
+  
+  <rect x="295" y="200" width="170" height="35" rx="4" fill="#334155"/>
+  <text x="380" y="222" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="11">Dequeue() / Complete() / Fail()</text>
+  <text x="380" y="232" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="9">BRPOP + atomic operations</text>
+  
+  <!-- Redis Storage -->
+  <rect x="540" y="80" width="320" height="180" rx="8" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+  <text x="700" y="105" text-anchor="middle" fill="#ef4444" font-family="Arial, sans-serif" font-size="14" font-weight="bold">Redis 7 - Storage</text>
+  
+  <!-- Redis Keys -->
+  <g transform="translate(555, 115)">
+    <rect width="135" height="22" rx="3" fill="#3b82f6" opacity="0.3"/>
+    <text x="68" y="15" text-anchor="middle" fill="#93c5fd" font-family="monospace" font-size="10">jobs:pending</text>
+  </g>
+  <g transform="translate(555, 142)">
+    <rect width="135" height="22" rx="3" fill="#f97316" opacity="0.3"/>
+    <text x="68" y="15" text-anchor="middle" fill="#fdba74" font-family="monospace" font-size="10">jobs:processing</text>
+  </g>
+  <g transform="translate(555, 169)">
+    <rect width="135" height="22" rx="3" fill="#10b981" opacity="0.3"/>
+    <text x="68" y="15" text-anchor="middle" fill="#6ee7b7" font-family="monospace" font-size="10">jobs:completed</text>
+  </g>
+  <g transform="translate(555, 196)">
+    <rect width="135" height="22" rx="3" fill="#ef4444" opacity="0.3"/>
+    <text x="68" y="15" text-anchor="middle" fill="#fca5a5" font-family="monospace" font-size="10">jobs:failed (DLQ)</text>
+  </g>
+  <g transform="translate(555, 223)">
+    <rect width="135" height="22" rx="3" fill="#8b5cf6" opacity="0.3"/>
+    <text x="68" y="15" text-anchor="middle" fill="#c4b5fd" font-family="monospace" font-size="10">jobs:scheduled</text>
+  </g>
+  
+  <!-- Data storage -->
+  <g transform="translate(705, 115)">
+    <rect width="135" height="45" rx="3" fill="#334155"/>
+    <text x="68" y="18" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">jobs:data:{id}</text>
+    <text x="68" y="35" text-anchor="middle" fill="#64748b" font-family="monospace" font-size="9">Hash with job data</text>
+  </g>
+  <g transform="translate(705, 165)">
+    <rect width="135" height="45" rx="3" fill="#334155"/>
+    <text x="68" y="18" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">jobs:stats</text>
+    <text x="68" y="35" text-anchor="middle" fill="#64748b" font-family="monospace" font-size="9">Counters &amp; metrics</text>
+  </g>
+  
+  <!-- Worker Component -->
+  <rect x="280" y="290" width="200" height="170" rx="8" fill="#1e293b" stroke="#f97316" stroke-width="2"/>
+  <text x="380" y="315" text-anchor="middle" fill="#f97316" font-family="Arial, sans-serif" font-size="14" font-weight="bold">pkg/jobs/Worker</text>
+  
+  <rect x="295" y="330" width="170" height="30" rx="4" fill="#334155"/>
+  <text x="380" y="350" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="11">RegisterHandler()</text>
+  
+  <rect x="295" y="365" width="170" height="30" rx="4" fill="#334155"/>
+  <text x="380" y="385" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="11">Start() / Stop() / Run()</text>
+  
+  <rect x="295" y="400" width="170" height="30" rx="4" fill="#334155"/>
+  <text x="380" y="420" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="11">Concurrency: 3-5 goroutines</text>
+  
+  <!-- Job Handlers -->
+  <rect x="540" y="290" width="320" height="170" rx="8" fill="#1e293b" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="700" y="315" text-anchor="middle" fill="#8b5cf6" font-family="Arial, sans-serif" font-size="14" font-weight="bold">Job Handlers</text>
+  
+  <g transform="translate(555, 330)">
+    <rect width="140" height="50" rx="4" fill="#3b82f6" opacity="0.2"/>
+    <text x="70" y="20" text-anchor="middle" fill="#93c5fd" font-family="Arial, sans-serif" font-size="11" font-weight="bold">NotificationHandler</text>
+    <text x="70" y="38" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="9">email, sms, push, slack</text>
+  </g>
+  
+  <g transform="translate(705, 330)">
+    <rect width="140" height="50" rx="4" fill="#10b981" opacity="0.2"/>
+    <text x="70" y="20" text-anchor="middle" fill="#6ee7b7" font-family="Arial, sans-serif" font-size="11" font-weight="bold">ImportHandler</text>
+    <text x="70" y="38" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="9">csv, xlsx → database</text>
+  </g>
+  
+  <g transform="translate(555, 390)">
+    <rect width="140" height="50" rx="4" fill="#f97316" opacity="0.2"/>
+    <text x="70" y="20" text-anchor="middle" fill="#fdba74" font-family="Arial, sans-serif" font-size="11" font-weight="bold">ReportHandler</text>
+    <text x="70" y="38" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="9">PDF, Excel generation</text>
+  </g>
+  
+  <g transform="translate(705, 390)">
+    <rect width="140" height="50" rx="4" fill="#ef4444" opacity="0.2"/>
+    <text x="70" y="20" text-anchor="middle" fill="#fca5a5" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Custom Handlers</text>
+    <text x="70" y="38" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="9">calculation, cleanup, webhook</text>
+  </g>
+  
+  <!-- Job Types -->
+  <rect x="40" y="490" width="820" height="130" rx="8" fill="#1e293b" stroke="#64748b" stroke-width="1"/>
+  <text x="450" y="515" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="14" font-weight="bold">pkg/jobs/types.go - Job Types &amp; Payloads</text>
+  
+  <g transform="translate(55, 530)">
+    <rect width="110" height="35" rx="4" fill="#3b82f6" opacity="0.3"/>
+    <text x="55" y="15" text-anchor="middle" fill="#93c5fd" font-family="Arial, sans-serif" font-size="10" font-weight="bold">notification</text>
+    <text x="55" y="28" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="8">PriorityHigh (10)</text>
+  </g>
+  
+  <g transform="translate(175, 530)">
+    <rect width="110" height="35" rx="4" fill="#10b981" opacity="0.3"/>
+    <text x="55" y="15" text-anchor="middle" fill="#6ee7b7" font-family="Arial, sans-serif" font-size="10" font-weight="bold">import</text>
+    <text x="55" y="28" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="8">PriorityNormal (5)</text>
+  </g>
+  
+  <g transform="translate(295, 530)">
+    <rect width="110" height="35" rx="4" fill="#f97316" opacity="0.3"/>
+    <text x="55" y="15" text-anchor="middle" fill="#fdba74" font-family="Arial, sans-serif" font-size="10" font-weight="bold">report</text>
+    <text x="55" y="28" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="8">PriorityLow (1)</text>
+  </g>
+  
+  <g transform="translate(415, 530)">
+    <rect width="110" height="35" rx="4" fill="#8b5cf6" opacity="0.3"/>
+    <text x="55" y="15" text-anchor="middle" fill="#c4b5fd" font-family="Arial, sans-serif" font-size="10" font-weight="bold">calculation</text>
+    <text x="55" y="28" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="8">batch processing</text>
+  </g>
+  
+  <g transform="translate(535, 530)">
+    <rect width="110" height="35" rx="4" fill="#ef4444" opacity="0.3"/>
+    <text x="55" y="15" text-anchor="middle" fill="#fca5a5" font-family="Arial, sans-serif" font-size="10" font-weight="bold">cleanup</text>
+    <text x="55" y="28" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="8">tokens, logs</text>
+  </g>
+  
+  <g transform="translate(655, 530)">
+    <rect width="110" height="35" rx="4" fill="#06b6d4" opacity="0.3"/>
+    <text x="55" y="15" text-anchor="middle" fill="#67e8f9" font-family="Arial, sans-serif" font-size="10" font-weight="bold">webhook</text>
+    <text x="55" y="28" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="8">external calls</text>
+  </g>
+  
+  <g transform="translate(775, 530)">
+    <rect width="70" height="35" rx="4" fill="#334155"/>
+    <text x="35" y="22" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="9">+custom</text>
+  </g>
+  
+  <!-- Job Flow States -->
+  <g transform="translate(55, 575)">
+    <text x="0" y="12" fill="#64748b" font-family="Arial, sans-serif" font-size="10">Flow:</text>
+    <rect x="40" y="0" width="70" height="20" rx="3" fill="#3b82f6" opacity="0.5"/>
+    <text x="75" y="14" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="9">pending</text>
+    <text x="120" y="14" fill="#64748b" font-family="Arial, sans-serif" font-size="12">→</text>
+    <rect x="135" y="0" width="70" height="20" rx="3" fill="#f97316" opacity="0.5"/>
+    <text x="170" y="14" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="9">processing</text>
+    <text x="215" y="14" fill="#64748b" font-family="Arial, sans-serif" font-size="12">→</text>
+    <rect x="230" y="0" width="70" height="20" rx="3" fill="#10b981" opacity="0.5"/>
+    <text x="265" y="14" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="9">completed</text>
+    <text x="320" y="14" fill="#64748b" font-family="Arial, sans-serif" font-size="10">|</text>
+    <rect x="340" y="0" width="55" height="20" rx="3" fill="#eab308" opacity="0.5"/>
+    <text x="368" y="14" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="9">retrying</text>
+    <text x="405" y="14" fill="#64748b" font-family="Arial, sans-serif" font-size="12">→</text>
+    <rect x="420" y="0" width="55" height="20" rx="3" fill="#ef4444" opacity="0.5"/>
+    <text x="448" y="14" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="9">failed</text>
+  </g>
+  
+  <!-- Retry info -->
+  <g transform="translate(500, 575)">
+    <text x="0" y="12" fill="#64748b" font-family="Arial, sans-serif" font-size="10">Retry: MaxRetries=3, Backoff=1m×2^attempt</text>
+  </g>
+  
+  <!-- Arrows -->
+  <!-- API to Queue -->
+  <line x1="220" y1="150" x2="275" y2="150" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead-blue)"/>
+  
+  <!-- Queue to Redis -->
+  <line x1="480" y1="150" x2="535" y2="150" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Queue to Worker -->
+  <line x1="380" y1="260" x2="380" y2="285" stroke="#f97316" stroke-width="2" marker-end="url(#arrowhead-orange)"/>
+  
+  <!-- Worker to Handlers -->
+  <line x1="480" y1="375" x2="535" y2="375" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Redis to Worker (dequeue) -->
+  <path d="M 540 230 Q 500 300 480 320" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowhead-red)"/>
+  <text x="485" y="275" fill="#ef4444" font-family="Arial, sans-serif" font-size="9">BRPOP</text>
+</svg>
