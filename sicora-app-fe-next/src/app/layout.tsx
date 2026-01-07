@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import { Providers } from './providers';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -14,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'SICORA - Sistema de Coordinación Académica',
-  description: 'Sistema de información para la gestión académica',
+  description: 'Sistema de información para la gestión académica - OneVision',
+  keywords: ['SICORA', 'gestión académica', 'horarios', 'evaluaciones'],
 };
 
 export default function RootLayout({
@@ -26,7 +28,7 @@ export default function RootLayout({
     <html lang="es">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -1,9 +1,10 @@
 import type { ApiResponse } from '../types/auth.types';
 
-// Configuración de la API
+// Configuración de la API (adaptado para Next.js)
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001',
-  USER_SERVICE_URL: import.meta.env.VITE_USER_SERVICE_URL || 'http://localhost:8001',
+  BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8001',
+  USER_SERVICE_URL:
+    process.env.NEXT_PUBLIC_USER_SERVICE_URL || 'http://localhost:8001',
   TIMEOUT: 30000, // 30 segundos
   HEADERS: {
     'Content-Type': 'application/json',
@@ -17,7 +18,12 @@ export class ApiClientError extends Error {
   public code: string;
   public details?: Record<string, unknown>;
 
-  constructor(message: string, status: number, code: string, details?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    status: number,
+    code: string,
+    details?: Record<string, unknown>
+  ) {
     super(message);
     this.name = 'ApiClientError';
     this.status = status;
@@ -58,7 +64,9 @@ class HttpClient {
   /**
    * Preparar headers para la petición
    */
-  private getHeaders(customHeaders?: Record<string, string>): Record<string, string> {
+  private getHeaders(
+    customHeaders?: Record<string, string>
+  ): Record<string, string> {
     const headers = { ...this.defaultHeaders };
 
     // Agregar token de autenticación si está disponible
@@ -113,7 +121,10 @@ class HttpClient {
   /**
    * Realizar petición GET
    */
-  async get<T>(url: string, customHeaders?: Record<string, string>): Promise<ApiResponse<T>> {
+  async get<T>(
+    url: string,
+    customHeaders?: Record<string, string>
+  ): Promise<ApiResponse<T>> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -210,7 +221,10 @@ class HttpClient {
   /**
    * Realizar petición DELETE
    */
-  async delete<T>(url: string, customHeaders?: Record<string, string>): Promise<ApiResponse<T>> {
+  async delete<T>(
+    url: string,
+    customHeaders?: Record<string, string>
+  ): Promise<ApiResponse<T>> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -242,12 +256,14 @@ export const httpClient = new HttpClient();
 
 // Funciones de conveniencia para usar en la aplicación
 export const apiClient = {
-  get: <T>(url: string, headers?: Record<string, string>) => httpClient.get<T>(url, headers),
+  get: <T>(url: string, headers?: Record<string, string>) =>
+    httpClient.get<T>(url, headers),
   post: <T>(url: string, data?: unknown, headers?: Record<string, string>) =>
     httpClient.post<T>(url, data, headers),
   put: <T>(url: string, data?: unknown, headers?: Record<string, string>) =>
     httpClient.put<T>(url, data, headers),
-  delete: <T>(url: string, headers?: Record<string, string>) => httpClient.delete<T>(url, headers),
+  delete: <T>(url: string, headers?: Record<string, string>) =>
+    httpClient.delete<T>(url, headers),
 };
 
 export default apiClient;

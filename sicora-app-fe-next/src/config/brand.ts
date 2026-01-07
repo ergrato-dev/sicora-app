@@ -1,6 +1,7 @@
 /**
  * Configuración de marca dual EPTI/SENA
  * Sistema que permite cambiar entre configuraciones sin modificar código
+ * Adaptado para Next.js (usa process.env con prefijo NEXT_PUBLIC_)
  */
 
 export interface BrandConfig {
@@ -17,19 +18,25 @@ export interface BrandConfig {
 }
 
 export const BRAND_CONFIG: BrandConfig = {
-  name: import.meta.env.VITE_BRAND_NAME || 'EPTI - ONEVISION',
-  subtitle: import.meta.env.VITE_BRAND_SUBTITLE || 'Sistema de Coordinación Académica',
+  name: process.env.NEXT_PUBLIC_BRAND_NAME || 'EPTI - ONEVISION',
+  subtitle:
+    process.env.NEXT_PUBLIC_BRAND_SUBTITLE ||
+    'Sistema de Coordinación Académica',
   description:
-    import.meta.env.VITE_BRAND_DESCRIPTION || 'Plataforma integral para la gestión académica',
-  showLogo: import.meta.env.VITE_SHOW_LOGO === 'true',
-  buildTarget: (import.meta.env.VITE_BUILD_TARGET as BrandConfig['buildTarget']) || 'development',
-  organization: import.meta.env.VITE_ORGANIZATION || 'EPTI',
+    process.env.NEXT_PUBLIC_BRAND_DESCRIPTION ||
+    'Plataforma integral para la gestión académica',
+  showLogo: process.env.NEXT_PUBLIC_SHOW_LOGO === 'true',
+  buildTarget:
+    (process.env.NEXT_PUBLIC_BUILD_TARGET as BrandConfig['buildTarget']) ||
+    'development',
+  organization: process.env.NEXT_PUBLIC_ORGANIZATION || 'EPTI',
   organizationFull:
-    import.meta.env.VITE_ORGANIZATION_FULL ||
+    process.env.NEXT_PUBLIC_ORGANIZATION_FULL ||
     'EPTI - Plataforma de Desarrollo y Tecnologías de la Información',
-  contactEmail: import.meta.env.VITE_CONTACT_EMAIL || 'demo@ejemplo.local',
-  supportUrl: import.meta.env.VITE_SUPPORT_URL || 'http://localhost:5173/soporte',
-  docsUrl: import.meta.env.VITE_DOCS_URL || 'http://localhost:5173/docs',
+  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'demo@ejemplo.local',
+  supportUrl:
+    process.env.NEXT_PUBLIC_SUPPORT_URL || 'http://localhost:3000/soporte',
+  docsUrl: process.env.NEXT_PUBLIC_DOCS_URL || 'http://localhost:3000/docs',
 };
 
 /**
@@ -43,7 +50,9 @@ export const IS_DEVELOPMENT = BRAND_CONFIG.buildTarget === 'development';
  * Configuración de URLs específicas por entorno
  */
 export const BRAND_URLS = {
-  home: IS_SENA_BUILD ? 'https://sicora.sena.edu.co' : 'https://epti.onevision.com.co',
+  home: IS_SENA_BUILD
+    ? 'https://sicora.sena.edu.co'
+    : 'https://epti.onevision.com.co',
   support: BRAND_CONFIG.supportUrl,
   docs: BRAND_CONFIG.docsUrl,
   contact: '/contacto-seguro', // Enlace a página de contacto seguro
@@ -65,7 +74,9 @@ export const BRAND_TEXTS = {
     ? 'Accede al Sistema de Información de Coordinación Académica'
     : 'Accede al Sistema de Coordinación Académica EPTI',
 
-  dashboardTitle: IS_SENA_BUILD ? 'Panel de Coordinación Académica' : 'Panel de Control EPTI',
+  dashboardTitle: IS_SENA_BUILD
+    ? 'Panel de Coordinación Académica'
+    : 'Panel de Control EPTI',
 
   systemDescription: IS_SENA_BUILD
     ? 'Sistema integral de gestión académica del CGMLTI'

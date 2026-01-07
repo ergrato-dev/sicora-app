@@ -41,7 +41,7 @@ export const useUserStore = create<UserState>()(
       initializeUser: () => {
         const state = get();
         // Si no hay usuario y estamos en desarrollo, usar el demo
-        if (!state.user && import.meta.env.DEV) {
+        if (!state.user && process.env.NODE_ENV === 'development') {
           set({ user: demoUser, isAuthenticated: true });
         }
       },
@@ -72,7 +72,7 @@ export const useInitDemoUser = () => {
   const { setUser, user } = useUserStore();
 
   // Si no hay usuario en desarrollo, usar el demo
-  if (!user && import.meta.env.DEV) {
+  if (!user && process.env.NODE_ENV === 'development') {
     setUser(demoUser);
   }
 };
