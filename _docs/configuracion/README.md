@@ -19,6 +19,7 @@
 - [Configuración de Base de Datos](./CONFIGURACION_BASE_DATOS.md)
 - [Configuración de Docker](./CONFIGURACION_DOCKER.md)
 - [Configuración de CI/CD](./CONFIGURACION_CICD.md)
+- [**ADR: Traefik como Reverse Proxy**](./ADR_TRAEFIK_REVERSE_PROXY.md) - Decisión arquitectónica Nginx → Traefik
 
 ### Configuración de Lenguajes
 

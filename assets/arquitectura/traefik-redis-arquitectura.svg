@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650">
+  <defs>
+    <style>
+      .bg { fill: #1a1a2e; }
+      .box { fill: #16213e; stroke: #0f3460; stroke-width: 2; rx: 8; }
+      .box-traefik { fill: #0d4f8c; stroke: #083358; stroke-width: 2; rx: 8; }
+      .box-gateway { fill: #7209b7; stroke: #560bad; stroke-width: 2; rx: 8; }
+      .box-redis { fill: #dc3545; stroke: #b02a37; stroke-width: 2; rx: 8; }
+      .box-service { fill: #198754; stroke: #146c43; stroke-width: 2; rx: 8; }
+      .box-db { fill: #fd7e14; stroke: #ca6510; stroke-width: 2; rx: 8; }
+      .box-frontend { fill: #6f42c1; stroke: #59359a; stroke-width: 2; rx: 8; }
+      .title { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; fill: #e94560; }
+      .subtitle { font-family: Arial, sans-serif; font-size: 14px; fill: #a0a0a0; }
+      .label { font-family: Arial, sans-serif; font-size: 13px; font-weight: bold; fill: #ffffff; }
+      .label-sm { font-family: Arial, sans-serif; font-size: 11px; fill: #ffffff; }
+      .arrow { stroke: #718096; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .arrow-data { stroke: #00d4ff; stroke-width: 2; stroke-dasharray: 5,3; fill: none; }
+      .legend-text { font-family: Arial, sans-serif; font-size: 11px; fill: #d0d0d0; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#718096"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect class="bg" width="900" height="650"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" class="title">Arquitectura SICORA - Traefik + Redis Cache</text>
+  <text x="450" y="55" text-anchor="middle" class="subtitle">Doble capa de rate limiting y service discovery automático</text>
+  
+  <!-- Internet -->
+  <rect x="350" y="75" width="200" height="40" class="box"/>
+  <text x="450" y="100" text-anchor="middle" class="label">🌐 Internet</text>
+  
+  <!-- Arrow to Traefik -->
+  <line x1="450" y1="115" x2="450" y2="145" class="arrow"/>
+  
+  <!-- Traefik Box -->
+  <rect x="200" y="150" width="500" height="100" class="box-traefik"/>
+  <text x="450" y="175" text-anchor="middle" class="label">🔀 TRAEFIK v3.2</text>
+  <text x="450" y="195" text-anchor="middle" class="label-sm">Reverse Proxy &amp; Load Balancer</text>
+  <text x="280" y="220" text-anchor="middle" class="label-sm">:80 HTTP</text>
+  <text x="380" y="220" text-anchor="middle" class="label-sm">:443 HTTPS</text>
+  <text x="480" y="220" text-anchor="middle" class="label-sm">:8080 Dashboard</text>
+  <text x="600" y="220" text-anchor="middle" class="label-sm">Rate: 100/min</text>
+  
+  <!-- Traefik features -->
+  <rect x="720" y="150" width="160" height="100" class="box"/>
+  <text x="800" y="175" text-anchor="middle" class="label-sm">Middlewares:</text>
+  <text x="800" y="195" text-anchor="middle" class="label-sm">• SSL automático</text>
+  <text x="800" y="210" text-anchor="middle" class="label-sm">• Security Headers</text>
+  <text x="800" y="225" text-anchor="middle" class="label-sm">• Circuit Breaker</text>
+  <text x="800" y="240" text-anchor="middle" class="label-sm">• CORS</text>
+  
+  <!-- Arrow to Gateway -->
+  <line x1="450" y1="250" x2="450" y2="280" class="arrow"/>
+  
+  <!-- API Gateway Box -->
+  <rect x="250" y="285" width="400" height="90" class="box-gateway"/>
+  <text x="450" y="315" text-anchor="middle" class="label">🚀 API Gateway (Go)</text>
+  <text x="450" y="335" text-anchor="middle" class="label-sm">JWT Auth + Token Blacklist + Sessions</text>
+  <text x="450" y="355" text-anchor="middle" class="label-sm">Rate Limit Redis: por usuario/IP</text>
+  
+  <!-- Redis Connection -->
+  <rect x="700" y="285" width="120" height="90" class="box-redis"/>
+  <text x="760" y="320" text-anchor="middle" class="label">🔴 Redis</text>
+  <text x="760" y="340" text-anchor="middle" class="label-sm">Cache</text>
+  <text x="760" y="355" text-anchor="middle" class="label-sm">Sessions</text>
+  <text x="760" y="370" text-anchor="middle" class="label-sm">Blacklist</text>
+  
+  <!-- Arrow Gateway to Redis -->
+  <line x1="650" y1="330" x2="695" y2="330" class="arrow-data"/>
+  
+  <!-- Arrow to Services -->
+  <line x1="450" y1="375" x2="450" y2="410" class="arrow"/>
+  
+  <!-- Microservices -->
+  <rect x="60" y="420" width="120" height="70" class="box-service"/>
+  <text x="120" y="450" text-anchor="middle" class="label-sm">UserService</text>
+  <text x="120" y="470" text-anchor="middle" class="label-sm">:8001</text>
+  
+  <rect x="200" y="420" width="120" height="70" class="box-service"/>
+  <text x="260" y="450" text-anchor="middle" class="label-sm">ScheduleService</text>
+  <text x="260" y="470" text-anchor="middle" class="label-sm">:8002</text>
+  
+  <rect x="340" y="420" width="120" height="70" class="box-service"/>
+  <text x="400" y="450" text-anchor="middle" class="label-sm">KbService</text>
+  <text x="400" y="470" text-anchor="middle" class="label-sm">:8005</text>
+  
+  <rect x="480" y="420" width="120" height="70" class="box-service"/>
+  <text x="540" y="450" text-anchor="middle" class="label-sm">EvalinService</text>
+  <text x="540" y="470" text-anchor="middle" class="label-sm">:8004</text>
+  
+  <rect x="620" y="420" width="120" height="70" class="box-service"/>
+  <text x="680" y="450" text-anchor="middle" class="label-sm">MevalService</text>
+  <text x="680" y="470" text-anchor="middle" class="label-sm">:8008</text>
+  
+  <rect x="760" y="420" width="120" height="70" class="box-service"/>
+  <text x="820" y="450" text-anchor="middle" class="label-sm">AIService</text>
+  <text x="820" y="470" text-anchor="middle" class="label-sm">:8006</text>
+  
+  <!-- Arrows to each service -->
+  <line x1="350" y1="400" x2="120" y2="415" class="arrow"/>
+  <line x1="380" y1="400" x2="260" y2="415" class="arrow"/>
+  <line x1="420" y1="400" x2="400" y2="415" class="arrow"/>
+  <line x1="480" y1="400" x2="540" y2="415" class="arrow"/>
+  <line x1="520" y1="400" x2="680" y2="415" class="arrow"/>
+  <line x1="550" y1="400" x2="820" y2="415" class="arrow"/>
+  
+  <!-- Databases -->
+  <rect x="200" y="520" width="140" height="60" class="box-db"/>
+  <text x="270" y="550" text-anchor="middle" class="label">🐘 PostgreSQL</text>
+  <text x="270" y="565" text-anchor="middle" class="label-sm">:5433</text>
+  
+  <rect x="380" y="520" width="140" height="60" class="box-db"/>
+  <text x="450" y="550" text-anchor="middle" class="label">🍃 MongoDB</text>
+  <text x="450" y="565" text-anchor="middle" class="label-sm">:27017</text>
+  
+  <!-- Arrows to DBs -->
+  <line x1="400" y1="490" x2="270" y2="515" class="arrow"/>
+  <line x1="540" y1="490" x2="450" y2="515" class="arrow"/>
+  
+  <!-- Frontend -->
+  <rect x="20" y="150" width="160" height="80" class="box-frontend"/>
+  <text x="100" y="180" text-anchor="middle" class="label">🖥️ Frontend</text>
+  <text x="100" y="200" text-anchor="middle" class="label-sm">React + Vite</text>
+  <text x="100" y="215" text-anchor="middle" class="label-sm">app.localhost</text>
+  
+  <!-- Arrow Frontend to Traefik -->
+  <line x1="180" y1="190" x2="195" y2="190" class="arrow"/>
+  
+  <!-- Legend -->
+  <rect x="20" y="590" width="860" height="50" class="box" opacity="0.5"/>
+  <text x="40" y="610" class="legend-text">Flujo: Internet → Traefik (Rate Limit Global) → API Gateway (Rate Limit Redis + Auth) → Microservicios → Databases</text>
+  <text x="40" y="630" class="legend-text">URLs: localhost (Frontend) | api.localhost (API) | traefik.localhost:8080 (Dashboard) | grafana.localhost (Monitoring)</text>
+</svg>
