@@ -7,54 +7,63 @@ rule_files:
   # - "second_rules.yml"
 
 scrape_configs:
-  - job_name: "prometheus"
+  - job_name: 'prometheus'
     static_configs:
-      - targets: ["localhost:9090"]
+      - targets: ['localhost:9090']
 
-  - job_name: "sicora-userservice"
+  - job_name: 'sicora-userservice'
     static_configs:
-      - targets: ["host.docker.internal:8001"]
-    metrics_path: "/metrics"
+      - targets: ['host.docker.internal:8001']
+    metrics_path: '/metrics'
     scrape_interval: 5s
 
-  - job_name: "sicora-scheduleservice"
+  - job_name: 'sicora-scheduleservice'
     static_configs:
-      - targets: ["host.docker.internal:8002"]
-    metrics_path: "/metrics"
+      - targets: ['host.docker.internal:8002']
+    metrics_path: '/metrics'
     scrape_interval: 5s
 
-  - job_name: "sicora-attendanceservice"
+  - job_name: 'sicora-attendanceservice'
     static_configs:
-      - targets: ["host.docker.internal:8003"]
-    metrics_path: "/metrics"
+      - targets: ['host.docker.internal:8003']
+    metrics_path: '/metrics'
     scrape_interval: 5s
 
-  - job_name: "sicora-evalinservice"
+  - job_name: 'sicora-evalinservice'
     static_configs:
-      - targets: ["host.docker.internal:8004"]
-    metrics_path: "/metrics"
+      - targets: ['host.docker.internal:8004']
+    metrics_path: '/metrics'
     scrape_interval: 5s
 
-  - job_name: "sicora-kbservice"
+  - job_name: 'sicora-kbservice'
     static_configs:
-      - targets: ["host.docker.internal:8005"]
-    metrics_path: "/metrics"
+      - targets: ['host.docker.internal:8005']
+    metrics_path: '/metrics'
     scrape_interval: 5s
 
-  - job_name: "sicora-aiservice"
+  - job_name: 'sicora-aiservice'
     static_configs:
-      - targets: ["host.docker.internal:8006"]
-    metrics_path: "/metrics"
+      - targets: ['host.docker.internal:8006']
+    metrics_path: '/metrics'
     scrape_interval: 5s
 
-  - job_name: "postgres-exporter"
+  - job_name: 'postgres-exporter'
     static_configs:
-      - targets: ["host.docker.internal:9187"]
+      - targets: ['host.docker.internal:9187']
 
-  - job_name: "redis-exporter"
+  - job_name: 'redis-exporter'
     static_configs:
-      - targets: ["host.docker.internal:9121"]
+      - targets: ['host.docker.internal:9121']
 
-  - job_name: "nginx-exporter"
+  # Traefik metrics (reemplaza nginx-exporter)
+  - job_name: 'traefik'
     static_configs:
-      - targets: ["host.docker.internal:9113"]
+      - targets: ['traefik:8082']
+    scrape_interval: 5s
+
+  # API Gateway Go metrics
+  - job_name: 'sicora-apigateway'
+    static_configs:
+      - targets: ['apigateway:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 5s

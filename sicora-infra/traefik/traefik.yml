@@ -1,0 +1,94 @@
+# Traefik Static Configuration
+# =============================================================================
+# Este archivo configura Traefik como reverse proxy para SICORA
+# Documentación: https://doc.traefik.io/traefik/
+
+api:
+  # Dashboard habilitado (accesible en /dashboard/)
+  dashboard: true
+  # Modo inseguro para desarrollo (en producción usar middleware de auth)
+  insecure: true
+
+# Entry Points - Puntos de entrada para el tráfico
+entryPoints:
+  # HTTP - Puerto 80
+  web:
+    address: ':80'
+    # Redirección automática a HTTPS en producción
+    # http:
+    #   redirections:
+    #     entryPoint:
+    #       to: websecure
+    #       scheme: https
+
+  # HTTPS - Puerto 443
+  websecure:
+    address: ':443'
+    http:
+      tls:
+        certResolver: letsencrypt
+
+  # Métricas - Puerto interno
+  metrics:
+    address: ':8082'
+
+# Providers - Fuentes de configuración
+providers:
+  # Docker provider - Auto-descubre servicios por labels
+  docker:
+    endpoint: 'unix:///var/run/docker.sock'
+    exposedByDefault: false # Solo exponer servicios con label traefik.enable=true
+    network: sicora-network
+    watch: true
+
+  # Configuración dinámica desde archivos
+  file:
+    directory: '/etc/traefik/dynamic'
+    watch: true
+
+# Certificate Resolvers - SSL automático con Let's Encrypt
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      # Email para notificaciones de Let's Encrypt
+      email: '${ACME_EMAIL:-admin@sicora.dev}'
+      # Archivo donde se almacenan los certificados
+      storage: '/letsencrypt/acme.json'
+      # Usar servidor de staging para pruebas (cambiar a producción)
+      # caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      httpChallenge:
+        entryPoint: web
+
+# Logging
+log:
+  level: INFO
+  # format: json  # Descomentar para logs en JSON
+
+accessLog:
+  filePath: '/var/log/traefik/access.log'
+  bufferingSize: 100
+  filters:
+    statusCodes:
+      - '400-599'
+
+# Métricas para Prometheus
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    buckets:
+      - 0.1
+      - 0.3
+      - 1.2
+      - 5.0
+
+# Health check
+ping:
+  entryPoint: web
+# Tracing (opcional - para Jaeger/Zipkin)
+# tracing:
+#   jaeger:
+#     samplingServerURL: http://jaeger:5778/sampling
+#     localAgentHostPort: jaeger:6831

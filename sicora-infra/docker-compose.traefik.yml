@@ -1,0 +1,393 @@
+# Docker Compose - Traefik + SICORA Services
+# =============================================================================
+# Uso:
+#   Desarrollo: docker compose -f docker-compose.traefik.yml up -d
+#   Producción: docker compose -f docker-compose.traefik.yml -f docker-compose.prod.yml up -d
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # TRAEFIK - Reverse Proxy
+  # ===========================================================================
+  traefik:
+    image: traefik:v3.2
+    container_name: sicora-traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # Dashboard (solo desarrollo)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - traefik_letsencrypt:/letsencrypt
+      - traefik_logs:/var/log/traefik
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      # Dashboard
+      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=web"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================================================
+  # DATABASES
+  # ===========================================================================
+  postgres:
+    image: postgres:18-alpine
+    container_name: sicora-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sicora_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-sicora_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sicora_password}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/database/init:/docker-entrypoint-initdb.d
+    networks:
+      - sicora-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sicora_user}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: sicora-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sicora-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=false"
+
+  mongodb:
+    image: mongo:8.0
+    container_name: sicora-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USER:-sicora_admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:-mongodb_password}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-sicora_nosql}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=false"
+
+  # ===========================================================================
+  # API GATEWAY (Go)
+  # ===========================================================================
+  apigateway:
+    build:
+      context: ../sicora-be-go/apigateway
+      dockerfile: Dockerfile
+    container_name: sicora-apigateway
+    restart: unless-stopped
+    environment:
+      - PORT=8000
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-24h}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      - RATE_LIMIT=${RATE_LIMIT:-100}
+      # Redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_DB=0
+      # Backend Services
+      - USERSERVICE_URL=http://userservice:8000
+      - SCHEDULESERVICE_URL=http://scheduleservice:8000
+      - ATTENDANCESERVICE_URL=http://attendanceservice:8000
+      - EVALINSERVICE_URL=http://evalinservice:8000
+      - KBSERVICE_URL=http://kbservice:8000
+      - AISERVICE_URL=http://aiservice:8000
+      - MEVALSERVICE_URL=http://mevalservice:8000
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      # Router principal para API
+      - "traefik.http.routers.api.rule=Host(`api.localhost`) || PathPrefix(`/api`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.routers.api.service=api"
+      - "traefik.http.routers.api.middlewares=rate-limit@file,secure-headers@file,cors-dev@file"
+      # Router HTTPS (producción)
+      - "traefik.http.routers.api-secure.rule=Host(`api.sicora.dev`)"
+      - "traefik.http.routers.api-secure.entrypoints=websecure"
+      - "traefik.http.routers.api-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.api-secure.middlewares=rate-limit@file,secure-headers@file,cors-prod@file"
+      # Service
+      - "traefik.http.services.api.loadbalancer.server.port=8000"
+      - "traefik.http.services.api.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.services.api.loadbalancer.healthcheck.interval=10s"
+
+  # ===========================================================================
+  # MICROSERVICES (Python/FastAPI)
+  # ===========================================================================
+  userservice:
+    build:
+      context: ../sicora-be-python/userservice
+      dockerfile: Dockerfile
+    container_name: sicora-userservice
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-sicora_user}:${POSTGRES_PASSWORD:-sicora_password}@postgres:5432/${POSTGRES_DB:-sicora_dev}
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${JWT_SECRET:-change-me}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.userservice.rule=Host(`users.localhost`)"
+      - "traefik.http.routers.userservice.entrypoints=web"
+      - "traefik.http.services.userservice.loadbalancer.server.port=8000"
+
+  scheduleservice:
+    build:
+      context: ../sicora-be-python/scheduleservice
+      dockerfile: Dockerfile
+    container_name: sicora-scheduleservice
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sicora_user}:${POSTGRES_PASSWORD:-sicora_password}@postgres:5432/${POSTGRES_DB:-sicora_dev}
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${JWT_SECRET:-change-me}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.scheduleservice.rule=Host(`schedules.localhost`)"
+      - "traefik.http.routers.scheduleservice.entrypoints=web"
+      - "traefik.http.services.scheduleservice.loadbalancer.server.port=8000"
+
+  attendanceservice:
+    build:
+      context: ../sicora-be-python/attendanceservice
+      dockerfile: Dockerfile
+    container_name: sicora-attendanceservice
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sicora_user}:${POSTGRES_PASSWORD:-sicora_password}@postgres:5432/${POSTGRES_DB:-sicora_dev}
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${JWT_SECRET:-change-me}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.attendanceservice.rule=Host(`attendance.localhost`)"
+      - "traefik.http.routers.attendanceservice.entrypoints=web"
+      - "traefik.http.services.attendanceservice.loadbalancer.server.port=8000"
+
+  evalinservice:
+    build:
+      context: ../sicora-be-python/evalinservice
+      dockerfile: Dockerfile
+    container_name: sicora-evalinservice
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sicora_user}:${POSTGRES_PASSWORD:-sicora_password}@postgres:5432/${POSTGRES_DB:-sicora_dev}
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${JWT_SECRET:-change-me}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.evalinservice.rule=Host(`evaluations.localhost`)"
+      - "traefik.http.routers.evalinservice.entrypoints=web"
+      - "traefik.http.services.evalinservice.loadbalancer.server.port=8000"
+
+  kbservice:
+    build:
+      context: ../sicora-be-python/kbservice
+      dockerfile: Dockerfile
+    container_name: sicora-kbservice
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sicora_user}:${POSTGRES_PASSWORD:-sicora_password}@postgres:5432/${POSTGRES_DB:-sicora_dev}
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${JWT_SECRET:-change-me}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kbservice.rule=Host(`kb.localhost`)"
+      - "traefik.http.routers.kbservice.entrypoints=web"
+      - "traefik.http.services.kbservice.loadbalancer.server.port=8000"
+
+  aiservice:
+    build:
+      context: ../sicora-be-python/aiservice
+      dockerfile: Dockerfile
+    container_name: sicora-aiservice
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-sicora_user}:${POSTGRES_PASSWORD:-sicora_password}@postgres:5432/${POSTGRES_DB:-sicora_dev}
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${JWT_SECRET:-change-me}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.aiservice.rule=Host(`ai.localhost`)"
+      - "traefik.http.routers.aiservice.entrypoints=web"
+      - "traefik.http.services.aiservice.loadbalancer.server.port=8000"
+
+  mevalservice:
+    build:
+      context: ../sicora-be-python/mevalservice
+      dockerfile: Dockerfile
+    container_name: sicora-mevalservice
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sicora_user}:${POSTGRES_PASSWORD:-sicora_password}@postgres:5432/${POSTGRES_DB:-sicora_dev}
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${JWT_SECRET:-change-me}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mevalservice.rule=Host(`meval.localhost`)"
+      - "traefik.http.routers.mevalservice.entrypoints=web"
+      - "traefik.http.services.mevalservice.loadbalancer.server.port=8000"
+
+  # ===========================================================================
+  # FRONTEND
+  # ===========================================================================
+  frontend:
+    build:
+      context: ../sicora-app-fe
+      dockerfile: Dockerfile.dev
+    container_name: sicora-frontend
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=http://api.localhost
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      # Desarrollo
+      - "traefik.http.routers.frontend.rule=Host(`localhost`) || Host(`app.localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.service=frontend"
+      # Producción
+      - "traefik.http.routers.frontend-secure.rule=Host(`sicora.dev`) || Host(`www.sicora.dev`)"
+      - "traefik.http.routers.frontend-secure.entrypoints=websecure"
+      - "traefik.http.routers.frontend-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend.loadbalancer.server.port=5173"
+
+  # ===========================================================================
+  # MONITORING (opcional)
+  # ===========================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sicora-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-lifecycle"
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
+      - "traefik.http.routers.prometheus.entrypoints=web"
+      - "traefik.http.routers.prometheus.middlewares=admin-whitelist@file"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sicora-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://grafana.localhost
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - sicora-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.localhost`)"
+      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+# ===========================================================================
+# VOLUMES
+# ===========================================================================
+volumes:
+  postgres_data:
+  redis_data:
+  mongodb_data:
+  traefik_letsencrypt:
+  traefik_logs:
+  prometheus_data:
+  grafana_data:
+
+# ===========================================================================
+# NETWORKS
+# ===========================================================================
+networks:
+  sicora-network:
+    driver: bridge
+    name: sicora-network

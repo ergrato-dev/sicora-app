@@ -1,0 +1,155 @@
+# Traefik Dynamic Configuration
+# =============================================================================
+# Middleware y configuraciones dinámicas que se recargan automáticamente
+
+http:
+  # =========================================================================
+  # MIDDLEWARES
+  # =========================================================================
+  middlewares:
+    # Rate Limiting global (complementa el rate limiting de Redis en el Gateway)
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+        period: 1m
+
+    # Rate Limiting estricto para endpoints sensibles
+    rate-limit-strict:
+      rateLimit:
+        average: 10
+        burst: 5
+        period: 1m
+
+    # Headers de seguridad
+    secure-headers:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        frameDeny: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 31536000
+        customFrameOptionsValue: 'SAMEORIGIN'
+        customResponseHeaders:
+          X-Robots-Tag: 'noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+          Server: '' # Ocultar versión del servidor
+
+    # Compresión GZIP
+    compress:
+      compress: {}
+
+    # CORS para desarrollo
+    cors-dev:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - '*'
+        accessControlAllowOriginList:
+          - 'http://localhost:3000'
+          - 'http://localhost:5173'
+          - 'http://127.0.0.1:3000'
+          - 'http://127.0.0.1:5173'
+        accessControlMaxAge: 100
+        addVaryHeader: true
+
+    # CORS para producción (ajustar dominios)
+    cors-prod:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - Authorization
+          - Content-Type
+          - X-Request-ID
+          - X-Session-ID
+        accessControlAllowOriginList:
+          - 'https://sicora.dev'
+          - 'https://www.sicora.dev'
+          - 'https://app.sicora.dev'
+        accessControlMaxAge: 86400
+        addVaryHeader: true
+
+    # Retry automático para alta disponibilidad
+    retry:
+      retry:
+        attempts: 3
+        initialInterval: 100ms
+
+    # Circuit breaker para proteger servicios
+    circuit-breaker:
+      circuitBreaker:
+        expression: 'NetworkErrorRatio() > 0.5 || ResponseCodeRatio(500, 600, 0, 600) > 0.5'
+
+    # Strip prefix para APIs
+    strip-api-prefix:
+      stripPrefix:
+        prefixes:
+          - '/api'
+
+    # Basic Auth para dashboard (producción)
+    dashboard-auth:
+      basicAuth:
+        # Generar con: htpasswd -nb admin password
+        # users: admin:$apr1$xxx
+        users:
+          - 'admin:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/' # admin:traefik
+
+    # IP Whitelist para admin (opcional)
+    admin-whitelist:
+      ipWhiteList:
+        sourceRange:
+          - '127.0.0.1/32'
+          - '10.0.0.0/8'
+          - '172.16.0.0/12'
+          - '192.168.0.0/16'
+
+  # =========================================================================
+  # ROUTERS (rutas adicionales no manejadas por Docker labels)
+  # =========================================================================
+  routers:
+    # Dashboard de Traefik (desarrollo)
+    traefik-dashboard:
+      rule: 'Host(`traefik.localhost`)'
+      service: api@internal
+      middlewares:
+        - admin-whitelist
+      entryPoints:
+        - web
+
+  # =========================================================================
+  # SERVICES (servicios adicionales)
+  # =========================================================================
+  services:
+    # Servicio de health check global
+    health-check:
+      loadBalancer:
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+# TLS Configuration
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+      sniStrict: true
+      cipherSuites:
+        - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
