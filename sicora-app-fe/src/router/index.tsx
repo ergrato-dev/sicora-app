@@ -3,6 +3,21 @@ import { Suspense, lazy } from 'react';
 import { LayoutWrapper } from '../components/LayoutWrapper';
 import { Dashboard } from '../pages/Dashboard';
 import { NotFoundPage } from '../pages/NotFoundPage';
+import { ProtectedRoute, PublicRoute } from '../components/auth/ProtectedRoute';
+
+// Auth pages - lazy loaded
+const LoginPage = lazy(() =>
+  import('../pages/auth/LoginPage').then((m) => ({ default: m.LoginPage }))
+);
+const ForgotPasswordPage = lazy(() =>
+  import('../pages/auth/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage }))
+);
+const ResetPasswordPage = lazy(() =>
+  import('../pages/auth/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage }))
+);
+const ChangePasswordPage = lazy(() =>
+  import('../pages/auth/ChangePasswordPage').then((m) => ({ default: m.ChangePasswordPage }))
+);
 
 // Lazy loaded pages - se cargan solo cuando se navega a ellas
 const UsuariosPage = lazy(() =>
@@ -74,7 +89,42 @@ export function AppRouter() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path='/' element={<LayoutWrapper />}>
+        {/* Rutas de autenticación (públicas) */}
+        <Route
+          path='login'
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path='forgot-password'
+          element={
+            <PublicRoute>
+              <ForgotPasswordPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path='reset-password'
+          element={
+            <PublicRoute>
+              <ResetPasswordPage />
+            </PublicRoute>
+          }
+        />
+        <Route path='change-password' element={<ChangePasswordPage />} />
+
+        {/* Rutas protegidas con layout */}
+        <Route
+          path='/'
+          element={
+            <ProtectedRoute>
+              <LayoutWrapper />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path='demo' element={<DemoPage />} />
           <Route path='contacto-seguro' element={<ContactPage />} />
@@ -85,7 +135,7 @@ export function AppRouter() {
           <Route path='modal-skeleton-toast' element={<ModalSkeletonToastDemoPage />} />
           <Route path='spinner-tooltip-dropdown' element={<SpinnerTooltipDropdownDemoPage />} />
 
-          {/* Rutas de Usuarios */}
+          {/* Rutas de Usuarios - Solo admin/coordinador */}
           <Route path='usuarios'>
             <Route index element={<UsuariosPage />} />
             <Route path='crear' element={<UsuariosPage />} />

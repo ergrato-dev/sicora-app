@@ -1,6 +1,7 @@
-import { useUserStore } from '../stores/userStore';
+import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/Button';
-import { BRAND_CONFIG, IS_SENA_BUILD } from '../config/brand';
+import { StatCard } from '../components/dashboard';
+import { BRAND_CONFIG } from '../config/brand';
 import {
   UserGroupIcon,
   CalendarDaysIcon,
@@ -10,9 +11,10 @@ import {
   ClipboardDocumentListIcon,
   PresentationChartLineIcon,
 } from '@heroicons/react/24/outline';
+import { Users, Calendar, BarChart3, Clock } from 'lucide-react';
 
 export function Dashboard() {
-  const { user } = useUserStore();
+  const { user } = useAuth();
 
   const dashboardCards = [
     {
@@ -95,7 +97,8 @@ export function Dashboard() {
       timeGreeting = 'Buenas noches';
     }
 
-    return `${timeGreeting}, ${user?.name || 'Usuario'}`;
+    const userName = user?.first_name || user?.email?.split('@')[0] || 'Usuario';
+    return `${timeGreeting}, ${userName}`;
   };
 
   const getRoleDisplay = () => {
@@ -116,59 +119,46 @@ export function Dashboard() {
       <div className='bg-gradient-to-r from-sena-primary-600 to-sena-primary-700 rounded-lg p-8 text-white'>
         <h1 className='text-3xl font-bold mb-2'>{getWelcomeMessage()}</h1>
         <p className='text-sena-primary-100 text-lg'>
-          {getRoleDisplay()} -{' '}
-          {IS_SENA_BUILD ? user?.coordination || 'SENA CGMLTI' : BRAND_CONFIG.organizationFull}
+          {getRoleDisplay()} - {BRAND_CONFIG.organizationFull}
         </p>
-        {user?.ficha && IS_SENA_BUILD && (
-          <p className='text-sena-primary-200 text-sm mt-1'>Ficha de Formación: {user.ficha}</p>
-        )}
-        {!IS_SENA_BUILD && (
-          <p className='text-sena-primary-200 text-sm mt-1'>{BRAND_CONFIG.description}</p>
-        )}
+        <p className='text-sena-primary-200 text-sm mt-1'>{BRAND_CONFIG.description}</p>
       </div>
 
       {/* Estadísticas rápidas */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        <div className='bg-white p-6 rounded-lg shadow-md border border-gray-100'>
-          <div className='flex items-center'>
-            <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center'>
-              <UserGroupIcon className='w-6 h-6 text-blue-600' />
-            </div>
-            <div className='ml-4'>
-              <p className='text-2xl font-bold text-gray-900'>1,247</p>
-              <p className='text-gray-600'>Usuarios Activos</p>
-            </div>
-          </div>
-        </div>
-
-        <div className='bg-white p-6 rounded-lg shadow-md border border-gray-100'>
-          <div className='flex items-center'>
-            <div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center'>
-              <CalendarDaysIcon className='w-6 h-6 text-green-600' />
-            </div>
-            <div className='ml-4'>
-              <p className='text-2xl font-bold text-gray-900'>89</p>
-              <p className='text-gray-600'>Clases Programadas</p>
-            </div>
-          </div>
-        </div>
-
-        <div className='bg-white p-6 rounded-lg shadow-md border border-gray-100'>
-          <div className='flex items-center'>
-            <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center'>
-              <ChartBarIcon className='w-6 h-6 text-purple-600' />
-            </div>
-            <div className='ml-4'>
-              <p className='text-2xl font-bold text-gray-900'>95.2%</p>
-              <p className='text-gray-600'>Asistencia Promedio</p>
-            </div>
-          </div>
-        </div>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+        <StatCard
+          title='Usuarios Activos'
+          value='1,247'
+          icon={<Users className='h-6 w-6' />}
+          variant='primary'
+          trend={{ value: 12, isPositive: true }}
+        />
+        <StatCard
+          title='Clases Programadas'
+          value='89'
+          icon={<Calendar className='h-6 w-6' />}
+          variant='success'
+          description='Esta semana'
+        />
+        <StatCard
+          title='Asistencia Promedio'
+          value='95.2%'
+          icon={<BarChart3 className='h-6 w-6' />}
+          variant='warning'
+          trend={{ value: 2.3, isPositive: true }}
+        />
+        <StatCard
+          title='Horas de Formación'
+          value='2,340'
+          icon={<Clock className='h-6 w-6' />}
+          variant='default'
+          description='Este mes'
+        />
       </div>
 
       {/* Módulos disponibles */}
       <div>
-        <h2 className='text-2xl font-bold text-gray-900 mb-6'>Módulos Disponibles</h2>
+        <h2 className='text-2xl font-bold text-foreground mb-6'>Módulos Disponibles</h2>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           {availableCards.map((card) => {
