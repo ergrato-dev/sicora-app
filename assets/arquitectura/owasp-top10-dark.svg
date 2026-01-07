@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <defs>
+    <style>
+      .bg { fill: #1a1a2e; }
+      .title { fill: #ffffff; font-family: Arial, sans-serif; font-size: 28px; font-weight: bold; }
+      .subtitle { fill: #a0aec0; font-family: Arial, sans-serif; font-size: 14px; }
+      .box { fill: #16213e; stroke: #0f3460; stroke-width: 2; rx: 8; }
+      .box-green { fill: #1a4d2e; stroke: #2d8659; stroke-width: 2; rx: 8; }
+      .box-yellow { fill: #4a4020; stroke: #b8860b; stroke-width: 2; rx: 8; }
+      .box-header { fill: #0f3460; rx: 8 8 0 0; }
+      .header-text { fill: #60a5fa; font-family: Arial, sans-serif; font-size: 13px; font-weight: bold; }
+      .item-text { fill: #e2e8f0; font-family: Arial, sans-serif; font-size: 11px; }
+      .check { fill: #22c55e; font-family: Arial, sans-serif; font-size: 12px; }
+      .partial { fill: #eab308; font-family: Arial, sans-serif; font-size: 12px; }
+      .arrow { stroke: #4a5568; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .center-box { fill: #7c3aed; stroke: #a78bfa; stroke-width: 3; rx: 12; }
+      .center-text { fill: #ffffff; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; }
+      .legend-text { fill: #a0aec0; font-family: Arial, sans-serif; font-size: 11px; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4a5568"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect class="bg" width="1200" height="800"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" class="title" text-anchor="middle">OWASP Top 10 - Cobertura SICORA</text>
+  <text x="600" y="60" class="subtitle" text-anchor="middle">Controles de seguridad implementados por categoría</text>
+  
+  <!-- Center: SICORA -->
+  <rect x="500" y="350" width="200" height="80" class="center-box"/>
+  <text x="600" y="385" class="center-text" text-anchor="middle">SICORA</text>
+  <text x="600" y="410" class="subtitle" text-anchor="middle" style="fill: #e2e8f0;">Backend + Frontend</text>
+  
+  <!-- A01: Broken Access Control -->
+  <g transform="translate(50, 80)">
+    <rect width="200" height="120" class="box-green"/>
+    <rect width="200" height="30" class="box-header"/>
+    <text x="100" y="20" class="header-text" text-anchor="middle">A01: Access Control</text>
+    <text x="15" y="50" class="check">✓</text>
+    <text x="30" y="50" class="item-text">JWT + RBAC Middleware</text>
+    <text x="15" y="70" class="check">✓</text>
+    <text x="30" y="70" class="item-text">Validación ownership</text>
+    <text x="15" y="90" class="check">✓</text>
+    <text x="30" y="90" class="item-text">Token refresh seguro</text>
+    <text x="15" y="110" class="check">✓</text>
+    <text x="30" y="110" class="item-text">Logout invalida sesión</text>
+  </g>
+  <path class="arrow" d="M 250 140 Q 350 200 500 380"/>
+  
+  <!-- A02: Cryptographic Failures -->
+  <g transform="translate(280, 80)">
+    <rect width="200" height="120" class="box-green"/>
+    <rect width="200" height="30" class="box-header"/>
+    <text x="100" y="20" class="header-text" text-anchor="middle">A02: Crypto Failures</text>
+    <text x="15" y="50" class="check">✓</text>
+    <text x="30" y="50" class="item-text">bcrypt (cost 12)</text>
+    <text x="15" y="70" class="check">✓</text>
+    <text x="30" y="70" class="item-text">HTTPS obligatorio</text>
+    <text x="15" y="90" class="check">✓</text>
+    <text x="30" y="90" class="item-text">Secrets en env vars</text>
+    <text x="15" y="110" class="check">✓</text>
+    <text x="30" y="110" class="item-text">Cookies seguras</text>
+  </g>
+  <path class="arrow" d="M 380 200 Q 450 280 520 350"/>
+  
+  <!-- A03: Injection -->
+  <g transform="translate(510, 80)">
+    <rect width="200" height="120" class="box-green"/>
+    <rect width="200" height="30" class="box-header"/>
+    <text x="100" y="20" class="header-text" text-anchor="middle">A03: Injection</text>
+    <text x="15" y="50" class="check">✓</text>
+    <text x="30" y="50" class="item-text">ORM prepared stmts</text>
+    <text x="15" y="70" class="check">✓</text>
+    <text x="30" y="70" class="item-text">Zod validation (FE)</text>
+    <text x="15" y="90" class="check">✓</text>
+    <text x="30" y="90" class="item-text">Gin binding (BE)</text>
+    <text x="15" y="110" class="check">✓</text>
+    <text x="30" y="110" class="item-text">HTML escaping</text>
+  </g>
+  <path class="arrow" d="M 610 200 L 600 350"/>
+  
+  <!-- A04: Insecure Design -->
+  <g transform="translate(740, 80)">
+    <rect width="200" height="120" class="box-yellow"/>
+    <rect width="200" height="30" class="box-header"/>
+    <text x="100" y="20" class="header-text" text-anchor="middle">A04: Insecure Design</text>
+    <text x="15" y="50" class="check">✓</text>
+    <text x="30" y="50" class="item-text">Microservicios</text>
+    <text x="15" y="70" class="check">✓</text>
+    <text x="30" y="70" class="item-text">Mínimo privilegio</text>
+    <text x="15" y="90" class="partial">○</text>
+    <text x="30" y="90" class="item-text">Threat modeling</text>
+    <text x="15" y="110" class="partial">○</text>
+    <text x="30" y="110" class="item-text">Security review</text>
+  </g>
+  <path class="arrow" d="M 840 200 Q 750 280 680 350"/>
+  
+  <!-- A05: Security Misconfiguration -->
+  <g transform="translate(950, 80)">
+    <rect width="200" height="120" class="box-green"/>
+    <rect width="200" height="30" class="box-header"/>
+    <text x="100" y="20" class="header-text" text-anchor="middle">A05: Misconfiguration</text>
+    <text x="15" y="50" class="check">✓</text>
+    <text x="30" y="50" class="item-text">Security headers</text>
+    <text x="15" y="70" class="check">✓</text>
+    <text x="30" y="70" class="item-text">CORS restrictivo</text>
+    <text x="15" y="90" class="check">✓</text>
+    <text x="30" y="90" class="item-text">CSP configurado</text>
+    <text x="15" y="110" class="check">✓</text>
+    <text x="30" y="110" class="item-text">Debug deshabilitado</text>
+  </g>
+  <path class="arrow" d="M 950 140 Q 850 250 700 380"/>
+  
+  <!-- A06: Vulnerable Components -->
+  <g transform="translate(50, 500)">
+    <rect width="200" height="120" class="box-green"/>
+    <rect width="200" height="30" class="box-header"/>
+    <text x="100" y="20" class="header-text" text-anchor="middle">A06: Vulnerable Deps</text>
+    <text x="15" y="50" class="check">✓</text>
+    <text x="30" y="50" class="item-text">Dependabot</text>
+    <text x="15" y="70" class="check">✓</text>
+    <text x="30" y="70" class="item-text">npm audit en CI</text>
+    <text x="15" y="90" class="check">✓</text>
+    <text x="30" y="90" class="item-text">gosec escaneo</text>
+    <text x="15" y="110" class="check">✓</text>
+    <text x="30" y="110" class="item-text">bandit (Python)</text>
+  </g>
+  <path class="arrow" d="M 250 560 Q 350 500 500 400"/>
+  
+  <!-- A07: Auth Failures -->
+  <g transform="translate(280, 500)">
+    <rect width="200" height="120" class="box-green"/>
+    <rect width="200" height="30" class="box-header"/>
+    <text x="100" y="20" class="header-text" text-anchor="middle">A07: Auth Failures</text>
+    <text x="15" y="50" class="check">✓</text>
+    <text x="30" y="50" class="item-text">JWT 15min expiry</text>
+    <text x="15" y="70" class="check">✓</text>
+    <text x="30" y="70" class="item-text">Refresh en Redis</text>
+    <text x="15" y="90" class="check">✓</text>
+    <text x="30" y="90" class="item-text">Rate limit login</text>
+    <text x="15" y="110" class="check">✓</text>
+    <text x="30" y="110" class="item-text">Password policy</text>
+  </g>
+  <path class="arrow" d="M 380 500 Q 450 450 520 430"/>
+  
+  <!-- A08: Data Integrity -->
+  <g transform="translate(510, 500)">
+    <rect width="200" height="120" class="box-green"/>
+    <rect width="200" height="30" class="box-header"/>
+    <text x="100" y="20" class="header-text" text-anchor="middle">A08: Data Integrity</text>
+    <text x="15" y="50" class="check">✓</text>
+    <text x="30" y="50" class="item-text">Lock files</text>
+    <text x="15" y="70" class="check">✓</text>
+    <text x="30" y="70" class="item-text">Branch protection</text>
+    <text x="15" y="90" class="check">✓</text>
+    <text x="30" y="90" class="item-text">Code review</text>
+    <text x="15" y="110" class="partial">○</text>
+    <text x="30" y="110" class="item-text">GPG commits</text>
+  </g>
+  <path class="arrow" d="M 610 500 L 600 430"/>
+  
+  <!-- A09: Logging -->
+  <g transform="translate(740, 500)">
+    <rect width="200" height="120" class="box-yellow"/>
+    <rect width="200" height="30" class="box-header"/>
+    <text x="100" y="20" class="header-text" text-anchor="middle">A09: Logging</text>
+    <text x="15" y="50" class="check">✓</text>
+    <text x="30" y="50" class="item-text">Structured logs</text>
+    <text x="15" y="70" class="check">✓</text>
+    <text x="30" y="70" class="item-text">Auth events logged</text>
+    <text x="15" y="90" class="partial">○</text>
+    <text x="30" y="90" class="item-text">Alertas automáticas</text>
+    <text x="15" y="110" class="partial">○</text>
+    <text x="30" y="110" class="item-text">Log retention 90d</text>
+  </g>
+  <path class="arrow" d="M 740 560 Q 700 480 680 430"/>
+  
+  <!-- A10: SSRF -->
+  <g transform="translate(950, 500)">
+    <rect width="200" height="120" class="box-green"/>
+    <rect width="200" height="30" class="box-header"/>
+    <text x="100" y="20" class="header-text" text-anchor="middle">A10: SSRF</text>
+    <text x="15" y="50" class="check">✓</text>
+    <text x="30" y="50" class="item-text">URL validation</text>
+    <text x="15" y="70" class="check">✓</text>
+    <text x="30" y="70" class="item-text">Domain allowlist</text>
+    <text x="15" y="90" class="check">✓</text>
+    <text x="30" y="90" class="item-text">Block private IPs</text>
+    <text x="15" y="110" class="check">✓</text>
+    <text x="30" y="110" class="item-text">Request timeout</text>
+  </g>
+  <path class="arrow" d="M 950 560 Q 850 480 700 400"/>
+  
+  <!-- Legend -->
+  <g transform="translate(50, 720)">
+    <rect width="15" height="15" fill="#1a4d2e" stroke="#2d8659" stroke-width="2" rx="2"/>
+    <text x="25" y="12" class="legend-text">Cubierto (8/10)</text>
+    
+    <rect x="150" width="15" height="15" fill="#4a4020" stroke="#b8860b" stroke-width="2" rx="2"/>
+    <text x="175" y="12" class="legend-text">Parcial (2/10)</text>
+    
+    <text x="300" y="12" class="check">✓</text>
+    <text x="315" y="12" class="legend-text">Implementado</text>
+    
+    <text x="420" y="12" class="partial">○</text>
+    <text x="435" y="12" class="legend-text">Pendiente</text>
+  </g>
+  
+  <!-- Footer -->
+  <text x="600" y="770" class="subtitle" text-anchor="middle">SICORA - Sistema de Control de Horarios y Asistencia | Enero 2026</text>
+</svg>

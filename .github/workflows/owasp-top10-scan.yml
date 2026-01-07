@@ -1,0 +1,279 @@
+# OWASP Top 10 Security Scan
+# Ejecuta análisis de seguridad estático para Go, Python y Node.js
+# Referencia: _docs/configuracion/OWASP_TOP_10_COVERAGE.md
+
+name: OWASP Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Escaneo semanal los lunes a las 6:00 UTC
+    - cron: '0 6 * * 1'
+
+env:
+  GO_VERSION: '1.25'
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '22'
+
+jobs:
+  # ============================================
+  # A06: Vulnerable and Outdated Components
+  # ============================================
+
+  go-security:
+    name: Go Security (gosec)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sicora-be-go
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Instalar gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+      - name: Ejecutar gosec
+        run: |
+          gosec -fmt=json -out=gosec-results.json -severity=medium ./... || true
+          gosec -fmt=text ./...
+        continue-on-error: true
+
+      - name: Verificar vulnerabilidades críticas
+        run: |
+          if gosec -fmt=json ./... 2>/dev/null | jq -e '.Issues[] | select(.severity == "HIGH")' > /dev/null 2>&1; then
+            echo "❌ Se encontraron vulnerabilidades HIGH en Go"
+            gosec -severity=high ./...
+            exit 1
+          fi
+          echo "✅ No se encontraron vulnerabilidades HIGH en Go"
+
+      - name: Subir resultados gosec
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gosec-results
+          path: sicora-be-go/gosec-results.json
+
+  python-security:
+    name: Python Security (bandit)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sicora-be-python
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Instalar bandit
+        run: pip install bandit[toml]
+
+      - name: Ejecutar bandit
+        run: |
+          bandit -r . -f json -o bandit-results.json --exclude ./tests,./venv,./.venv || true
+          bandit -r . --exclude ./tests,./venv,./.venv -ll
+        continue-on-error: true
+
+      - name: Verificar vulnerabilidades críticas
+        run: |
+          # Fallar solo en severidad HIGH (-ll = medium+, -lll = high only)
+          if bandit -r . --exclude ./tests,./venv,./.venv -lll -q 2>/dev/null | grep -q "Issue"; then
+            echo "❌ Se encontraron vulnerabilidades HIGH en Python"
+            bandit -r . --exclude ./tests,./venv,./.venv -lll
+            exit 1
+          fi
+          echo "✅ No se encontraron vulnerabilidades HIGH en Python"
+
+      - name: Subir resultados bandit
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-results
+          path: sicora-be-python/bandit-results.json
+
+  node-security:
+    name: Node.js Security (npm audit)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [sicora-app-fe, sicora-app-fe-next]
+    defaults:
+      run:
+        working-directory: ${{ matrix.project }}
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+        continue-on-error: true
+
+      - name: Ejecutar npm audit
+        run: |
+          pnpm audit --json > npm-audit-results.json || true
+          pnpm audit || true
+        continue-on-error: true
+
+      - name: Verificar vulnerabilidades críticas
+        run: |
+          # Fallar solo en vulnerabilidades high o critical
+          if pnpm audit --audit-level=high 2>&1 | grep -q "high\|critical"; then
+            echo "❌ Se encontraron vulnerabilidades HIGH/CRITICAL en ${{ matrix.project }}"
+            pnpm audit --audit-level=high
+            exit 1
+          fi
+          echo "✅ No se encontraron vulnerabilidades HIGH/CRITICAL en ${{ matrix.project }}"
+
+      - name: Subir resultados npm audit
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: npm-audit-${{ matrix.project }}
+          path: ${{ matrix.project }}/npm-audit-results.json
+
+  # ============================================
+  # A03: Injection - Verificar SQL/NoSQL injection
+  # ============================================
+
+  injection-check:
+    name: Injection Patterns Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Buscar patrones de SQL injection en Go
+        run: |
+          echo "🔍 Buscando patrones peligrosos de SQL..."
+
+          # Buscar concatenación de strings en queries SQL
+          if grep -rn --include="*.go" -E 'db\.(Raw|Exec)\s*\(\s*[^)]*\+' sicora-be-go/ 2>/dev/null; then
+            echo "⚠️ ADVERTENCIA: Posible concatenación de SQL encontrada"
+          fi
+
+          # Buscar fmt.Sprintf en queries
+          if grep -rn --include="*.go" -E 'fmt\.Sprintf.*SELECT|fmt\.Sprintf.*INSERT|fmt\.Sprintf.*UPDATE|fmt\.Sprintf.*DELETE' sicora-be-go/ 2>/dev/null; then
+            echo "⚠️ ADVERTENCIA: Posible SQL injection con fmt.Sprintf"
+          fi
+
+          echo "✅ Verificación de injection completada"
+
+      - name: Buscar patrones peligrosos en Python
+        run: |
+          echo "🔍 Buscando patrones peligrosos en Python..."
+
+          # Buscar f-strings en queries SQL
+          if grep -rn --include="*.py" -E 'execute\s*\(\s*f["\x27]' sicora-be-python/ 2>/dev/null; then
+            echo "⚠️ ADVERTENCIA: Posible SQL injection con f-string"
+          fi
+
+          # Buscar .format() en queries
+          if grep -rn --include="*.py" -E 'execute\s*\([^)]*\.format\(' sicora-be-python/ 2>/dev/null; then
+            echo "⚠️ ADVERTENCIA: Posible SQL injection con .format()"
+          fi
+
+          echo "✅ Verificación de injection Python completada"
+
+  # ============================================
+  # A05: Security Misconfiguration
+  # ============================================
+
+  config-check:
+    name: Security Configuration Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Verificar secrets expuestos
+        run: |
+          echo "🔍 Buscando secrets expuestos..."
+
+          # Patrones de secrets comunes
+          PATTERNS="password\s*=\s*['\"][^'\"]+['\"]|api_key\s*=\s*['\"][^'\"]+['\"]|secret\s*=\s*['\"][^'\"]+['\"]|token\s*=\s*['\"][^'\"]+['\"]"
+
+          # Excluir archivos de ejemplo y tests
+          if grep -rn --include="*.go" --include="*.py" --include="*.ts" --include="*.js" \
+             --exclude-dir=node_modules --exclude-dir=vendor --exclude-dir=.git \
+             --exclude="*_test.go" --exclude="*_test.py" --exclude="*.test.ts" \
+             -iE "$PATTERNS" . 2>/dev/null | grep -v "example\|sample\|test\|mock\|env\."; then
+            echo "⚠️ ADVERTENCIA: Posibles secrets hardcodeados encontrados"
+          fi
+
+          echo "✅ Verificación de secrets completada"
+
+      - name: Verificar debug mode
+        run: |
+          echo "🔍 Verificando configuraciones de debug..."
+
+          # Buscar debug=True en Python
+          if grep -rn --include="*.py" -E "DEBUG\s*=\s*True" sicora-be-python/ 2>/dev/null | grep -v "test\|example"; then
+            echo "⚠️ ADVERTENCIA: DEBUG=True encontrado en Python"
+          fi
+
+          # Buscar gin.SetMode(gin.DebugMode) en Go
+          if grep -rn --include="*.go" "gin.DebugMode" sicora-be-go/ 2>/dev/null | grep -v "_test.go"; then
+            echo "⚠️ ADVERTENCIA: gin.DebugMode encontrado en Go"
+          fi
+
+          echo "✅ Verificación de debug mode completada"
+
+  # ============================================
+  # Resumen de Seguridad
+  # ============================================
+
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs:
+      [
+        go-security,
+        python-security,
+        node-security,
+        injection-check,
+        config-check,
+      ]
+    if: always()
+
+    steps:
+      - name: Generar resumen
+        run: |
+          echo "# 🛡️ OWASP Top 10 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Go Security (gosec) | ${{ needs.go-security.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Python Security (bandit) | ${{ needs.python-security.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Node.js Security (npm audit) | ${{ needs.node-security.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Injection Patterns | ${{ needs.injection-check.result == 'success' && '✅ Pass' || '⚠️ Check' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Config Check | ${{ needs.config-check.result == 'success' && '✅ Pass' || '⚠️ Check' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📚 Documentación: [OWASP Top 10 Coverage](_docs/configuracion/OWASP_TOP_10_COVERAGE.md)" >> $GITHUB_STEP_SUMMARY

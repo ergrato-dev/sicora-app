@@ -27,6 +27,10 @@
 - [**Configuración Python 3.14+**](./CONFIGURACION_PYTHON_314.md) - Requisitos y migración a Python 3.14
 - [**Configuración PostgreSQL 18**](./CONFIGURACION_POSTGRESQL_18.md) - Base de datos unificada
 
+### Seguridad
+
+- [**🛡️ OWASP Top 10 Coverage**](./OWASP_TOP_10_COVERAGE.md) - Cobertura de seguridad según OWASP Top 10 (2021)
+
 ## 🎯 Propósito
 
 Esta sección contiene toda la documentación relacionada con la configuración del proyecto SICORA, incluyendo:
