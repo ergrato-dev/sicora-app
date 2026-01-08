@@ -1,0 +1,254 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 800" fill="none">
+  <style>
+    .title { font: bold 24px 'Segoe UI', sans-serif; fill: #E0E0E0; }
+    .subtitle { font: 14px 'Segoe UI', sans-serif; fill: #9E9E9E; }
+    .axis-label { font: bold 14px 'Segoe UI', sans-serif; fill: #B0BEC5; }
+    .cell-text { font: bold 12px 'Segoe UI', sans-serif; fill: #FFFFFF; }
+    .risk-id { font: 10px 'Segoe UI', sans-serif; fill: #FFFFFF; }
+    .legend-text { font: 12px 'Segoe UI', sans-serif; fill: #B0BEC5; }
+    .legend-title { font: bold 14px 'Segoe UI', sans-serif; fill: #E0E0E0; }
+    .stat-value { font: bold 28px 'Segoe UI', sans-serif; fill: #E0E0E0; }
+    .stat-label { font: 11px 'Segoe UI', sans-serif; fill: #9E9E9E; }
+    .box-bg { fill: #1E1E1E; stroke: #424242; stroke-width: 1; }
+    .critical { fill: #B71C1C; }
+    .high { fill: #E65100; }
+    .medium { fill: #F9A825; }
+    .low { fill: #2E7D32; }
+    .cell-border { stroke: #424242; stroke-width: 1; }
+    .mitigated { stroke: #4CAF50; stroke-width: 3; stroke-dasharray: none; }
+    .pending { stroke: #FF9800; stroke-width: 3; stroke-dasharray: 5,3; }
+  </style>
+  
+  <!-- Background -->
+  <rect width="1100" height="800" fill="#121212"/>
+  
+  <!-- Title -->
+  <text x="550" y="35" text-anchor="middle" class="title">Mapa de Calor de Riesgos - SICORA</text>
+  <text x="550" y="55" text-anchor="middle" class="subtitle">45 riesgos identificados | 31 mitigados (69%) | Última actualización: Enero 2026</text>
+  
+  <!-- Main Heat Map Grid -->
+  <g transform="translate(150, 100)">
+    <!-- Grid Background -->
+    <rect x="0" y="0" width="560" height="400" fill="#1A1A1A" rx="8"/>
+    
+    <!-- Y-Axis Label -->
+    <text x="-70" y="200" text-anchor="middle" class="axis-label" transform="rotate(-90, -70, 200)">PROBABILIDAD</text>
+    
+    <!-- X-Axis Label -->
+    <text x="280" y="450" text-anchor="middle" class="axis-label">IMPACTO</text>
+    
+    <!-- Y-Axis Values -->
+    <text x="-15" y="60" text-anchor="end" class="legend-text">Alta (4)</text>
+    <text x="-15" y="160" text-anchor="end" class="legend-text">Media (3)</text>
+    <text x="-15" y="260" text-anchor="end" class="legend-text">Baja (2)</text>
+    <text x="-15" y="360" text-anchor="end" class="legend-text">Muy Baja (1)</text>
+    
+    <!-- X-Axis Values -->
+    <text x="70" y="420" text-anchor="middle" class="legend-text">Bajo (1)</text>
+    <text x="210" y="420" text-anchor="middle" class="legend-text">Medio (2)</text>
+    <text x="350" y="420" text-anchor="middle" class="legend-text">Alto (3)</text>
+    <text x="490" y="420" text-anchor="middle" class="legend-text">Crítico (4)</text>
+    
+    <!-- Row 1: Probabilidad Alta (4) -->
+    <!-- Bajo (4) - Medium -->
+    <rect x="0" y="0" width="140" height="100" class="medium cell-border"/>
+    <text x="70" y="55" text-anchor="middle" class="cell-text">4</text>
+    
+    <!-- Medio (8) - High -->
+    <rect x="140" y="0" width="140" height="100" class="high cell-border"/>
+    <text x="210" y="45" text-anchor="middle" class="cell-text">8</text>
+    <text x="210" y="65" text-anchor="middle" class="risk-id">RA-005 ✓</text>
+    
+    <!-- Alto (12) - Critical -->
+    <rect x="280" y="0" width="140" height="100" class="critical cell-border"/>
+    <text x="350" y="45" text-anchor="middle" class="cell-text">12</text>
+    
+    <!-- Crítico (16) - Critical -->
+    <rect x="420" y="0" width="140" height="100" class="critical cell-border"/>
+    <text x="490" y="45" text-anchor="middle" class="cell-text">16</text>
+    <text x="490" y="65" text-anchor="middle" class="risk-id">RC-001 ✓</text>
+    
+    <!-- Row 2: Probabilidad Media (3) -->
+    <!-- Bajo (3) - Low -->
+    <rect x="0" y="100" width="140" height="100" class="low cell-border"/>
+    <text x="70" y="155" text-anchor="middle" class="cell-text">3</text>
+    
+    <!-- Medio (6) - Medium -->
+    <rect x="140" y="100" width="140" height="100" class="medium cell-border"/>
+    <text x="210" y="135" text-anchor="middle" class="cell-text">6</text>
+    <text x="210" y="155" text-anchor="middle" class="risk-id">RA-003 ⏳</text>
+    <text x="210" y="170" text-anchor="middle" class="risk-id">RA-010 ⏳</text>
+    
+    <!-- Alto (9) - High -->
+    <rect x="280" y="100" width="140" height="100" class="high cell-border"/>
+    <text x="350" y="135" text-anchor="middle" class="cell-text">9</text>
+    <text x="350" y="155" text-anchor="middle" class="risk-id">RC-005 ✓</text>
+    <text x="350" y="170" text-anchor="middle" class="risk-id">RA-001 ✓</text>
+    <text x="350" y="185" text-anchor="middle" class="risk-id">RA-002 ⏳</text>
+    
+    <!-- Crítico (12) - Critical -->
+    <rect x="420" y="100" width="140" height="100" class="critical cell-border"/>
+    <text x="490" y="135" text-anchor="middle" class="cell-text">12</text>
+    <text x="490" y="155" text-anchor="middle" class="risk-id">RC-002 ✓</text>
+    <text x="490" y="170" text-anchor="middle" class="risk-id">RC-003 ✓</text>
+    <text x="490" y="185" text-anchor="middle" class="risk-id">RC-006 ✓</text>
+    
+    <!-- Row 3: Probabilidad Baja (2) -->
+    <!-- Bajo (2) - Low -->
+    <rect x="0" y="200" width="140" height="100" class="low cell-border"/>
+    <text x="70" y="255" text-anchor="middle" class="cell-text">2</text>
+    
+    <!-- Bajo (4) - Low -->
+    <rect x="140" y="200" width="140" height="100" class="low cell-border"/>
+    <text x="210" y="245" text-anchor="middle" class="cell-text">4</text>
+    <text x="210" y="265" text-anchor="middle" class="risk-id">RA-12 ✓</text>
+    
+    <!-- Medio (6) - Medium -->
+    <rect x="280" y="200" width="140" height="100" class="medium cell-border"/>
+    <text x="350" y="235" text-anchor="middle" class="cell-text">6</text>
+    <text x="350" y="255" text-anchor="middle" class="risk-id">RA-04 ✓</text>
+    <text x="350" y="270" text-anchor="middle" class="risk-id">RA-06 ✓</text>
+    <text x="350" y="285" text-anchor="middle" class="risk-id">RA-08 ✓</text>
+    
+    <!-- Alto (8) - High -->
+    <rect x="420" y="200" width="140" height="100" class="high cell-border"/>
+    <text x="490" y="235" text-anchor="middle" class="cell-text">8</text>
+    <text x="490" y="255" text-anchor="middle" class="risk-id">RC-004 ⏳</text>
+    <text x="490" y="270" text-anchor="middle" class="risk-id">RC-008 ✓</text>
+    <text x="490" y="285" text-anchor="middle" class="risk-id">RA-007 ✓</text>
+    
+    <!-- Row 4: Probabilidad Muy Baja (1) -->
+    <!-- Bajo (1) - Low -->
+    <rect x="0" y="300" width="140" height="100" class="low cell-border"/>
+    <text x="70" y="355" text-anchor="middle" class="cell-text">1</text>
+    
+    <!-- Bajo (2) - Low -->
+    <rect x="140" y="300" width="140" height="100" class="low cell-border"/>
+    <text x="210" y="355" text-anchor="middle" class="cell-text">2</text>
+    
+    <!-- Bajo (3) - Low -->
+    <rect x="280" y="300" width="140" height="100" class="low cell-border"/>
+    <text x="350" y="355" text-anchor="middle" class="cell-text">3</text>
+    
+    <!-- Medio (4) - Medium -->
+    <rect x="420" y="300" width="140" height="100" class="medium cell-border"/>
+    <text x="490" y="345" text-anchor="middle" class="cell-text">4</text>
+    <text x="490" y="365" text-anchor="middle" class="risk-id">RC-007 ✓</text>
+  </g>
+  
+  <!-- Legend Panel -->
+  <g transform="translate(780, 100)">
+    <rect x="0" y="0" width="280" height="180" class="box-bg" rx="8"/>
+    <text x="140" y="25" text-anchor="middle" class="legend-title">Niveles de Riesgo</text>
+    
+    <rect x="20" y="45" width="30" height="20" class="critical" rx="3"/>
+    <text x="60" y="60" class="legend-text">Crítico (12-16): Acción inmediata</text>
+    
+    <rect x="20" y="75" width="30" height="20" class="high" rx="3"/>
+    <text x="60" y="90" class="legend-text">Alto (8-11): Plan activo</text>
+    
+    <rect x="20" y="105" width="30" height="20" class="medium" rx="3"/>
+    <text x="60" y="120" class="legend-text">Medio (4-7): Monitoreo regular</text>
+    
+    <rect x="20" y="135" width="30" height="20" class="low" rx="3"/>
+    <text x="60" y="150" class="legend-text">Bajo (1-3): Revisión periódica</text>
+  </g>
+  
+  <!-- Status Legend -->
+  <g transform="translate(780, 300)">
+    <rect x="0" y="0" width="280" height="100" class="box-bg" rx="8"/>
+    <text x="140" y="25" text-anchor="middle" class="legend-title">Estado de Mitigación</text>
+    
+    <text x="20" y="55" class="legend-text">✓ Mitigado / Resuelto</text>
+    <text x="20" y="80" class="legend-text">⏳ Pendiente / Parcial</text>
+  </g>
+  
+  <!-- Statistics Panel -->
+  <g transform="translate(780, 420)">
+    <rect x="0" y="0" width="280" height="180" class="box-bg" rx="8"/>
+    <text x="140" y="25" text-anchor="middle" class="legend-title">Estadísticas</text>
+    
+    <!-- Total Risks -->
+    <text x="70" y="70" text-anchor="middle" class="stat-value">45</text>
+    <text x="70" y="90" text-anchor="middle" class="stat-label">Total Riesgos</text>
+    
+    <!-- Mitigated -->
+    <text x="210" y="70" text-anchor="middle" class="stat-value" style="fill: #4CAF50;">31</text>
+    <text x="210" y="90" text-anchor="middle" class="stat-label">Mitigados (69%)</text>
+    
+    <!-- Pending -->
+    <text x="70" y="140" text-anchor="middle" class="stat-value" style="fill: #FF9800;">8</text>
+    <text x="70" y="160" text-anchor="middle" class="stat-label">Pendientes (18%)</text>
+    
+    <!-- Accepted -->
+    <text x="210" y="140" text-anchor="middle" class="stat-value" style="fill: #78909C;">6</text>
+    <text x="210" y="160" text-anchor="middle" class="stat-label">Aceptados (13%)</text>
+  </g>
+  
+  <!-- Categories Panel -->
+  <g transform="translate(50, 540)">
+    <rect x="0" y="0" width="1000" height="200" class="box-bg" rx="8"/>
+    <text x="500" y="25" text-anchor="middle" class="legend-title">Distribución por Categoría</text>
+    
+    <!-- Category bars -->
+    <!-- Seguridad -->
+    <rect x="30" y="50" width="200" height="25" fill="#263238" rx="3"/>
+    <rect x="30" y="50" width="160" height="25" fill="#EF5350" rx="3"/>
+    <text x="35" y="68" class="legend-text" style="fill: #FFF;">Seguridad</text>
+    <text x="200" y="68" text-anchor="end" class="legend-text" style="fill: #FFF;">16</text>
+    
+    <!-- Disponibilidad -->
+    <rect x="30" y="85" width="200" height="25" fill="#263238" rx="3"/>
+    <rect x="30" y="85" width="100" height="25" fill="#42A5F5" rx="3"/>
+    <text x="35" y="103" class="legend-text" style="fill: #FFF;">Disponibilidad</text>
+    <text x="120" y="103" text-anchor="end" class="legend-text" style="fill: #FFF;">8</text>
+    
+    <!-- Integridad -->
+    <rect x="30" y="120" width="200" height="25" fill="#263238" rx="3"/>
+    <rect x="30" y="120" width="75" height="25" fill="#AB47BC" rx="3"/>
+    <text x="35" y="138" class="legend-text" style="fill: #FFF;">Integridad</text>
+    <text x="95" y="138" text-anchor="end" class="legend-text" style="fill: #FFF;">6</text>
+    
+    <!-- Técnico -->
+    <rect x="270" y="50" width="200" height="25" fill="#263238" rx="3"/>
+    <rect x="270" y="50" width="100" height="25" fill="#66BB6A" rx="3"/>
+    <text x="275" y="68" class="legend-text" style="fill: #FFF;">Técnico</text>
+    <text x="360" y="68" text-anchor="end" class="legend-text" style="fill: #FFF;">8</text>
+    
+    <!-- Rendimiento -->
+    <rect x="270" y="85" width="200" height="25" fill="#263238" rx="3"/>
+    <rect x="270" y="85" width="50" height="25" fill="#FFA726" rx="3"/>
+    <text x="275" y="103" class="legend-text" style="fill: #FFF;">Rendimiento</text>
+    <text x="310" y="103" text-anchor="end" class="legend-text" style="fill: #FFF;">4</text>
+    
+    <!-- Continuidad -->
+    <rect x="270" y="120" width="200" height="25" fill="#263238" rx="3"/>
+    <rect x="270" y="120" width="38" height="25" fill="#26C6DA" rx="3"/>
+    <text x="275" y="138" class="legend-text" style="fill: #FFF;">Continuidad</text>
+    <text x="300" y="138" text-anchor="end" class="legend-text" style="fill: #FFF;">3</text>
+    
+    <!-- Top 5 Risks -->
+    <g transform="translate(520, 40)">
+      <text x="200" y="10" text-anchor="middle" class="legend-title">🔥 Top 5 Riesgos Activos</text>
+      
+      <rect x="0" y="25" width="400" height="28" fill="#B71C1C" rx="3"/>
+      <text x="10" y="45" class="legend-text" style="fill: #FFF;">RC-004: Fallo PostgreSQL (Replica pendiente)</text>
+      <text x="380" y="45" text-anchor="end" class="risk-id">⏳ 8</text>
+      
+      <rect x="0" y="58" width="400" height="28" fill="#E65100" rx="3"/>
+      <text x="10" y="78" class="legend-text" style="fill: #FFF;">RA-002: Performance bajo carga (Cache pendiente)</text>
+      <text x="380" y="78" text-anchor="end" class="risk-id">⏳ 9</text>
+      
+      <rect x="0" y="91" width="400" height="28" fill="#F9A825" rx="3"/>
+      <text x="10" y="111" class="legend-text" style="fill: #212121;">RA-003: NotificationService retry (Pendiente)</text>
+      <text x="380" y="111" text-anchor="end" class="risk-id" style="fill: #212121;">⏳ 6</text>
+      
+      <rect x="0" y="124" width="400" height="28" fill="#F9A825" rx="3"/>
+      <text x="10" y="144" class="legend-text" style="fill: #212121;">RM-003: Load testing (No implementado)</text>
+      <text x="380" y="144" text-anchor="end" class="risk-id" style="fill: #212121;">⏳ 6</text>
+    </g>
+  </g>
+  
+  <!-- Footer -->
+  <text x="550" y="770" text-anchor="middle" class="subtitle">SICORA - Sistema de Información de Coordinación Académica | Versión 1.0 | Enero 2026</text>
+</svg>

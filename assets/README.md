@@ -73,6 +73,18 @@ assets/
   - Casos específicos y soluciones
   - Estrategias de prevención
 
+### `mapa-calor-riesgos-sicora.svg` - Mapa de Calor de Riesgos
+
+- **Dimensiones**: 1100x800px
+- **Uso**: Documentación de gestión de riesgos
+- **Ruta**: `./assets/diagramas/mapa-calor-riesgos-sicora.svg`
+- **Características**:
+  - Matriz Probabilidad × Impacto
+  - 45 riesgos identificados con estado
+  - Distribución por categoría
+  - Top 5 riesgos activos
+  - Estadísticas de mitigación
+
 ## 🏗️ Arquitectura (`/arquitectura/`)
 
 ### `arquitectura-sistema-sicora.svg` - Arquitectura General
@@ -120,6 +132,18 @@ assets/
   - Servicios específicos por dominio
   - Múltiples bases de datos
   - Salidas y reportes
+
+### `flujo-carga-aprendices-ficha.svg` - Carga de Aprendices
+
+- **Dimensiones**: 1200x900px
+- **Uso**: Documentación de regla de negocio carga de aprendices
+- **Ruta**: `./assets/flujos/flujo-carga-aprendices-ficha.svg`
+- **Características**:
+  - Flujo de asignación de Instructor Director
+  - Bloqueo de acceso para Administrador
+  - Proceso de carga masiva Excel/CSV
+  - Validaciones y resultados
+  - Auditoría de operaciones
 
 ## 📚 Educativos (`/educativos/`)
 
