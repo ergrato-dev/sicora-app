@@ -194,12 +194,13 @@ export interface AttendanceRecord {
 export interface StudentAttendanceSummary {
   total_classes: number;
   attended: number;
-  absent: number;
+  absences: number; // Renamed from 'absent' for widget compatibility
   late: number;
   justified: number;
   attendance_rate: number; // Porcentaje 0-100
   streak_days: number; // Días consecutivos asistiendo
   last_absence?: string; // Fecha de última ausencia
+  pending_justifications: number; // Justificaciones pendientes
 }
 
 /**
@@ -210,7 +211,10 @@ export interface InstructorAttendanceSummary {
   present_today: number;
   absent_today: number;
   late_today: number;
-  average_attendance_rate: number;
+  average_rate: number; // Tasa promedio de asistencia
+  trend: number; // Tendencia vs periodo anterior (+/-)
+  classes_today: number; // Clases programadas hoy
+  pending_attendance: number; // Registros de asistencia pendientes
   lowest_attendance_ficha?: {
     id: string;
     name: string;
@@ -222,12 +226,19 @@ export interface InstructorAttendanceSummary {
  * Resumen global de asistencia para admin
  */
 export interface GlobalAttendanceSummary {
+  global_rate: number; // Tasa global de asistencia
+  trend: number; // Tendencia numérica (+/-)
+  active_students: number; // Aprendices activos
+  total_groups: number; // Total de fichas/grupos
+  critical_groups: number; // Grupos con asistencia crítica
+  on_time_rate: number; // Porcentaje a tiempo
+  late_rate: number; // Porcentaje tarde
+  absence_rate: number; // Porcentaje ausencias
   total_records_today: number;
   attendance_rate_today: number;
   attendance_rate_week: number;
   attendance_rate_month: number;
-  trend: 'up' | 'down' | 'stable';
-  trend_percentage: number;
+  trend_direction: 'up' | 'down' | 'stable';
   by_coordination: Array<{
     coordination_id: string;
     coordination_name: string;
