@@ -5,6 +5,8 @@
 ### Guías de Componentes UI/UX
 
 - [Componente DataTable UI/UX](./COMPONENTE_DATATABLE_UIUX.md) - Guía completa para tablas configurables y reutilizables
+- [**Accesibilidad Web WCAG**](./ACCESIBILIDAD_WCAG.md) - **Guía completa de accesibilidad WCAG 2.1/2.2, WAI-ARIA, Section 508, EN 301 549**
+- [Sistema de Horarios/Calendar](./SISTEMA_HORARIOS_CALENDAR.md) - Diseño del calendario de horarios con detección de conflictos
 
 ### Guías de Carga de Datos
 
