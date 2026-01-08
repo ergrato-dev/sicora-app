@@ -24,9 +24,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/signal"
-	_ "projectevalservice/docs"
-	"syscall"
 	"time"
 
 	_ "projectevalservice/docs"
@@ -34,6 +31,7 @@ import (
 	"projectevalservice/internal/infrastructure/auth"
 	"projectevalservice/internal/infrastructure/database"
 	"projectevalservice/internal/infrastructure/database/repositories"
+	infraerrors "projectevalservice/internal/infrastructure/errors"
 	"projectevalservice/internal/presentation/handlers"
 	"projectevalservice/internal/presentation/middleware"
 	"projectevalservice/internal/presentation/routes"
@@ -50,12 +48,18 @@ func main() {
 		log.Println("Warning: .env file not found")
 	}
 
+	// Initialize centralized error handling
+	infraerrors.InitServiceContext()
+
 	// Initialize database
 	db := database.NewDatabase()
 	if err := db.Connect(); err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
+
+	// Initialize service setup (health checker + shutdown manager)
+	serviceSetup := infraerrors.NewServiceSetup(db.GetDB())
 
 	// Run migrations
 	if err := db.Migrate(); err != nil {
@@ -106,11 +110,11 @@ func main() {
 	// SECURITY: Rate limiting - 30 req/min por IP
 	rateLimiter := middleware.NewRateLimiter(30, time.Minute)
 
-	// SECURITY: Middleware en orden correcto
-	router.Use(middleware.RequestID())
+	// SECURITY: Middleware en orden correcto (V2 with centralized error handling)
+	router.Use(infraerrors.RequestContextMiddleware()) // Request ID + correlation
 	router.Use(middleware.SecurityHeaders())
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
+	router.Use(infraerrors.RecoveryMiddlewareV2()) // Replaces gin.Recovery()
+	router.Use(infraerrors.LoggingMiddlewareV2())  // Replaces gin.Logger()
 	router.Use(rateLimiter.RateLimitMiddleware())
 	router.Use(middleware.SecureCORS())
 
@@ -119,6 +123,9 @@ func main() {
 
 	// Swagger documentation
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// Health check endpoints
+	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
 
 	// Server configuration
 	port := os.Getenv("PORT")
@@ -131,29 +138,17 @@ func main() {
 		Handler: router,
 	}
 
-	// Graceful shutdown
-	go func() {
-		log.Printf("Server starting on port %s", port)
-		log.Printf("Swagger documentation available at http://localhost:%s/swagger/index.html", port)
+	// Register HTTP server with shutdown manager (priority 100 = shutdown last)
+	serviceSetup.ShutdownManager.Register("http-server", 100, func(ctx context.Context) error {
+		return srv.Shutdown(ctx)
+	})
 
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Failed to start server: %v", err)
-		}
-	}()
+	// Start server
+	log.Printf("Server starting on port %s", port)
+	log.Printf("Swagger documentation available at http://localhost:%s/swagger/index.html", port)
+	log.Printf("Health check available at http://localhost:%s/health", port)
 
-	// Wait for interrupt signal to gracefully shutdown the server
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("Shutting down server...")
-
-	// Give outstanding requests 30 seconds to complete
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown:", err)
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("Failed to start server: %v", err)
 	}
-
-	log.Println("Server exited")
 }
