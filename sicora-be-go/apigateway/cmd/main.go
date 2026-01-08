@@ -5,12 +5,11 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"apigateway/internal/infrastructure/cache"
 	"apigateway/internal/infrastructure/config"
+	infraerrors "apigateway/internal/infrastructure/errors"
 	"apigateway/internal/infrastructure/logger"
 	"apigateway/internal/presentation/handlers"
 	"apigateway/internal/presentation/middleware"
@@ -47,6 +46,9 @@ func main() {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
+	// Initialize centralized error handling
+	infraerrors.InitServiceContext()
+
 	// Initialize logger
 	zapLogger, err := logger.NewLogger(cfg.LogLevel, cfg.Environment)
 	if err != nil {
@@ -71,6 +73,9 @@ func main() {
 		zapLogger.Info("Redis cache initialized for API Gateway")
 	}
 
+	// Initialize service setup (health checker + shutdown manager)
+	serviceSetup := infraerrors.NewServiceSetup(gatewayCache)
+
 	// Create middleware manager with cache
 	var middlewareManager *middleware.MiddlewareManager
 	if gatewayCache != nil {
@@ -80,8 +85,8 @@ func main() {
 	// Create Gin router
 	router := gin.New()
 
-	// Add recovery middleware
-	router.Use(gin.Recovery())
+	// Add V2 recovery middleware (centralized error handling)
+	router.Use(infraerrors.RecoveryMiddlewareV2())
 
 	// Configure CORS - SECURITY FIX: No permitir credentials con wildcard
 	allowCredentials := true
@@ -109,10 +114,10 @@ func main() {
 	}
 	router.Use(cors.New(corsConfig))
 
-	// Add custom middleware
-	router.Use(middleware.RequestID())
+	// Add V2 middlewares (centralized error handling)
+	router.Use(infraerrors.RequestContextMiddleware()) // Replaces middleware.RequestID()
 	router.Use(middleware.SecurityHeaders())
-	router.Use(middleware.Logger(zapLogger))
+	router.Use(infraerrors.LoggingMiddlewareV2()) // Replaces middleware.Logger(zapLogger)
 
 	// Use Redis-based rate limiting if available, otherwise fall back to in-memory
 	if middlewareManager != nil {
@@ -130,6 +135,9 @@ func main() {
 	// Setup routes with middleware manager for Redis-based auth
 	routes.SetupRoutes(router, cfg, zapLogger, healthHandler, proxyHandler, middlewareManager)
 
+	// Health check endpoints (V2 with centralized error handling)
+	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
+
 	// Create HTTP server
 	srv := &http.Server{
 		Addr:         ":" + cfg.Port,
@@ -139,31 +147,26 @@ func main() {
 		IdleTimeout:  cfg.IdleTimeout,
 	}
 
-	// Start server in goroutine
-	go func() {
-		zapLogger.Info("Starting API Gateway",
-			"port", cfg.Port,
-			"environment", cfg.Environment,
-		)
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			zapLogger.Fatal("Failed to start server", "error", err)
-		}
-	}()
+	// Register HTTP server with shutdown manager (priority 100 = shutdown last)
+	serviceSetup.ShutdownManager.Register("http-server", 100, func(ctx context.Context) error {
+		return srv.Shutdown(ctx)
+	})
 
-	// Wait for interrupt signal
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-
-	zapLogger.Info("Shutting down server...")
-
-	// Graceful shutdown with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	if err := srv.Shutdown(ctx); err != nil {
-		zapLogger.Fatal("Server forced to shutdown", "error", err)
+	// Register Redis cache with shutdown manager (priority 50 = shutdown before http)
+	if gatewayCache != nil {
+		serviceSetup.ShutdownManager.Register("redis-cache", 50, func(ctx context.Context) error {
+			gatewayCache.Close()
+			return nil
+		})
 	}
 
-	zapLogger.Info("Server exited properly")
+	// Start server
+	zapLogger.Info("Starting API Gateway",
+		"port", cfg.Port,
+		"environment", cfg.Environment,
+	)
+
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		zapLogger.Fatal("Failed to start server", "error", err)
+	}
 }
