@@ -26,6 +26,7 @@
 | **AIService**           | 0/22      | 📋 PENDIENTE     | 0%          | [HU_AIService.md](HU_AIService.md)                     |
 | **APIGateway**          | 0/20      | 📋 PENDIENTE     | 0%          | [HU_APIGateway.md](HU_APIGateway.md)                   |
 | **MongoDB Integration** | 0/12      | 📋 PLANIFICACIÓN | 0%          | [HU_MongoDB_Integration.md](HU_MongoDB_Integration.md) |
+| **Instructor Director Ficha** | 0/8 | 📋 PLANIFICACIÓN | 0%          | [HU_INSTRUCTOR_DIRECTOR_FICHA.md](HU_INSTRUCTOR_DIRECTOR_FICHA.md) |
 
 ---
 
@@ -34,6 +35,7 @@
 ### **🏗️ Requisitos Funcionales por Microservicio:**
 
 - **[RF UserService](../../general/rf_userservice.md)** - Autenticación, usuarios, roles
+- **[RF Gestión Fichas y Aprendices](../../general/rf_gestion_fichas_aprendices.md)** - Carga de aprendices por instructor director
 - **[RF ScheduleService](../../general/rf_scheduleservice.md)** - Horarios, fichas, ambientes
 - **[RF AttendanceService](../../general/rf_attendanceservice.md)** - Control de asistencia
 - **[RF EvalinService](../../general/rf_evalinservice.md)** - Evaluación de instructores

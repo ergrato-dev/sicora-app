@@ -7,6 +7,7 @@ Esta documentación está organizada siguiendo los principios de Clean Architect
 ### General
 
 - [Requisitos Funcionales](general/rf.md) - Especificaciones completas del sistema
+- [RF Gestión Fichas y Aprendices](general/rf_gestion_fichas_aprendices.md) - Carga de aprendices por Instructor Director
 - [Integración MongoDB NoSQL](general/rf_mongodb_integration.md) - Requisitos para base de datos NoSQL
 - [Infraestructura MongoDB](general/rf_mongodb_infrastructure.md) - Backup, failover, monitoreo MongoDB
 - [Arquitectura](general/arquitectura_comparativa_microservicios_scs.md) - Decisiones arquitectónicas

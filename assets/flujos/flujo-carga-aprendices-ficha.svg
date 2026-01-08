@@ -1,0 +1,218 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" fill="none">
+  <style>
+    .title { font: bold 24px 'Segoe UI', sans-serif; fill: #E0E0E0; }
+    .subtitle { font: 16px 'Segoe UI', sans-serif; fill: #9E9E9E; }
+    .box-title { font: bold 14px 'Segoe UI', sans-serif; fill: #FFFFFF; }
+    .box-text { font: 12px 'Segoe UI', sans-serif; fill: #B0BEC5; }
+    .label { font: 11px 'Segoe UI', sans-serif; fill: #78909C; }
+    .role-admin { fill: #EF5350; }
+    .role-coord { fill: #AB47BC; }
+    .role-instructor { fill: #42A5F5; }
+    .role-aprendiz { fill: #66BB6A; }
+    .box-bg { fill: #1E1E1E; stroke: #424242; stroke-width: 2; }
+    .connector { stroke: #616161; stroke-width: 2; fill: none; }
+    .connector-arrow { fill: #616161; }
+    .blocked { stroke: #EF5350; stroke-width: 3; stroke-dasharray: 8,4; }
+    .allowed { stroke: #66BB6A; stroke-width: 3; }
+    .decision { fill: #37474F; stroke: #546E7A; stroke-width: 2; }
+    .process { fill: #263238; stroke: #37474F; stroke-width: 2; rx: 8; }
+    .highlight { fill: #1B5E20; stroke: #4CAF50; stroke-width: 2; rx: 8; }
+    .warning { fill: #4A1C1C; stroke: #EF5350; stroke-width: 2; rx: 8; }
+    .icon { font: bold 18px 'Segoe UI', sans-serif; }
+  </style>
+  
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#121212"/>
+  
+  <!-- Title Section -->
+  <text x="600" y="40" text-anchor="middle" class="title">Flujo de Carga de Aprendices por Ficha - SICORA</text>
+  <text x="600" y="65" text-anchor="middle" class="subtitle">Regla de Negocio: Solo el Instructor Director de Ficha puede cargar aprendices</text>
+  
+  <!-- Legend -->
+  <rect x="20" y="85" width="200" height="120" class="box-bg" rx="8"/>
+  <text x="30" y="105" class="box-title">Leyenda de Roles</text>
+  <circle cx="45" cy="125" r="8" class="role-admin"/>
+  <text x="60" y="130" class="box-text">Administrador (❌ Sin acceso)</text>
+  <circle cx="45" cy="150" r="8" class="role-coord"/>
+  <text x="60" y="155" class="box-text">Coordinador Académico</text>
+  <circle cx="45" cy="175" r="8" class="role-instructor"/>
+  <text x="60" y="180" class="box-text">Instructor Director</text>
+  <circle cx="45" cy="200" r="8" class="role-aprendiz"/>
+  <text x="60" y="205" class="box-text">Aprendiz</text>
+  
+  <!-- Flow Arrows Legend -->
+  <rect x="240" y="85" width="180" height="120" class="box-bg" rx="8"/>
+  <text x="250" y="105" class="box-title">Tipo de Conexión</text>
+  <line x1="260" y1="125" x2="320" y2="125" class="allowed"/>
+  <text x="330" y="130" class="box-text">Permitido</text>
+  <line x1="260" y1="155" x2="320" y2="155" class="blocked"/>
+  <text x="330" y="160" class="box-text">Bloqueado</text>
+  <line x1="260" y1="185" x2="320" y2="185" class="connector"/>
+  <text x="330" y="190" class="box-text">Flujo de datos</text>
+  
+  <!-- SECTION 1: Role Assignment Flow -->
+  <text x="600" y="240" text-anchor="middle" class="box-title" style="font-size: 18px;">1. Asignación de Instructor Director (Coordinación Académica)</text>
+  
+  <!-- Coordinator Box -->
+  <rect x="80" y="260" width="200" height="80" class="process"/>
+  <circle cx="100" cy="280" r="10" class="role-coord"/>
+  <text x="120" y="285" class="box-title">Coordinador Académico</text>
+  <text x="100" y="310" class="box-text">Selecciona ficha y</text>
+  <text x="100" y="325" class="box-text">asigna instructor director</text>
+  
+  <!-- Arrow -->
+  <path d="M280 300 L380 300" class="connector" marker-end="url(#arrow)"/>
+  
+  <!-- Ficha Box -->
+  <rect x="380" y="260" width="180" height="80" class="process"/>
+  <text x="400" y="285" class="box-title">📁 Ficha 2826503</text>
+  <text x="400" y="310" class="box-text">Programa: ADSO</text>
+  <text x="400" y="325" class="box-text">Estado: Activa</text>
+  
+  <!-- Arrow -->
+  <path d="M560 300 L660 300" class="connector" marker-end="url(#arrow)"/>
+  
+  <!-- Instructor Director Box -->
+  <rect x="660" y="260" width="200" height="80" class="highlight"/>
+  <circle cx="680" cy="280" r="10" class="role-instructor"/>
+  <text x="700" y="285" class="box-title">Instructor Director</text>
+  <text x="680" y="310" class="box-text">✅ Puede cargar aprendices</text>
+  <text x="680" y="325" class="box-text">Solo en SUS fichas</text>
+  
+  <!-- Notification -->
+  <rect x="920" y="260" width="160" height="80" class="process"/>
+  <text x="940" y="285" class="box-title">📧 Notificación</text>
+  <text x="940" y="310" class="box-text">Email + In-app al</text>
+  <text x="940" y="325" class="box-text">instructor asignado</text>
+  <path d="M860 300 L920 300" class="connector" marker-end="url(#arrow)"/>
+  
+  <!-- SECTION 2: Blocked Admin Flow -->
+  <text x="600" y="390" text-anchor="middle" class="box-title" style="font-size: 18px;">2. Administrador - ACCESO BLOQUEADO ❌</text>
+  
+  <!-- Admin Box -->
+  <rect x="80" y="410" width="200" height="80" class="warning"/>
+  <circle cx="100" cy="430" r="10" class="role-admin"/>
+  <text x="120" y="435" class="box-title">Administrador</text>
+  <text x="100" y="460" class="box-text">❌ NO puede cargar</text>
+  <text x="100" y="475" class="box-text">aprendices a fichas</text>
+  
+  <!-- Blocked Arrow -->
+  <path d="M280 450 L380 450" class="blocked"/>
+  <text x="310" y="440" class="label">BLOQUEADO</text>
+  
+  <!-- Blocked Action Box -->
+  <rect x="380" y="410" width="180" height="80" class="warning"/>
+  <text x="400" y="435" class="box-title">🚫 Carga Masiva</text>
+  <text x="400" y="460" class="box-text">Error 403: Forbidden</text>
+  <text x="400" y="475" class="box-text">"No autorizado"</text>
+  
+  <!-- Admin Permissions -->
+  <rect x="620" y="410" width="240" height="80" class="process"/>
+  <text x="640" y="435" class="box-title">Permisos del Admin</text>
+  <text x="640" y="460" class="box-text">✅ Ver fichas, reportes</text>
+  <text x="640" y="475" class="box-text">❌ Crear/modificar aprendices</text>
+  
+  <!-- SECTION 3: Instructor Upload Flow -->
+  <text x="600" y="540" text-anchor="middle" class="box-title" style="font-size: 18px;">3. Carga de Aprendices por Instructor Director ✅</text>
+  
+  <!-- Instructor Start -->
+  <rect x="40" y="560" width="160" height="70" class="highlight"/>
+  <circle cx="60" cy="580" r="10" class="role-instructor"/>
+  <text x="80" y="585" class="box-title">Instructor</text>
+  <text x="50" y="605" class="box-text">Accede a "Carga</text>
+  <text x="50" y="618" class="box-text">Masiva" de su ficha</text>
+  
+  <!-- Arrow -->
+  <path d="M200 595 L250 595" class="connector" marker-end="url(#arrow)"/>
+  
+  <!-- Decision: Is Director? -->
+  <polygon points="330,560 400,595 330,630 260,595" class="decision"/>
+  <text x="295" y="592" class="box-text">¿Es director</text>
+  <text x="295" y="605" class="box-text">de ficha?</text>
+  
+  <!-- Yes Arrow -->
+  <path d="M400 595 L450 595" class="allowed" marker-end="url(#arrow-green)"/>
+  <text x="410" y="585" class="box-text" style="fill: #66BB6A;">SÍ</text>
+  
+  <!-- No Arrow -->
+  <path d="M330 630 L330 680 L200 680" class="blocked"/>
+  <text x="335" y="660" class="box-text" style="fill: #EF5350;">NO</text>
+  <rect x="80" y="660" width="120" height="40" class="warning"/>
+  <text x="95" y="685" class="box-text">403 Forbidden</text>
+  
+  <!-- Upload File -->
+  <rect x="450" y="560" width="140" height="70" class="process"/>
+  <text x="470" y="585" class="box-title">📤 Subir Archivo</text>
+  <text x="460" y="605" class="box-text">CSV o Excel</text>
+  <text x="460" y="618" class="box-text">UTF-8</text>
+  
+  <!-- Arrow -->
+  <path d="M590 595 L640 595" class="connector" marker-end="url(#arrow)"/>
+  
+  <!-- Validate -->
+  <rect x="640" y="560" width="140" height="70" class="process"/>
+  <text x="660" y="585" class="box-title">🔍 Validar</text>
+  <text x="650" y="605" class="box-text">Documentos únicos</text>
+  <text x="650" y="618" class="box-text">Emails únicos</text>
+  
+  <!-- Arrow -->
+  <path d="M780 595 L830 595" class="connector" marker-end="url(#arrow)"/>
+  
+  <!-- Preview -->
+  <rect x="830" y="560" width="140" height="70" class="process"/>
+  <text x="850" y="585" class="box-title">👁️ Preview</text>
+  <text x="840" y="605" class="box-text">✅ 45 válidos</text>
+  <text x="840" y="618" class="box-text">❌ 5 errores</text>
+  
+  <!-- Arrow -->
+  <path d="M970 595 L1020 595" class="connector" marker-end="url(#arrow)"/>
+  
+  <!-- Confirm & Load -->
+  <rect x="1020" y="560" width="140" height="70" class="highlight"/>
+  <text x="1040" y="585" class="box-title">✅ Confirmar</text>
+  <text x="1030" y="605" class="box-text">Cargar 45</text>
+  <text x="1030" y="618" class="box-text">aprendices</text>
+  
+  <!-- SECTION 4: Results -->
+  <text x="600" y="750" text-anchor="middle" class="box-title" style="font-size: 18px;">4. Resultado de la Carga</text>
+  
+  <!-- Results Flow -->
+  <rect x="200" y="770" width="200" height="70" class="process"/>
+  <text x="220" y="795" class="box-title">👥 Aprendices Creados</text>
+  <text x="220" y="815" class="box-text">Rol: APRENDIZ</text>
+  <text x="220" y="830" class="box-text">Ficha_id: 2826503</text>
+  
+  <path d="M400 805 L450 805" class="connector" marker-end="url(#arrow)"/>
+  
+  <rect x="450" y="770" width="200" height="70" class="process"/>
+  <text x="470" y="795" class="box-title">📧 Credenciales Enviadas</text>
+  <text x="470" y="815" class="box-text">Email de bienvenida</text>
+  <text x="470" y="830" class="box-text">Link de activación</text>
+  
+  <path d="M650 805 L700 805" class="connector" marker-end="url(#arrow)"/>
+  
+  <rect x="700" y="770" width="200" height="70" class="process"/>
+  <text x="720" y="795" class="box-title">📋 Reporte Generado</text>
+  <text x="720" y="815" class="box-text">Descargable en Excel</text>
+  <text x="720" y="830" class="box-text">Detalle de errores</text>
+  
+  <path d="M900 805 L950 805" class="connector" marker-end="url(#arrow)"/>
+  
+  <rect x="950" y="770" width="180" height="70" class="process"/>
+  <text x="970" y="795" class="box-title">🔍 Auditoría</text>
+  <text x="970" y="815" class="box-text">Registro completo</text>
+  <text x="970" y="830" class="box-text">Quién, cuándo, qué</text>
+  
+  <!-- Footer -->
+  <text x="600" y="880" text-anchor="middle" class="label">SICORA - Sistema de Información de Coordinación Académica | Versión 1.0 | Julio 2025</text>
+  
+  <!-- Arrow Markers -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#616161"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#66BB6A"/>
+    </marker>
+  </defs>
+</svg>

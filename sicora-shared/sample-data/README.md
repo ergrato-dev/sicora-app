@@ -81,10 +81,20 @@ shared-data/
 - **Archivos**: `users.csv`, `users.json`
 - **Campos**: id, nombre, apellido, email, documento, rol, contraseña, ficha_id, programa
 - **Validaciones**: Email único, documento único, políticas de contraseña
-- **Reglas SENA específicas**: 
+- **Reglas OneVision específicas**: 
   - **Aprendices**: OBLIGATORIO ficha_id (7 dígitos), un aprendiz solo puede estar en una ficha
   - **Instructores/Admin/Coordinadores**: ficha_id debe ser null, programa indica especialización
 - **Volumen**: Hasta 100K usuarios
+
+> ⚠️ **REGLA DE NEGOCIO CRÍTICA - CARGA DE APRENDICES**
+> 
+> La carga trimestral de aprendices por ficha la realizará **ÚNICAMENTE el Instructor Director de Ficha** asignado por la Coordinación Académica.
+> 
+> - ❌ **El Administrador del Sistema NO puede realizar cargas masivas globales de aprendices**
+> - ✅ Cada Instructor Director SÍ puede hacer carga masiva de aprendices para SUS fichas asignadas
+> - 📄 Formatos permitidos: Excel (.xlsx) o CSV UTF-8 con formato preestablecido
+> 
+> Ver documentación completa: [RF Gestión Fichas y Aprendices](../../sicora-docs/_docs/general/rf_gestion_fichas_aprendices.md)
 
 ### **📅 Horarios (ScheduleService)**
 - **Archivos**: `schedules.csv`, `schedules.json`
@@ -202,11 +212,13 @@ id,nombre,apellido,email,documento,rol,ficha_id,programa,created_at
 uuid-v4,string,string,email,string,enum,7-digits|null,string,iso-datetime
 ```
 
-### **Reglas de Validación SENA**
+### **Reglas de Validación OneVision**
 - **Aprendices**: ficha_id OBLIGATORIO (7 dígitos), programa = nombre del programa de formación
 - **Instructores**: ficha_id = null, programa = área de especialización
 - **Admin/Coordinadores**: ficha_id = null, programa = rol específico
 - **Unicidad**: Un aprendiz solo puede estar matriculado en una ficha
+
+> 📋 **IMPORTANTE**: La carga de aprendices solo puede ser realizada por el Instructor Director de cada ficha, NO por el Administrador del sistema. Ver [RF Gestión Fichas](../../sicora-docs/_docs/general/rf_gestion_fichas_aprendices.md).
 
 ### **Estructura JSON**
 ```json
