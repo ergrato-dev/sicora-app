@@ -1,204 +1,311 @@
+/**
+ * Página de gestión de usuarios
+ * Integrada con el sistema de auth y API de usuarios
+ */
+
 import { useState } from 'react';
-import { Button } from '../../components/Button';
-import { ValidatedInput } from '../../components/ValidatedInput';
-import { SecureFormDemo } from '../../components/examples/SecureFormDemo';
-import {
-  PlusIcon,
-  MagnifyingGlassIcon,
-  FunnelIcon,
-  UserGroupIcon,
-} from '@heroicons/react/24/outline';
+import { Plus, Search, Filter, Download, RefreshCw, AlertCircle } from 'lucide-react';
+import { useUsers, useCreateUser, useUserActions } from '../../hooks/useUsers';
+import { UsersTable } from '../../components/users/UsersTable';
+import { UserForm } from '../../components/users/UserForm';
+import type {
+  User,
+  CreateUserRequest,
+  UpdateUserRequest,
+  UserRole,
+  UserStatus,
+} from '../../types/user.types';
+import { RoleLabels, StatusLabels } from '../../types/user.types';
+import { usersApi } from '../../lib/api/users';
 
 export function UsuariosPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
 
-  // Mock data para demostración
-  const usuarios = [
-    {
-      id: '1',
-      name: 'María González Rodríguez',
-      email: 'maria.gonzalez@sena.edu.co',
-      role: 'admin',
-      status: 'online',
-      coordination: 'Administración Central',
-    },
-    {
-      id: '2',
-      name: 'Carlos Pérez Martínez',
-      email: 'carlos.perez@sena.edu.co',
-      role: 'instructor',
-      status: 'online',
-      coordination: 'CGMLTI',
-    },
-    {
-      id: '3',
-      name: 'Ana López Torres',
-      email: 'ana.lopez@sena.edu.co',
-      role: 'aprendiz',
-      status: 'away',
-      ficha: '2830024',
-    },
-  ];
+  // Hooks
+  const {
+    users,
+    totalUsers,
+    currentPage,
+    totalPages,
+    hasNextPage,
+    hasPrevPage,
+    filters,
+    isLoading,
+    error,
+    refresh,
+    search,
+    filterByRole,
+    filterByStatus,
+    clearFilters,
+    setPage,
+    clearError,
+  } = useUsers();
 
-  const getRoleBadge = (role: string) => {
-    const roleStyles = {
-      admin: 'bg-red-100 text-red-800',
-      coordinador: 'bg-blue-100 text-blue-800',
-      instructor: 'bg-green-100 text-green-800',
-      aprendiz: 'bg-yellow-100 text-yellow-800',
-      administrativo: 'bg-gray-100 text-gray-800',
-    };
+  const { create, isCreating } = useCreateUser();
+  const { activate, deactivate, changePassword } = useUserActions();
 
-    const roleLabels = {
-      admin: 'Administrador',
-      coordinador: 'Coordinador',
-      instructor: 'Instructor',
-      aprendiz: 'Aprendiz',
-      administrativo: 'Administrativo',
-    };
+  // Handlers
+  const handleSearch = () => {
+    search(searchInput);
+  };
 
-    return (
-      <span
-        className={`px-2 py-1 text-xs font-medium rounded-full ${roleStyles[role as keyof typeof roleStyles]}`}
-      >
-        {roleLabels[role as keyof typeof roleLabels]}
-      </span>
-    );
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleCreateUser = async (data: CreateUserRequest | UpdateUserRequest) => {
+    await create(data as CreateUserRequest);
+    setShowCreateModal(false);
+  };
+
+  const handleEditUser = (user: User) => {
+    setSelectedUser(user);
+    setShowEditModal(true);
+  };
+
+  const handleUpdateUser = async (data: CreateUserRequest | UpdateUserRequest) => {
+    if (!selectedUser) return;
+    // TODO: Implementar actualización
+    console.log('Update user:', selectedUser.id, data);
+    setShowEditModal(false);
+    setSelectedUser(null);
+  };
+
+  const handleDeleteUser = async (user: User) => {
+    if (window.confirm(`¿Está seguro de eliminar a ${user.first_name} ${user.last_name}?`)) {
+      // TODO: Implementar eliminación
+      console.log('Delete user:', user.id);
+    }
+  };
+
+  const handleActivateUser = async (user: User) => {
+    await activate(user.id);
+  };
+
+  const handleDeactivateUser = async (user: User) => {
+    await deactivate(user.id);
+  };
+
+  const handleChangePassword = async (user: User) => {
+    const newPassword = window.prompt('Ingrese la nueva contraseña:');
+    if (newPassword && newPassword.length >= 8) {
+      await changePassword(user.id, newPassword);
+    } else if (newPassword) {
+      alert('La contraseña debe tener al menos 8 caracteres');
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const blob = await usersApi.exportUsers(filters, 'csv');
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `usuarios_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error al exportar:', err);
+    }
   };
 
   return (
     <div className='space-y-6'>
       {/* Header */}
-      <div className='flex justify-between items-center'>
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
         <div>
-          <h1 className='text-2xl font-bold text-gray-900'>Gestión de Usuarios</h1>
-          <p className='text-gray-600 mt-1'>
-            Administrar instructores, aprendices y personal del SENA
+          <h1 className='text-2xl font-bold text-foreground'>Gestión de Usuarios</h1>
+          <p className='text-muted-foreground mt-1'>
+            Administrar usuarios del sistema ({totalUsers} registrados)
           </p>
         </div>
 
-        {/* ✅ Botón de acción principal a la derecha */}
-        <div className='flex items-center space-x-3'>
-          <Button variant='outline' size='sm'>
-            <FunnelIcon className='w-4 h-4 mr-2' />
-            Filtros
-          </Button>
-          <Button variant='primary' onClick={() => setShowCreateForm(!showCreateForm)}>
-            <PlusIcon className='w-4 h-4 mr-2' />
+        <div className='flex items-center gap-3'>
+          <button
+            onClick={() => refresh()}
+            className='p-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted'
+            title='Actualizar'
+          >
+            <RefreshCw className='h-5 w-5' />
+          </button>
+          <button
+            onClick={handleExport}
+            className='px-3 py-2 text-sm font-medium text-foreground bg-background border border-input rounded-lg hover:bg-muted flex items-center gap-2'
+          >
+            <Download className='h-4 w-4' />
+            Exportar
+          </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className='px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 flex items-center gap-2'
+          >
+            <Plus className='h-4 w-4' />
             Nuevo Usuario
-          </Button>
+          </button>
         </div>
       </div>
 
-      {/* Barra de búsqueda */}
-      <div className='bg-white p-6 rounded-lg shadow-md border border-gray-100'>
-        <div className='flex items-center space-x-4'>
-          <div className='flex-1'>
-            <ValidatedInput
-              label=''
-              validationPattern='textoSeguro'
-              placeholder='Buscar por nombre, email o cédula...'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          {/* ✅ Botón de búsqueda a la derecha */}
-          <div className='flex items-end'>
-            <Button variant='primary' size='md'>
-              <MagnifyingGlassIcon className='w-4 h-4 mr-2' />
-              Buscar
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Formulario de creación (condicional) */}
-      {showCreateForm && (
-        <div className='bg-white rounded-lg shadow-md border border-gray-100 p-6'>
-          <h2 className='text-xl font-semibold text-gray-900 mb-6'>Crear Nuevo Usuario</h2>
-          <SecureFormDemo />
+      {/* Error */}
+      {error && (
+        <div className='flex items-center gap-3 p-4 bg-destructive/10 border border-destructive/20 rounded-lg'>
+          <AlertCircle className='h-5 w-5 text-destructive' />
+          <p className='text-sm text-destructive'>{error}</p>
+          <button onClick={clearError} className='ml-auto text-sm text-destructive hover:underline'>
+            Cerrar
+          </button>
         </div>
       )}
 
-      {/* Lista de usuarios */}
-      <div className='bg-white rounded-lg shadow-md border border-gray-100'>
-        <div className='px-6 py-4 border-b border-gray-200'>
-          <div className='flex items-center space-x-2'>
-            <UserGroupIcon className='w-5 h-5 text-gray-500' />
-            <h2 className='text-lg font-medium text-gray-900'>
-              Usuarios Registrados ({usuarios.length})
-            </h2>
+      {/* Barra de búsqueda y filtros */}
+      <div className='bg-card p-4 rounded-lg border border-border'>
+        <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-4'>
+          {/* Búsqueda */}
+          <div className='flex-1 relative'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+            <input
+              type='text'
+              placeholder='Buscar por nombre, email o documento...'
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className='w-full pl-10 pr-4 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary'
+            />
+          </div>
+
+          {/* Filtros rápidos */}
+          <div className='flex items-center gap-2'>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className='px-3 py-2 text-sm font-medium text-foreground bg-background border border-input rounded-lg hover:bg-muted flex items-center gap-2'
+            >
+              <Filter className='h-4 w-4' />
+              Filtros
+            </button>
+            <button
+              onClick={handleSearch}
+              className='px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90'
+            >
+              Buscar
+            </button>
           </div>
         </div>
 
-        <div className='divide-y divide-gray-200'>
-          {usuarios.map((usuario) => (
-            <div key={usuario.id} className='p-6 hover:bg-gray-50'>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center space-x-4'>
-                  {/* Avatar */}
-                  <div className='w-12 h-12 bg-sena-primary-100 rounded-full flex items-center justify-center'>
-                    <span className='text-sena-primary-700 font-semibold text-lg'>
-                      {usuario.name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')
-                        .substring(0, 2)}
-                    </span>
-                  </div>
+        {/* Panel de filtros expandible */}
+        {showFilters && (
+          <div className='mt-4 pt-4 border-t border-border'>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+              {/* Filtro por rol */}
+              <div>
+                <label className='block text-sm font-medium text-foreground mb-1'>Rol</label>
+                <select
+                  value={filters.role || ''}
+                  onChange={(e) => filterByRole((e.target.value as UserRole) || undefined)}
+                  className='w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground'
+                >
+                  <option value=''>Todos los roles</option>
+                  {Object.entries(RoleLabels).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-                  {/* Información del usuario */}
-                  <div>
-                    <h3 className='text-lg font-medium text-gray-900'>{usuario.name}</h3>
-                    <p className='text-gray-600'>{usuario.email}</p>
-                    <div className='flex items-center space-x-4 mt-1'>
-                      {getRoleBadge(usuario.role)}
-                      {usuario.coordination && (
-                        <span className='text-sm text-gray-500'>{usuario.coordination}</span>
-                      )}
-                      {usuario.ficha && (
-                        <span className='text-sm text-gray-500'>Ficha: {usuario.ficha}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
+              {/* Filtro por estado */}
+              <div>
+                <label className='block text-sm font-medium text-foreground mb-1'>Estado</label>
+                <select
+                  value={filters.status || ''}
+                  onChange={(e) => filterByStatus((e.target.value as UserStatus) || undefined)}
+                  className='w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground'
+                >
+                  <option value=''>Todos los estados</option>
+                  {Object.entries(StatusLabels).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-                {/* ✅ Acciones por fila a la derecha */}
-                <div className='flex items-center space-x-2'>
-                  <Button variant='ghost' size='sm'>
-                    Ver
-                  </Button>
-                  <Button variant='ghost' size='sm'>
-                    Editar
-                  </Button>
-                  <Button variant='ghost' size='sm' className='text-red-600 hover:text-red-700'>
-                    Eliminar
-                  </Button>
-                </div>
+              {/* Botón limpiar */}
+              <div className='flex items-end'>
+                <button
+                  onClick={clearFilters}
+                  className='px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground'
+                >
+                  Limpiar filtros
+                </button>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Paginación */}
-      <div className='bg-white px-6 py-4 rounded-lg shadow-md border border-gray-100'>
-        <div className='flex items-center justify-between'>
-          <div className='text-sm text-gray-500'>Mostrando 1-3 de 3 usuarios</div>
+      {/* Tabla de usuarios */}
+      <UsersTable
+        users={users}
+        isLoading={isLoading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        hasNextPage={hasNextPage}
+        hasPrevPage={hasPrevPage}
+        onPageChange={setPage}
+        onEdit={handleEditUser}
+        onDelete={handleDeleteUser}
+        onActivate={handleActivateUser}
+        onDeactivate={handleDeactivateUser}
+        onChangePassword={handleChangePassword}
+      />
 
-          {/* ✅ Controles de paginación a la derecha */}
-          <div className='flex items-center space-x-2'>
-            <Button variant='outline' size='sm' disabled>
-              Anterior
-            </Button>
-            <Button variant='outline' size='sm' disabled>
-              Siguiente
-            </Button>
+      {/* Modal Crear Usuario */}
+      {showCreateModal && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center'>
+          <div className='fixed inset-0 bg-black/50' onClick={() => setShowCreateModal(false)} />
+          <div className='relative bg-card rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4'>
+            <div className='p-6'>
+              <h2 className='text-xl font-semibold text-foreground mb-6'>Crear Nuevo Usuario</h2>
+              <UserForm
+                onSubmit={handleCreateUser}
+                onCancel={() => setShowCreateModal(false)}
+                isLoading={isCreating}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Modal Editar Usuario */}
+      {showEditModal && selectedUser && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center'>
+          <div
+            className='fixed inset-0 bg-black/50'
+            onClick={() => {
+              setShowEditModal(false);
+              setSelectedUser(null);
+            }}
+          />
+          <div className='relative bg-card rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4'>
+            <div className='p-6'>
+              <h2 className='text-xl font-semibold text-foreground mb-6'>Editar Usuario</h2>
+              <UserForm
+                user={selectedUser}
+                onSubmit={handleUpdateUser}
+                onCancel={() => {
+                  setShowEditModal(false);
+                  setSelectedUser(null);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

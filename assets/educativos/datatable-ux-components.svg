@@ -1,0 +1,355 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" fill="none">
+  <defs>
+    <style>
+      .bg { fill: #0f172a; }
+      .card { fill: #1e293b; stroke: #334155; stroke-width: 1; }
+      .card-header { fill: #334155; }
+      .title { font-family: system-ui, sans-serif; font-size: 28px; font-weight: bold; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, sans-serif; font-size: 14px; fill: #94a3b8; }
+      .section-title { font-family: system-ui, sans-serif; font-size: 16px; font-weight: 600; fill: #e2e8f0; }
+      .item-text { font-family: system-ui, sans-serif; font-size: 12px; fill: #cbd5e1; }
+      .small-text { font-family: system-ui, sans-serif; font-size: 10px; fill: #64748b; }
+      .accent-blue { fill: #3b82f6; }
+      .accent-green { fill: #22c55e; }
+      .accent-purple { fill: #a855f7; }
+      .accent-orange { fill: #f97316; }
+      .accent-cyan { fill: #06b6d4; }
+      .accent-pink { fill: #ec4899; }
+      .border-blue { stroke: #3b82f6; stroke-width: 2; fill: none; }
+      .border-green { stroke: #22c55e; stroke-width: 2; fill: none; }
+      .icon-stroke { stroke: #94a3b8; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect class="bg" width="1200" height="900"/>
+  
+  <!-- Title Section -->
+  <text class="title" x="600" y="45" text-anchor="middle">DataTable - Componentes UI/UX Configurables</text>
+  <text class="subtitle" x="600" y="70" text-anchor="middle">Guía de elementos esenciales para tablas profesionales y reutilizables</text>
+  
+  <!-- Main Table Preview -->
+  <rect class="card" x="50" y="95" width="700" height="380" rx="8"/>
+  
+  <!-- Table Header Bar -->
+  <rect fill="#334155" x="50" y="95" width="700" height="50" rx="8"/>
+  <rect fill="#1e293b" x="50" y="125" width="700" height="20"/>
+  
+  <!-- Search Box -->
+  <rect fill="#0f172a" x="70" y="107" width="200" height="28" rx="4"/>
+  <circle cx="82" cy="121" r="8" class="icon-stroke"/>
+  <line x1="88" y1="127" x2="93" y2="132" class="icon-stroke"/>
+  <text class="small-text" x="98" y="125">Buscar...</text>
+  
+  <!-- Filter Button -->
+  <rect fill="#3b82f6" x="280" y="107" width="80" height="28" rx="4"/>
+  <text class="item-text" x="320" y="125" text-anchor="middle" fill="#fff">Filtros</text>
+  
+  <!-- Export Buttons -->
+  <rect fill="#0f172a" x="540" y="107" width="50" height="28" rx="4" stroke="#334155"/>
+  <text class="small-text" x="565" y="125" text-anchor="middle">CSV</text>
+  <rect fill="#0f172a" x="600" y="107" width="50" height="28" rx="4" stroke="#334155"/>
+  <text class="small-text" x="625" y="125" text-anchor="middle">Excel</text>
+  <rect fill="#22c55e" x="660" y="107" width="70" height="28" rx="4"/>
+  <text class="item-text" x="695" y="125" text-anchor="middle" fill="#fff">+ Nuevo</text>
+  
+  <!-- Column Headers -->
+  <rect fill="#1e293b" x="50" y="145" width="700" height="35"/>
+  <line x1="50" y1="180" x2="750" y2="180" stroke="#334155"/>
+  
+  <!-- Checkbox column -->
+  <rect fill="#0f172a" x="65" y="155" width="16" height="16" rx="2" stroke="#64748b"/>
+  <text class="section-title" x="100" y="168">Nombre</text>
+  <text class="section-title" x="250" y="168">Email</text>
+  <text class="section-title" x="420" y="168">Rol</text>
+  <text class="section-title" x="530" y="168">Estado</text>
+  <text class="section-title" x="640" y="168">Acciones</text>
+  
+  <!-- Sort indicators -->
+  <path d="M155 160 L160 167 L165 160" class="icon-stroke" stroke="#3b82f6"/>
+  
+  <!-- Table Rows -->
+  <!-- Row 1 -->
+  <rect fill="#1e293b" x="50" y="180" width="700" height="45"/>
+  <rect fill="#3b82f6" x="65" y="195" width="16" height="16" rx="2"/>
+  <path d="M69 203 L73 207 L79 197" stroke="#fff" stroke-width="2" fill="none"/>
+  <text class="item-text" x="100" y="207">María González</text>
+  <text class="item-text" x="250" y="207">maria@email.com</text>
+  <rect fill="#3b82f6" x="420" y="195" width="60" height="20" rx="10"/>
+  <text class="small-text" x="450" y="209" text-anchor="middle" fill="#fff">Admin</text>
+  <rect fill="#22c55e" x="530" y="195" width="55" height="20" rx="10"/>
+  <text class="small-text" x="557" y="209" text-anchor="middle" fill="#fff">Activo</text>
+  <!-- Action buttons -->
+  <circle cx="655" cy="202" r="12" fill="#0f172a" stroke="#334155"/>
+  <circle cx="685" cy="202" r="12" fill="#0f172a" stroke="#334155"/>
+  <circle cx="715" cy="202" r="12" fill="#0f172a" stroke="#ef4444"/>
+  
+  <!-- Row 2 (Zebra) -->
+  <rect fill="#0f172a" x="50" y="225" width="700" height="45"/>
+  <rect fill="#0f172a" x="65" y="240" width="16" height="16" rx="2" stroke="#64748b"/>
+  <text class="item-text" x="100" y="252">Carlos Pérez</text>
+  <text class="item-text" x="250" y="252">carlos@email.com</text>
+  <rect fill="#a855f7" x="420" y="240" width="75" height="20" rx="10"/>
+  <text class="small-text" x="457" y="254" text-anchor="middle" fill="#fff">Instructor</text>
+  <rect fill="#22c55e" x="530" y="240" width="55" height="20" rx="10"/>
+  <text class="small-text" x="557" y="254" text-anchor="middle" fill="#fff">Activo</text>
+  <circle cx="655" cy="247" r="12" fill="#0f172a" stroke="#334155"/>
+  <circle cx="685" cy="247" r="12" fill="#0f172a" stroke="#334155"/>
+  <circle cx="715" cy="247" r="12" fill="#0f172a" stroke="#ef4444"/>
+  
+  <!-- Row 3 -->
+  <rect fill="#1e293b" x="50" y="270" width="700" height="45"/>
+  <rect fill="#0f172a" x="65" y="285" width="16" height="16" rx="2" stroke="#64748b"/>
+  <text class="item-text" x="100" y="297">Ana López</text>
+  <text class="item-text" x="250" y="297">ana@email.com</text>
+  <rect fill="#f97316" x="420" y="285" width="65" height="20" rx="10"/>
+  <text class="small-text" x="452" y="299" text-anchor="middle" fill="#fff">Usuario</text>
+  <rect fill="#64748b" x="530" y="285" width="65" height="20" rx="10"/>
+  <text class="small-text" x="562" y="299" text-anchor="middle" fill="#fff">Inactivo</text>
+  <circle cx="655" cy="292" r="12" fill="#0f172a" stroke="#334155"/>
+  <circle cx="685" cy="292" r="12" fill="#0f172a" stroke="#334155"/>
+  <circle cx="715" cy="292" r="12" fill="#0f172a" stroke="#ef4444"/>
+  
+  <!-- Row 4 (Zebra) -->
+  <rect fill="#0f172a" x="50" y="315" width="700" height="45"/>
+  <rect fill="#0f172a" x="65" y="330" width="16" height="16" rx="2" stroke="#64748b"/>
+  <text class="item-text" x="100" y="342">Pedro Ramírez</text>
+  <text class="item-text" x="250" y="342">pedro@email.com</text>
+  <rect fill="#a855f7" x="420" y="330" width="75" height="20" rx="10"/>
+  <text class="small-text" x="457" y="344" text-anchor="middle" fill="#fff">Instructor</text>
+  <rect fill="#22c55e" x="530" y="330" width="55" height="20" rx="10"/>
+  <text class="small-text" x="557" y="344" text-anchor="middle" fill="#fff">Activo</text>
+  <circle cx="655" cy="337" r="12" fill="#0f172a" stroke="#334155"/>
+  <circle cx="685" cy="337" r="12" fill="#0f172a" stroke="#334155"/>
+  <circle cx="715" cy="337" r="12" fill="#0f172a" stroke="#ef4444"/>
+  
+  <!-- Pagination Footer -->
+  <rect fill="#334155" x="50" y="425" width="700" height="50" rx="0 0 8 8"/>
+  
+  <!-- Items per page -->
+  <text class="small-text" x="70" y="455">Mostrar:</text>
+  <rect fill="#0f172a" x="115" y="438" width="50" height="24" rx="4"/>
+  <text class="item-text" x="140" y="455" text-anchor="middle">25</text>
+  <path d="M155 448 L160 455 L165 448" class="icon-stroke"/>
+  
+  <!-- Info text -->
+  <text class="item-text" x="380" y="455" text-anchor="middle">Mostrando 1-25 de 150 registros</text>
+  
+  <!-- Pagination buttons -->
+  <rect fill="#0f172a" x="560" y="438" width="30" height="24" rx="4"/>
+  <text class="item-text" x="575" y="455" text-anchor="middle">«</text>
+  <rect fill="#0f172a" x="595" y="438" width="30" height="24" rx="4"/>
+  <text class="item-text" x="610" y="455" text-anchor="middle">‹</text>
+  <rect fill="#3b82f6" x="630" y="438" width="30" height="24" rx="4"/>
+  <text class="item-text" x="645" y="455" text-anchor="middle" fill="#fff">1</text>
+  <rect fill="#0f172a" x="665" y="438" width="30" height="24" rx="4"/>
+  <text class="item-text" x="680" y="455" text-anchor="middle">2</text>
+  <rect fill="#0f172a" x="700" y="438" width="30" height="24" rx="4"/>
+  <text class="item-text" x="715" y="455" text-anchor="middle">›</text>
+  
+  <!-- Right Side Components -->
+  
+  <!-- 1. Filtros Section -->
+  <rect class="card" x="770" y="95" width="200" height="180" rx="6"/>
+  <rect fill="#3b82f6" x="770" y="95" width="200" height="30" rx="6"/>
+  <rect fill="#1e293b" x="770" y="115" width="200" height="10"/>
+  <text class="section-title" x="870" y="115" text-anchor="middle" fill="#fff">Filtros</text>
+  
+  <text class="item-text" x="785" y="145">Tipo de filtro</text>
+  <rect fill="#0f172a" x="785" y="152" width="170" height="24" rx="4" stroke="#334155"/>
+  <text class="small-text" x="795" y="168">Seleccionar...</text>
+  
+  <text class="item-text" x="785" y="195">Rango de fechas</text>
+  <rect fill="#0f172a" x="785" y="202" width="80" height="24" rx="4" stroke="#334155"/>
+  <text class="small-text" x="795" y="218">Desde</text>
+  <rect fill="#0f172a" x="875" y="202" width="80" height="24" rx="4" stroke="#334155"/>
+  <text class="small-text" x="885" y="218">Hasta</text>
+  
+  <!-- Filter chips -->
+  <rect fill="#3b82f6" x="785" y="235" width="70" height="22" rx="11" opacity="0.2"/>
+  <text class="small-text" x="820" y="250" text-anchor="middle" fill="#3b82f6">Admin ×</text>
+  <rect fill="#22c55e" x="860" y="235" width="70" height="22" rx="11" opacity="0.2"/>
+  <text class="small-text" x="895" y="250" text-anchor="middle" fill="#22c55e">Activo ×</text>
+  
+  <!-- 2. Column Config Section -->
+  <rect class="card" x="770" y="285" width="200" height="190" rx="6"/>
+  <rect fill="#a855f7" x="770" y="285" width="200" height="30" rx="6"/>
+  <rect fill="#1e293b" x="770" y="305" width="200" height="10"/>
+  <text class="section-title" x="870" y="305" text-anchor="middle" fill="#fff">Columnas</text>
+  
+  <!-- Column toggles -->
+  <rect fill="#22c55e" x="785" y="325" width="32" height="18" rx="9"/>
+  <circle cx="808" cy="334" r="7" fill="#fff"/>
+  <text class="item-text" x="825" y="338">Nombre</text>
+  
+  <rect fill="#22c55e" x="785" y="350" width="32" height="18" rx="9"/>
+  <circle cx="808" cy="359" r="7" fill="#fff"/>
+  <text class="item-text" x="825" y="363">Email</text>
+  
+  <rect fill="#334155" x="785" y="375" width="32" height="18" rx="9"/>
+  <circle cx="794" cy="384" r="7" fill="#64748b"/>
+  <text class="item-text" x="825" y="388" fill="#64748b">Teléfono</text>
+  
+  <rect fill="#22c55e" x="785" y="400" width="32" height="18" rx="9"/>
+  <circle cx="808" cy="409" r="7" fill="#fff"/>
+  <text class="item-text" x="825" y="413">Rol</text>
+  
+  <rect fill="#22c55e" x="785" y="425" width="32" height="18" rx="9"/>
+  <circle cx="808" cy="434" r="7" fill="#fff"/>
+  <text class="item-text" x="825" y="438">Estado</text>
+  
+  <!-- Drag indicator -->
+  <text class="small-text" x="940" y="338">⋮⋮</text>
+  <text class="small-text" x="940" y="363">⋮⋮</text>
+  <text class="small-text" x="940" y="388">⋮⋮</text>
+  <text class="small-text" x="940" y="413">⋮⋮</text>
+  <text class="small-text" x="940" y="438">⋮⋮</text>
+  
+  <!-- 3. Density Section -->
+  <rect class="card" x="980" y="95" width="170" height="100" rx="6"/>
+  <rect fill="#06b6d4" x="980" y="95" width="170" height="30" rx="6"/>
+  <rect fill="#1e293b" x="980" y="115" width="170" height="10"/>
+  <text class="section-title" x="1065" y="115" text-anchor="middle" fill="#fff">Densidad</text>
+  
+  <rect fill="#0f172a" x="995" y="135" width="45" height="24" rx="4" stroke="#334155"/>
+  <text class="small-text" x="1017" y="151" text-anchor="middle">S</text>
+  <rect fill="#3b82f6" x="1045" y="135" width="45" height="24" rx="4"/>
+  <text class="small-text" x="1067" y="151" text-anchor="middle" fill="#fff">M</text>
+  <rect fill="#0f172a" x="1095" y="135" width="45" height="24" rx="4" stroke="#334155"/>
+  <text class="small-text" x="1117" y="151" text-anchor="middle">L</text>
+  
+  <text class="small-text" x="1065" y="180" text-anchor="middle">Compact | Normal | Spacious</text>
+  
+  <!-- 4. Export Section -->
+  <rect class="card" x="980" y="205" width="170" height="70" rx="6"/>
+  <rect fill="#f97316" x="980" y="205" width="170" height="30" rx="6"/>
+  <rect fill="#1e293b" x="980" y="225" width="170" height="10"/>
+  <text class="section-title" x="1065" y="225" text-anchor="middle" fill="#fff">Exportar</text>
+  
+  <rect fill="#0f172a" x="995" y="245" width="45" height="22" rx="4" stroke="#22c55e"/>
+  <text class="small-text" x="1017" y="260" text-anchor="middle" fill="#22c55e">CSV</text>
+  <rect fill="#0f172a" x="1045" y="245" width="45" height="22" rx="4" stroke="#3b82f6"/>
+  <text class="small-text" x="1067" y="260" text-anchor="middle" fill="#3b82f6">XLS</text>
+  <rect fill="#0f172a" x="1095" y="245" width="45" height="22" rx="4" stroke="#ef4444"/>
+  <text class="small-text" x="1117" y="260" text-anchor="middle" fill="#ef4444">PDF</text>
+  
+  <!-- 5. Selection Info -->
+  <rect class="card" x="980" y="285" width="170" height="65" rx="6"/>
+  <rect fill="#ec4899" x="980" y="285" width="170" height="30" rx="6"/>
+  <rect fill="#1e293b" x="980" y="305" width="170" height="10"/>
+  <text class="section-title" x="1065" y="305" text-anchor="middle" fill="#fff">Selección</text>
+  
+  <text class="item-text" x="1065" y="335" text-anchor="middle">1 de 150 seleccionados</text>
+  
+  <!-- Bottom Section - Features Grid -->
+  <rect class="card" x="50" y="500" width="1100" height="380" rx="8"/>
+  <text class="section-title" x="600" y="530" text-anchor="middle">Características del Componente DataTable</text>
+  
+  <!-- Feature Cards Row 1 -->
+  <!-- 1. Responsive -->
+  <rect fill="#0f172a" x="70" y="550" width="160" height="90" rx="6" stroke="#3b82f6"/>
+  <circle cx="95" cy="575" r="12" class="accent-blue"/>
+  <text class="item-text" x="115" y="580" fill="#3b82f6">Responsive</text>
+  <text class="small-text" x="80" y="600">Móvil, Tablet, Desktop</text>
+  <text class="small-text" x="80" y="615">Breakpoints adaptativos</text>
+  <text class="small-text" x="80" y="630">Scroll horizontal móvil</text>
+  
+  <!-- 2. Sticky Header -->
+  <rect fill="#0f172a" x="245" y="550" width="160" height="90" rx="6" stroke="#22c55e"/>
+  <circle cx="270" cy="575" r="12" class="accent-green"/>
+  <text class="item-text" x="290" y="580" fill="#22c55e">Sticky Header</text>
+  <text class="small-text" x="255" y="600">Cabecera fija scroll</text>
+  <text class="small-text" x="255" y="615">Altura configurable</text>
+  <text class="small-text" x="255" y="630">Virtual scrolling</text>
+  
+  <!-- 3. Sorting -->
+  <rect fill="#0f172a" x="420" y="550" width="160" height="90" rx="6" stroke="#a855f7"/>
+  <circle cx="445" cy="575" r="12" class="accent-purple"/>
+  <text class="item-text" x="465" y="580" fill="#a855f7">Ordenación</text>
+  <text class="small-text" x="430" y="600">Multi-column sort</text>
+  <text class="small-text" x="430" y="615">ASC / DESC / None</text>
+  <text class="small-text" x="430" y="630">Indicadores visuales</text>
+  
+  <!-- 4. Row Selection -->
+  <rect fill="#0f172a" x="595" y="550" width="160" height="90" rx="6" stroke="#f97316"/>
+  <circle cx="620" cy="575" r="12" class="accent-orange"/>
+  <text class="item-text" x="640" y="580" fill="#f97316">Selección</text>
+  <text class="small-text" x="605" y="600">Checkbox / Radio</text>
+  <text class="small-text" x="605" y="615">Select All / None</text>
+  <text class="small-text" x="605" y="630">Bulk actions</text>
+  
+  <!-- 5. Inline Edit -->
+  <rect fill="#0f172a" x="770" y="550" width="160" height="90" rx="6" stroke="#06b6d4"/>
+  <circle cx="795" cy="575" r="12" class="accent-cyan"/>
+  <text class="item-text" x="815" y="580" fill="#06b6d4">Edición</text>
+  <text class="small-text" x="780" y="600">Inline / Modal edit</text>
+  <text class="small-text" x="780" y="615">Validación real-time</text>
+  <text class="small-text" x="780" y="630">Optimistic updates</text>
+  
+  <!-- 6. Row Actions -->
+  <rect fill="#0f172a" x="945" y="550" width="160" height="90" rx="6" stroke="#ec4899"/>
+  <circle cx="970" cy="575" r="12" class="accent-pink"/>
+  <text class="item-text" x="990" y="580" fill="#ec4899">Acciones</text>
+  <text class="small-text" x="955" y="600">Ver / Editar / Eliminar</text>
+  <text class="small-text" x="955" y="615">Dropdown menú</text>
+  <text class="small-text" x="955" y="630">Confirmaciones</text>
+  
+  <!-- Feature Cards Row 2 -->
+  <!-- 7. Filters -->
+  <rect fill="#0f172a" x="70" y="660" width="160" height="90" rx="6" stroke="#3b82f6"/>
+  <circle cx="95" cy="685" r="12" class="accent-blue"/>
+  <text class="item-text" x="115" y="690" fill="#3b82f6">Filtros</text>
+  <text class="small-text" x="80" y="710">Global search</text>
+  <text class="small-text" x="80" y="725">Por columna (tipo)</text>
+  <text class="small-text" x="80" y="740">Chips removibles</text>
+  
+  <!-- 8. Pagination -->
+  <rect fill="#0f172a" x="245" y="660" width="160" height="90" rx="6" stroke="#22c55e"/>
+  <circle cx="270" cy="685" r="12" class="accent-green"/>
+  <text class="item-text" x="290" y="690" fill="#22c55e">Paginación</text>
+  <text class="small-text" x="255" y="710">Items por página</text>
+  <text class="small-text" x="255" y="725">Navegación completa</text>
+  <text class="small-text" x="255" y="740">Info de rango</text>
+  
+  <!-- 9. States -->
+  <rect fill="#0f172a" x="420" y="660" width="160" height="90" rx="6" stroke="#a855f7"/>
+  <circle cx="445" cy="685" r="12" class="accent-purple"/>
+  <text class="item-text" x="465" y="690" fill="#a855f7">Estados</text>
+  <text class="small-text" x="430" y="710">Loading skeletons</text>
+  <text class="small-text" x="430" y="725">Empty state + CTA</text>
+  <text class="small-text" x="430" y="740">Error state + retry</text>
+  
+  <!-- 10. Export -->
+  <rect fill="#0f172a" x="595" y="660" width="160" height="90" rx="6" stroke="#f97316"/>
+  <circle cx="620" cy="685" r="12" class="accent-orange"/>
+  <text class="item-text" x="640" y="690" fill="#f97316">Exportación</text>
+  <text class="small-text" x="605" y="710">CSV / Excel / PDF</text>
+  <text class="small-text" x="605" y="725">Selección o todo</text>
+  <text class="small-text" x="605" y="740">Progreso descarga</text>
+  
+  <!-- 11. Config -->
+  <rect fill="#0f172a" x="770" y="660" width="160" height="90" rx="6" stroke="#06b6d4"/>
+  <circle cx="795" cy="685" r="12" class="accent-cyan"/>
+  <text class="item-text" x="815" y="690" fill="#06b6d4">Configuración</text>
+  <text class="small-text" x="780" y="710">Show/Hide columns</text>
+  <text class="small-text" x="780" y="725">Drag &amp; drop orden</text>
+  <text class="small-text" x="780" y="740">Persistir prefs</text>
+  
+  <!-- 12. A11y -->
+  <rect fill="#0f172a" x="945" y="660" width="160" height="90" rx="6" stroke="#ec4899"/>
+  <circle cx="970" cy="685" r="12" class="accent-pink"/>
+  <text class="item-text" x="990" y="690" fill="#ec4899">Accesibilidad</text>
+  <text class="small-text" x="955" y="710">Keyboard nav</text>
+  <text class="small-text" x="955" y="725">ARIA labels</text>
+  <text class="small-text" x="955" y="740">Focus management</text>
+  
+  <!-- Footer -->
+  <text class="small-text" x="600" y="800" text-anchor="middle">Props: data, columns, pagination, filters, sorting, selection, actions, loading, empty, density, exportFormats</text>
+  
+  <!-- Tech Stack -->
+  <rect fill="#0f172a" x="400" y="820" width="400" height="30" rx="6" stroke="#334155"/>
+  <text class="item-text" x="600" y="840" text-anchor="middle">React + TypeScript + Tailwind CSS + Zustand + TanStack Table</text>
+  
+  <!-- Version -->
+  <text class="small-text" x="1150" y="880" text-anchor="end">SICORA DataTable v1.0</text>
+</svg>

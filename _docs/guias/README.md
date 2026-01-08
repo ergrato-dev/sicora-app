@@ -2,6 +2,10 @@
 
 ## 📋 Documentos en esta Sección
 
+### Guías de Componentes UI/UX
+
+- [Componente DataTable UI/UX](./COMPONENTE_DATATABLE_UIUX.md) - Guía completa para tablas configurables y reutilizables
+
 ### Guías de Carga de Datos
 
 - [Formato CSV para Programas de Formación](./FORMATO_CSV_PROGRAMAS_FORMACION.md) - Especificación completa para carga masiva de programas académicos
