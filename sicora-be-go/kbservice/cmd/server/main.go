@@ -31,10 +31,13 @@ import (
 
 	"kbservice/internal/application/usecases"
 	"kbservice/internal/infrastructure/database"
+	infraerrors "kbservice/internal/infrastructure/errors"
 	"kbservice/internal/infrastructure/repositories"
 	"kbservice/internal/presentation/handlers"
 	"kbservice/internal/presentation/middleware"
 	"kbservice/internal/presentation/routes"
+
+	apperrors "sicora-be-go/pkg/errors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -45,6 +48,13 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Printf("Warning: .env file not found: %v", err)
 	}
+
+	// Initialize error handling context
+	env := getEnv("GIN_MODE", "debug")
+	infraerrors.InitServiceContext("1.0.0", env)
+
+	// Determine if development mode
+	isDev := env != "release"
 
 	// Database configuration
 	dbConfig := database.Config{
@@ -62,7 +72,6 @@ func main() {
 	if err := database.Connect(dbConfig); err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer database.Close()
 
 	// Run migrations
 	log.Println("Running database migrations...")
@@ -72,6 +81,16 @@ func main() {
 
 	// Initialize repositories
 	db := database.GetDB()
+
+	// Setup service components (logger, health checker, shutdown manager)
+	serviceSetup := infraerrors.NewServiceSetup(db, isDev)
+
+	// Register database cleanup in shutdown manager
+	serviceSetup.ShutdownManager.Register("database", 1, func(ctx context.Context) error {
+		database.Close()
+		return nil
+	})
+
 	documentRepo := repositories.NewDocumentRepository(db)
 	faqRepo := repositories.NewFAQRepository(db)
 	analyticsRepo := repositories.NewAnalyticsRepository(db)
@@ -93,11 +112,14 @@ func main() {
 	faqHandler := handlers.NewFAQHandler()
 	analyticsHandler := handlers.NewAnalyticsHandler()
 
-	// Setup router
-	router := setupRouter()
+	// Setup router with V2 middlewares
+	router := setupRouter(serviceSetup.Logger)
 	routes.SetupDocumentRoutes(router, documentHandler)
 	routes.SetupFAQRoutes(router, faqHandler)
 	routes.SetupAnalyticsRoutes(router, analyticsHandler)
+
+	// Register health routes (replaces old /health endpoint)
+	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
 
 	// Server configuration
 	port := getEnv("PORT", "8080")
@@ -106,32 +128,40 @@ func main() {
 		Handler: router,
 	}
 
-	// Start server in a goroutine
+	// Register server shutdown
+	serviceSetup.ShutdownManager.Register("http-server", 10, func(ctx context.Context) error {
+		return server.Shutdown(ctx)
+	})
+
+	// Setup signal handling
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// Start server in goroutine
 	go func() {
-		log.Printf("Starting server on port %s", port)
+		serviceSetup.Logger.Info(context.Background(), "KBService starting",
+			apperrors.Str("port", port),
+			apperrors.Str("environment", env),
+		)
+
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Failed to start server: %v", err)
+			serviceSetup.Logger.Fatal(context.Background(), "Failed to start server", err)
 		}
 	}()
 
-	// Wait for interrupt signal to gracefully shutdown the server
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("Shutting down server...")
+	// Wait for shutdown signal
+	<-sigChan
+	serviceSetup.Logger.Info(context.Background(), "Shutdown signal received, closing services...")
 
-	// Graceful shutdown
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+	// Execute graceful shutdown
+	if err := serviceSetup.ShutdownManager.Shutdown(); err != nil {
+		serviceSetup.Logger.Error(context.Background(), "Shutdown completed with errors", err)
+	} else {
+		serviceSetup.Logger.Info(context.Background(), "KBService shutdown completed successfully")
 	}
-
-	log.Println("Server exited")
 }
 
-func setupRouter() *gin.Engine {
+func setupRouter(logger apperrors.Logger) *gin.Engine {
 	// Set gin mode
 	if getEnv("GIN_MODE", "debug") == "release" {
 		gin.SetMode(gin.ReleaseMode)
@@ -142,34 +172,19 @@ func setupRouter() *gin.Engine {
 	// SECURITY: Rate limiting - 30 req/min por IP
 	rateLimiter := middleware.NewRateLimiter(30, time.Minute)
 
+	// Apply V2 middlewares first
+	router.Use(infraerrors.RequestContextMiddleware())
+	router.Use(infraerrors.RecoveryMiddlewareV2(logger))
+	router.Use(infraerrors.LoggingMiddlewareV2(logger))
+
 	// SECURITY: Middleware en orden correcto
 	router.Use(middleware.RequestID())
 	router.Use(middleware.SecurityHeaders())
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
 	router.Use(rateLimiter.RateLimitMiddleware())
 
 	// CORS middleware - SECURITY: Origen específico en producción
 	// SecureCORS lee ALLOWED_ORIGINS de env automáticamente
 	router.Use(middleware.SecureCORS())
-
-	// Health check endpoint
-	router.GET("/health", func(c *gin.Context) {
-		if err := database.HealthCheck(c.Request.Context()); err != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{
-				"status": "unhealthy",
-				"error":  err.Error(),
-			})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"status":    "healthy",
-			"service":   "kbservice",
-			"version":   "1.0.0",
-			"timestamp": time.Now().UTC(),
-		})
-	})
 
 	// API version group (reserved for future use)
 	// v1 := router.Group("/api/v1")
