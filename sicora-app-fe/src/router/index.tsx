@@ -70,6 +70,11 @@ const Accesibilidad = lazy(() =>
   import('../pages/legal').then((m) => ({ default: m.Accesibilidad }))
 );
 
+// Admin pages - lazy loaded
+const BrandingAdminPage = lazy(() =>
+  import('../pages/admin/BrandingAdminPage').then((m) => ({ default: m.BrandingAdminPage }))
+);
+
 // Loading fallback component
 function PageLoader() {
   return (
@@ -165,6 +170,11 @@ export function AppRouter() {
             <Route path='terminos-uso' element={<TerminosUso />} />
             <Route path='mapa-sitio' element={<MapaSitio />} />
             <Route path='accesibilidad' element={<Accesibilidad />} />
+          </Route>
+
+          {/* Rutas de Administración */}
+          <Route path='admin'>
+            <Route path='branding' element={<BrandingAdminPage />} />
           </Route>
 
           {/* Página 404 */}

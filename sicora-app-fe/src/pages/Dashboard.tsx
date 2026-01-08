@@ -1,7 +1,7 @@
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/Button';
 import { StatCard } from '../components/dashboard';
-import { BRAND_CONFIG } from '../config/brand';
+import { useBrandingContext } from '../hooks/useBranding';
 import {
   UserGroupIcon,
   CalendarDaysIcon,
@@ -15,6 +15,7 @@ import { Users, Calendar, BarChart3, Clock } from 'lucide-react';
 
 export function Dashboard() {
   const { user } = useAuth();
+  const { organization, description, texts } = useBrandingContext();
 
   const dashboardCards = [
     {
@@ -117,11 +118,11 @@ export function Dashboard() {
     <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8'>
       {/* Header de bienvenida */}
       <div className='bg-gradient-to-r from-sena-primary-600 to-sena-primary-700 rounded-lg p-8 text-white'>
-        <h1 className='text-3xl font-bold mb-2'>{getWelcomeMessage()}</h1>
+        <h1 className='text-3xl font-bold mb-2'>{texts.welcomeMessage || getWelcomeMessage()}</h1>
         <p className='text-sena-primary-100 text-lg'>
-          {getRoleDisplay()} - {BRAND_CONFIG.organizationFull}
+          {getRoleDisplay()} - {organization}
         </p>
-        <p className='text-sena-primary-200 text-sm mt-1'>{BRAND_CONFIG.description}</p>
+        <p className='text-sena-primary-200 text-sm mt-1'>{description}</p>
       </div>
 
       {/* Estadísticas rápidas */}

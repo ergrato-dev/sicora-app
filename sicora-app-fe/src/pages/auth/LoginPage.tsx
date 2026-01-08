@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, LogIn, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { BRAND_CONFIG } from '../../config/brand';
+import { useBrandingContext } from '../../hooks/useBranding';
 
 // Schema de validación con Zod
 const loginSchema = z.object({
@@ -24,6 +24,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isLoading, error, clearError } = useAuth();
+  const { name, subtitle, description, texts } = useBrandingContext();
 
   // Obtener la URL de redirección si existe
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
@@ -57,15 +58,12 @@ export function LoginPage() {
       <div className='hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12'>
         <div className='text-center text-white max-w-md'>
           <div className='h-20 mx-auto mb-8 flex items-center justify-center'>
-            <span className='text-4xl font-bold'>{BRAND_CONFIG.name}</span>
+            <span className='text-4xl font-bold'>{name}</span>
           </div>
-          <h1 className='text-3xl font-bold mb-4'>{BRAND_CONFIG.subtitle}</h1>
-          <p className='text-lg opacity-90'>{BRAND_CONFIG.description}</p>
+          <h1 className='text-3xl font-bold mb-4'>{subtitle}</h1>
+          <p className='text-lg opacity-90'>{description}</p>
           <div className='mt-8 p-6 bg-white/10 rounded-lg backdrop-blur'>
-            <p className='text-sm opacity-80'>
-              Sistema de Información para la gestión integral de asistencia, horarios y evaluaciones
-              académicas.
-            </p>
+            <p className='text-sm opacity-80'>{texts.loginSubtitle}</p>
           </div>
         </div>
       </div>
@@ -76,7 +74,7 @@ export function LoginPage() {
           {/* Logo móvil */}
           <div className='lg:hidden text-center'>
             <div className='h-16 mx-auto mb-4 flex items-center justify-center'>
-              <span className='text-2xl font-bold text-primary'>{BRAND_CONFIG.name}</span>
+              <span className='text-2xl font-bold text-primary'>{name}</span>
             </div>
           </div>
 

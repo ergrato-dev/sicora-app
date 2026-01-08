@@ -3,12 +3,12 @@ import { LogoSenaNav } from './LogoSena';
 import { UserMenu } from './UserMenu';
 import { Breadcrumb } from './Breadcrumb';
 import { cn } from '../utils/cn';
-import { BRAND_CONFIG, IS_SENA_BUILD } from '../config/brand';
+import { useBrandingContext } from '../hooks/useBranding';
 
 /**
  * InstitutionalHeader - Header institucional adaptativo
  * Incluye logo, navegación principal, breadcrumbs y menú de usuario
- * Se adapta automáticamente entre configuración SENA y EPTI según variables de entorno
+ * Usa sistema de branding dinámico configurable desde admin
  */
 
 interface User {
@@ -49,6 +49,7 @@ export function InstitutionalHeader({
   className,
 }: InstitutionalHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { name, subtitle, logo } = useBrandingContext();
 
   // Generar breadcrumbs automáticamente
   const breadcrumbItems = currentPath
@@ -90,14 +91,11 @@ export function InstitutionalHeader({
           <div className='flex items-center justify-between h-16'>
             {/* Logo y título institucional */}
             <div className='flex items-center space-x-4'>
-              {BRAND_CONFIG.showLogo && <LogoSenaNav size='md' />}
+              {logo && <img src={logo} alt={name} className='h-10 w-auto' />}
+              {!logo && <LogoSenaNav size='md' />}
               <div className='hidden md:block'>
-                <h1 className='text-lg font-sena-heading font-semibold'>
-                  {IS_SENA_BUILD ? 'Sistema SICORA' : BRAND_CONFIG.name}
-                </h1>
-                <p className='text-xs text-sena-primary-200 font-sena-body'>
-                  {IS_SENA_BUILD ? 'Coordinación Académica - CGMLTI' : BRAND_CONFIG.subtitle}
-                </p>
+                <h1 className='text-lg font-sena-heading font-semibold'>{name}</h1>
+                <p className='text-xs text-sena-primary-200 font-sena-body'>{subtitle}</p>
               </div>
             </div>
 
