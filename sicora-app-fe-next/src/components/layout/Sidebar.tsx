@@ -8,6 +8,8 @@ import {
   Calendar,
   UserCheck,
   ClipboardCheck,
+  FileText,
+  Bell,
   Settings,
   LogOut,
   ChevronLeft,
@@ -34,6 +36,8 @@ const navItems: NavItem[] = [
   { label: 'Horarios', href: '/horarios', icon: Calendar },
   { label: 'Asistencia', href: '/asistencia', icon: UserCheck },
   { label: 'Evaluaciones', href: '/evaluaciones', icon: ClipboardCheck },
+  { label: 'Justificaciones', href: '/justificaciones', icon: FileText },
+  { label: 'Alertas', href: '/alertas', icon: Bell },
   { label: 'Configuración', href: '/configuracion', icon: Settings },
 ];
 
