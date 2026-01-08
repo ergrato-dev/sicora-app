@@ -23,9 +23,13 @@ export * from './schedules';
 // Attendance API (Sprint 5-6)
 export * from './attendance';
 
+// Evaluations API (Sprint 5-6)
+export * from './evaluations';
+
 // Re-export named exports
 export { default as authApi } from './auth';
 export { default as dashboardApi } from './dashboard';
 export { usersApi } from './users';
 export { default as schedulesApi } from './schedules';
 export { default as attendanceApi } from './attendance';
+export { default as evaluationsApi } from './evaluations';

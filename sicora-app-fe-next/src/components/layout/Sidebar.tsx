@@ -6,6 +6,7 @@ import {
   Home,
   Users,
   Calendar,
+  UserCheck,
   ClipboardCheck,
   Settings,
   LogOut,
@@ -31,6 +32,7 @@ const navItems: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: Home },
   { label: 'Usuarios', href: '/usuarios', icon: Users },
   { label: 'Horarios', href: '/horarios', icon: Calendar },
+  { label: 'Asistencia', href: '/asistencia', icon: UserCheck },
   { label: 'Evaluaciones', href: '/evaluaciones', icon: ClipboardCheck },
   { label: 'Configuración', href: '/configuracion', icon: Settings },
 ];
