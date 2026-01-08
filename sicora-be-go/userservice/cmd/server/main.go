@@ -20,7 +20,6 @@ package main
 //	@description				Type "Bearer" followed by a space and JWT token.
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"os"
@@ -34,6 +33,7 @@ import (
 	"userservice/internal/infrastructure/database"
 	"userservice/internal/infrastructure/database/models"
 	"userservice/internal/infrastructure/database/repositories"
+	infraerrors "userservice/internal/infrastructure/errors"
 	"userservice/internal/presentation/handlers"
 	"userservice/internal/presentation/middleware"
 	"userservice/internal/presentation/routes"
@@ -51,7 +51,17 @@ func main() {
 		log.Println("No .env file found, using environment variables")
 	}
 
-	// Setup logger
+	// Get environment
+	env := os.Getenv("ENV")
+	if env == "" {
+		env = "development"
+	}
+
+	// Initialize centralized error system
+	version := "1.0.0"
+	infraerrors.InitServiceContext(version, env)
+
+	// Setup logger (legacy for compatibility)
 	logger := log.New(os.Stdout, "[USERSERVICE-GO] ", log.LstdFlags|log.Lshortfile)
 	logger.Println("Starting SICORA UserService Go...")
 
@@ -61,7 +71,10 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+	// Note: db.Close() will be handled by shutdown manager
+
+	// Setup service infrastructure (health checks, shutdown, logging)
+	serviceSetup := infraerrors.NewServiceSetup(db.Connection, version, env)
 
 	// Run migrations
 	logger.Println("Running database migrations...")
@@ -169,17 +182,18 @@ func main() {
 	securityMetrics := middleware.NewSecurityMetrics(logger)
 
 	// Add global middleware
+	router.Use(infraerrors.RequestContextMiddleware()) // Context propagation (nuevo)
 	router.Use(middleware.RequestIDMiddleware())
 	router.Use(middleware.SecurityHeadersMiddleware())
 	router.Use(securityMetrics.SecurityMetricsMiddleware())           // Bloqueo de IPs maliciosas
 	router.Use(middleware.SuspiciousPatternDetector(securityMetrics)) // Detectar SQL injection, XSS, etc.
-	router.Use(middleware.LoggingMiddleware())
+	router.Use(infraerrors.LoggingMiddlewareV2(serviceSetup.Logger))  // Structured logging (nuevo)
 	router.Use(middleware.CORSMiddleware())
 	router.Use(generalRateLimiter.RateLimitMiddleware()) // 30 requests per minute
 	router.Use(middleware.CompressionMiddleware())
-	router.Use(middleware.TimeoutMiddleware(30 * time.Second))
-	router.Use(middleware.ErrorMiddleware(logger))
-	router.Use(middleware.NotFoundMiddleware())
+	router.Use(infraerrors.TimeoutMiddlewareV2(30 * time.Second))     // Timeout (nuevo)
+	router.Use(infraerrors.RecoveryMiddlewareV2(serviceSetup.Logger)) // Panic recovery (nuevo)
+	router.Use(infraerrors.NotFoundMiddlewareV2())                    // Not found (nuevo)
 
 	// Rate limiting específico para rutas de autenticación
 	authGroup := router.Group("/api/v1/auth")
@@ -194,8 +208,8 @@ func main() {
 	// Setup routes with auth config
 	routes.SetupUserRoutes(router, userHandler, authConfig)
 
-	// Health check endpoint
-	router.GET("/health", userHandler.HealthCheck)
+	// Health check endpoints (nuevo sistema)
+	serviceSetup.Health.RegisterRoutes(router)
 
 	// Swagger documentation
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -212,10 +226,15 @@ func main() {
 		Handler: router,
 	}
 
+	// Register components for graceful shutdown
+	serviceSetup.RegisterComponents(db.Connection, server)
+
 	// Start server in a goroutine
 	go func() {
 		logger.Printf("🚀 Server starting on port %s", port)
 		logger.Printf("📊 Health check: http://localhost:%s/health", port)
+		logger.Printf("📊 Readiness: http://localhost:%s/ready", port)
+		logger.Printf("📊 Liveness: http://localhost:%s/live", port)
 		logger.Printf("📖 API endpoints: http://localhost:%s/api/v1/users", port)
 
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -230,12 +249,9 @@ func main() {
 
 	logger.Println("🛑 Shutting down server...")
 
-	// Graceful shutdown with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		logger.Fatalf("Server forced to shutdown: %v", err)
+	// Graceful shutdown with centralized manager
+	if err := serviceSetup.Shutdown.Shutdown(); err != nil {
+		logger.Printf("Shutdown error: %v", err)
 	}
 
 	logger.Println("✅ Server shutdown completed")
