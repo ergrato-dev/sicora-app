@@ -1,0 +1,596 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" fill="none">
+  <defs>
+    <!-- Gradientes para secciones -->
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#334155"/>
+    </linearGradient>
+    
+    <!-- Colores de jornada -->
+    <linearGradient id="mananaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#60a5fa"/>
+    </linearGradient>
+    <linearGradient id="tardeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f97316"/>
+      <stop offset="100%" style="stop-color:#fb923c"/>
+    </linearGradient>
+    <linearGradient id="nocheGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#a78bfa"/>
+    </linearGradient>
+    
+    <!-- Sombras -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+    <filter id="shadowLg" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Fondo -->
+  <rect width="1200" height="900" fill="#0f172a"/>
+  
+  <!-- Título principal -->
+  <text x="600" y="45" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="28" font-weight="700">
+    Calendario Académico SICORA - Elementos UX
+  </text>
+  <text x="600" y="72" text-anchor="middle" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="14">
+    Componentes y estructura del sistema de gestión de horarios
+  </text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- SECCIÓN 1: ESTRUCTURA GENERAL -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(30, 100)">
+    <!-- Contenedor del calendario -->
+    <rect x="0" y="0" width="700" height="400" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2" filter="url(#shadowLg)"/>
+    
+    <!-- Header del calendario -->
+    <rect x="0" y="0" width="700" height="55" rx="12" fill="url(#headerGrad)"/>
+    <rect x="0" y="40" width="700" height="15" fill="url(#headerGrad)"/>
+    
+    <!-- Elementos del header -->
+    <!-- Filtros -->
+    <rect x="15" y="12" width="80" height="30" rx="6" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <text x="30" y="32" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">🔍 Filtros</text>
+    
+    <!-- Navegación temporal -->
+    <g transform="translate(250, 12)">
+      <rect x="0" y="0" width="200" height="30" rx="6" fill="#334155"/>
+      <rect x="5" y="5" width="20" height="20" rx="4" fill="#475569"/>
+      <text x="15" y="20" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12">◀</text>
+      <rect x="30" y="5" width="50" height="20" rx="4" fill="#3b82f6"/>
+      <text x="55" y="19" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="10" font-weight="600">Hoy</text>
+      <rect x="85" y="5" width="20" height="20" rx="4" fill="#475569"/>
+      <text x="95" y="20" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12">▶</text>
+      <text x="145" y="19" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="500">Semana 13-19</text>
+    </g>
+    
+    <!-- Selector de vista -->
+    <g transform="translate(500, 12)">
+      <rect x="0" y="0" width="120" height="30" rx="6" fill="#334155"/>
+      <rect x="3" y="3" width="35" height="24" rx="4" fill="#475569"/>
+      <text x="21" y="19" text-anchor="middle" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Día</text>
+      <rect x="41" y="3" width="35" height="24" rx="4" fill="#3b82f6"/>
+      <text x="59" y="19" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="10" font-weight="600">Sem</text>
+      <rect x="79" y="3" width="35" height="24" rx="4" fill="#475569"/>
+      <text x="97" y="19" text-anchor="middle" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Mes</text>
+    </g>
+    
+    <!-- Botón Nueva Clase -->
+    <rect x="630" y="12" width="55" height="30" rx="6" fill="#22c55e"/>
+    <text x="657" y="31" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="18">+</text>
+
+    <!-- Header de días -->
+    <g transform="translate(0, 55)">
+      <rect x="50" y="0" width="650" height="35" fill="#1e293b"/>
+      <line x1="50" y1="35" x2="700" y2="35" stroke="#334155" stroke-width="1"/>
+      
+      <!-- Columna de horas -->
+      <rect x="0" y="0" width="50" height="35" fill="#1e293b"/>
+      
+      <!-- Días de la semana -->
+      <g font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">
+        <text x="130" y="15">LUN</text>
+        <text x="130" y="28" fill="#f8fafc" font-weight="600">13</text>
+        
+        <text x="238" y="15">MAR</text>
+        <text x="238" y="28" fill="#f8fafc" font-weight="600">14</text>
+        
+        <text x="346" y="15">MIÉ</text>
+        <!-- Día actual -->
+        <circle cx="346" cy="26" r="11" fill="#3b82f6"/>
+        <text x="346" y="30" fill="#fff" font-weight="700">15</text>
+        
+        <text x="454" y="15">JUE</text>
+        <text x="454" y="28" fill="#f8fafc" font-weight="600">16</text>
+        
+        <text x="562" y="15">VIE</text>
+        <text x="562" y="28" fill="#f8fafc" font-weight="600">17</text>
+        
+        <text x="650" y="15" fill="#64748b">SÁB</text>
+        <text x="650" y="28" fill="#64748b" font-weight="600">18</text>
+      </g>
+    </g>
+
+    <!-- Grilla horaria -->
+    <g transform="translate(0, 90)">
+      <!-- Columna de horas -->
+      <g font-family="system-ui, sans-serif" font-size="10" fill="#64748b" text-anchor="end">
+        <text x="40" y="10">6 AM</text>
+        <text x="40" y="50">8 AM</text>
+        <text x="40" y="90">10 AM</text>
+        <text x="40" y="130">12 PM</text>
+        <text x="40" y="170">2 PM</text>
+        <text x="40" y="210">4 PM</text>
+        <text x="40" y="250">6 PM</text>
+        <text x="40" y="290">8 PM</text>
+      </g>
+      
+      <!-- Líneas de hora -->
+      <g stroke="#334155" stroke-width="1" stroke-dasharray="2,2">
+        <line x1="50" y1="5" x2="700" y2="5"/>
+        <line x1="50" y1="45" x2="700" y2="45"/>
+        <line x1="50" y1="85" x2="700" y2="85"/>
+        <line x1="50" y1="125" x2="700" y2="125"/>
+        <line x1="50" y1="165" x2="700" y2="165"/>
+        <line x1="50" y1="205" x2="700" y2="205"/>
+        <line x1="50" y1="245" x2="700" y2="245"/>
+        <line x1="50" y1="285" x2="700" y2="285"/>
+      </g>
+      
+      <!-- Columnas de días -->
+      <g stroke="#334155" stroke-width="1">
+        <line x1="158" y1="0" x2="158" y2="300"/>
+        <line x1="266" y1="0" x2="266" y2="300"/>
+        <line x1="374" y1="0" x2="374" y2="300"/>
+        <line x1="482" y1="0" x2="482" y2="300"/>
+        <line x1="590" y1="0" x2="590" y2="300"/>
+      </g>
+      
+      <!-- Indicador de hora actual -->
+      <g transform="translate(50, 110)">
+        <circle cx="0" cy="0" r="5" fill="#ef4444"/>
+        <line x1="0" y1="0" x2="650" y2="0" stroke="#ef4444" stroke-width="2"/>
+      </g>
+      
+      <!-- ═══════ BLOQUES DE CLASE ═══════ -->
+      
+      <!-- Clase Mañana - POO -->
+      <g transform="translate(55, 45)" filter="url(#shadow)">
+        <rect x="0" y="0" width="98" height="75" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1" stroke-left="4"/>
+        <rect x="0" y="0" width="4" height="75" rx="2" fill="#3b82f6"/>
+        <text x="10" y="18" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="600">POO</text>
+        <text x="10" y="32" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">📍 Aula 201</text>
+        <text x="10" y="46" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">⏰ 8:00 - 10:00</text>
+        <rect x="10" y="55" width="50" height="14" rx="3" fill="#3b82f6"/>
+        <text x="35" y="65" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="8">🌅 Mañana</text>
+      </g>
+      
+      <!-- Clase Tarde - BD -->
+      <g transform="translate(163, 125)" filter="url(#shadow)">
+        <rect x="0" y="0" width="98" height="75" rx="6" fill="#3d2914" stroke="#f97316" stroke-width="1"/>
+        <rect x="0" y="0" width="4" height="75" rx="2" fill="#f97316"/>
+        <text x="10" y="18" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Bases Datos</text>
+        <text x="10" y="32" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">📍 Lab 101</text>
+        <text x="10" y="46" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">⏰ 12:00 - 2:00</text>
+        <rect x="10" y="55" width="45" height="14" rx="3" fill="#f97316"/>
+        <text x="32" y="65" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="8">☀️ Tarde</text>
+      </g>
+      
+      <!-- Clase Noche - Redes -->
+      <g transform="translate(379, 245)" filter="url(#shadow)">
+        <rect x="0" y="0" width="98" height="50" rx="6" fill="#2e1f47" stroke="#8b5cf6" stroke-width="1"/>
+        <rect x="0" y="0" width="4" height="50" rx="2" fill="#8b5cf6"/>
+        <text x="10" y="16" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Redes</text>
+        <text x="10" y="30" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">📍 Aula 302</text>
+        <rect x="55" y="35" width="40" height="12" rx="3" fill="#8b5cf6"/>
+        <text x="75" y="44" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="7">🌙 Noche</text>
+      </g>
+      
+      <!-- Clase con conflicto -->
+      <g transform="translate(271, 45)" filter="url(#shadow)">
+        <rect x="0" y="0" width="98" height="75" rx="6" fill="#3f1f1f" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,2">
+          <animate attributeName="stroke-opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="0" y="0" width="4" height="75" rx="2" fill="#ef4444"/>
+        <text x="10" y="18" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Web Frontend</text>
+        <text x="10" y="32" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">📍 Lab 101</text>
+        <circle cx="85" cy="14" r="10" fill="#ef4444"/>
+        <text x="85" y="18" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="10">⚠</text>
+        <text x="10" y="65" fill="#fca5a5" font-family="system-ui, sans-serif" font-size="8" font-style="italic">Conflicto: Salón ocupado</text>
+      </g>
+      
+      <!-- Clase seleccionada -->
+      <g transform="translate(487, 165)" filter="url(#shadow)">
+        <rect x="-3" y="-3" width="104" height="81" rx="8" fill="none" stroke="#3b82f6" stroke-width="3"/>
+        <rect x="0" y="0" width="98" height="75" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1"/>
+        <rect x="0" y="0" width="4" height="75" rx="2" fill="#3b82f6"/>
+        <text x="10" y="18" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Python</text>
+        <text x="10" y="32" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">📍 Aula 205</text>
+        <text x="10" y="46" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">⏰ 2:00 - 4:00</text>
+        <rect x="60" y="55" width="32" height="14" rx="3" fill="#22c55e"/>
+        <text x="76" y="65" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="8">✓</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- SECCIÓN 2: SIDEBAR -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(760, 100)">
+    <rect x="0" y="0" width="180" height="400" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1" filter="url(#shadow)"/>
+    
+    <!-- Estadísticas -->
+    <g transform="translate(12, 15)">
+      <text x="0" y="0" fill="#64748b" font-family="system-ui, sans-serif" font-size="10" font-weight="600" text-transform="uppercase">📊 ESTADÍSTICAS</text>
+      
+      <g transform="translate(0, 15)">
+        <rect x="0" y="0" width="75" height="50" rx="6" fill="#334155"/>
+        <text x="37" y="25" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="20" font-weight="700">12</text>
+        <text x="37" y="40" text-anchor="middle" fill="#64748b" font-family="system-ui, sans-serif" font-size="9">Clases</text>
+        
+        <rect x="80" y="0" width="75" height="50" rx="6" fill="#334155"/>
+        <text x="117" y="25" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="20" font-weight="700">32h</text>
+        <text x="117" y="40" text-anchor="middle" fill="#64748b" font-family="system-ui, sans-serif" font-size="9">Programadas</text>
+      </g>
+      
+      <g transform="translate(0, 70)">
+        <rect x="0" y="0" width="75" height="50" rx="6" fill="#334155"/>
+        <text x="37" y="25" text-anchor="middle" fill="#22c55e" font-family="system-ui, sans-serif" font-size="20" font-weight="700">64h</text>
+        <text x="37" y="40" text-anchor="middle" fill="#64748b" font-family="system-ui, sans-serif" font-size="9">Disponibles</text>
+        
+        <rect x="80" y="0" width="75" height="50" rx="6" fill="#334155"/>
+        <text x="117" y="25" text-anchor="middle" fill="#ef4444" font-family="system-ui, sans-serif" font-size="20" font-weight="700">2</text>
+        <text x="117" y="40" text-anchor="middle" fill="#64748b" font-family="system-ui, sans-serif" font-size="9">Conflictos</text>
+      </g>
+    </g>
+    
+    <!-- Próximas clases -->
+    <g transform="translate(12, 150)">
+      <text x="0" y="0" fill="#64748b" font-family="system-ui, sans-serif" font-size="10" font-weight="600">📅 PRÓXIMAS CLASES</text>
+      
+      <g transform="translate(0, 15)">
+        <!-- Clase 1 -->
+        <g transform="translate(0, 0)">
+          <rect x="0" y="0" width="4" height="35" rx="2" fill="#3b82f6"/>
+          <text x="12" y="12" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="500">POO</text>
+          <text x="12" y="26" fill="#64748b" font-family="system-ui, sans-serif" font-size="9">Lun 8:00 • Aula 201</text>
+        </g>
+        
+        <!-- Clase 2 -->
+        <g transform="translate(0, 42)">
+          <rect x="0" y="0" width="4" height="35" rx="2" fill="#f97316"/>
+          <text x="12" y="12" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="500">Bases de Datos</text>
+          <text x="12" y="26" fill="#64748b" font-family="system-ui, sans-serif" font-size="9">Mar 12:00 • Lab 101</text>
+        </g>
+        
+        <!-- Clase 3 -->
+        <g transform="translate(0, 84)">
+          <rect x="0" y="0" width="4" height="35" rx="2" fill="#8b5cf6"/>
+          <text x="12" y="12" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="500">Redes</text>
+          <text x="12" y="26" fill="#64748b" font-family="system-ui, sans-serif" font-size="9">Jue 6:00 PM • Aula 302</text>
+        </g>
+      </g>
+    </g>
+    
+    <!-- Leyenda -->
+    <g transform="translate(12, 300)">
+      <text x="0" y="0" fill="#64748b" font-family="system-ui, sans-serif" font-size="10" font-weight="600">🎨 LEYENDA</text>
+      
+      <g transform="translate(0, 18)">
+        <rect x="0" y="0" width="12" height="12" rx="2" fill="#3b82f6"/>
+        <text x="18" y="10" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">🌅 Mañana (6-12)</text>
+        
+        <rect x="0" y="20" width="12" height="12" rx="2" fill="#f97316"/>
+        <text x="18" y="30" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">☀️ Tarde (12-6)</text>
+        
+        <rect x="0" y="40" width="12" height="12" rx="2" fill="#8b5cf6"/>
+        <text x="18" y="50" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">🌙 Noche (6-10)</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- SECCIÓN 3: FORMULARIO WIZARD -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(970, 100)">
+    <rect x="0" y="0" width="200" height="250" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1" filter="url(#shadowLg)"/>
+    
+    <!-- Header del formulario -->
+    <rect x="0" y="0" width="200" height="40" rx="10" fill="#334155"/>
+    <rect x="0" y="30" width="200" height="10" fill="#334155"/>
+    <text x="100" y="26" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Nueva Programación</text>
+    
+    <!-- Indicador de pasos -->
+    <g transform="translate(20, 55)">
+      <!-- Paso 1 -->
+      <circle cx="0" cy="0" r="12" fill="#22c55e"/>
+      <text x="0" y="4" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="10">✓</text>
+      <text x="0" y="25" text-anchor="middle" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="8">Qué</text>
+      
+      <!-- Línea 1-2 -->
+      <line x1="15" y1="0" x2="45" y2="0" stroke="#22c55e" stroke-width="2"/>
+      
+      <!-- Paso 2 -->
+      <circle cx="55" cy="0" r="12" fill="#3b82f6"/>
+      <text x="55" y="4" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="10" font-weight="700">2</text>
+      <text x="55" y="25" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="8" font-weight="600">Dónde</text>
+      
+      <!-- Línea 2-3 -->
+      <line x1="70" y1="0" x2="100" y2="0" stroke="#475569" stroke-width="2"/>
+      
+      <!-- Paso 3 -->
+      <circle cx="110" cy="0" r="12" fill="#475569"/>
+      <text x="110" y="4" text-anchor="middle" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">3</text>
+      <text x="110" y="25" text-anchor="middle" fill="#64748b" font-family="system-ui, sans-serif" font-size="8">Cuándo</text>
+      
+      <!-- Línea 3-4 -->
+      <line x1="125" y1="0" x2="155" y2="0" stroke="#475569" stroke-width="2"/>
+      
+      <!-- Paso 4 -->
+      <circle cx="165" cy="0" r="12" fill="#475569"/>
+      <text x="165" y="4" text-anchor="middle" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">4</text>
+      <text x="165" y="25" text-anchor="middle" fill="#64748b" font-family="system-ui, sans-serif" font-size="8">Confirmar</text>
+    </g>
+    
+    <!-- Contenido del paso actual -->
+    <g transform="translate(15, 100)">
+      <text x="0" y="0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Selecciona la sede:</text>
+      
+      <!-- Opción 1 -->
+      <rect x="0" y="12" width="170" height="40" rx="6" fill="#334155" stroke="#3b82f6" stroke-width="2"/>
+      <text x="15" y="30" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="500">🏢 Sede Principal</text>
+      <text x="15" y="44" fill="#64748b" font-family="system-ui, sans-serif" font-size="9">Calle 1 #2-3</text>
+      <circle cx="155" cy="32" r="8" fill="#3b82f6"/>
+      <text x="155" y="36" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="10">✓</text>
+      
+      <!-- Opción 2 -->
+      <rect x="0" y="58" width="170" height="40" rx="6" fill="#334155" stroke="#475569" stroke-width="1"/>
+      <text x="15" y="76" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="500">🏢 Sede Norte</text>
+      <text x="15" y="90" fill="#64748b" font-family="system-ui, sans-serif" font-size="9">Av. Norte #45-67</text>
+    </g>
+    
+    <!-- Botones del formulario -->
+    <g transform="translate(15, 210)">
+      <rect x="0" y="0" width="70" height="28" rx="6" fill="#475569"/>
+      <text x="35" y="18" text-anchor="middle" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">◀ Anterior</text>
+      
+      <rect x="100" y="0" width="70" height="28" rx="6" fill="#3b82f6"/>
+      <text x="135" y="18" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="10">Siguiente ▶</text>
+    </g>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- SECCIÓN 4: ESTADOS DE CLASE -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(30, 530)">
+    <text x="0" y="0" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="16" font-weight="600">Estados de Bloque de Clase</text>
+    
+    <!-- Grid de estados -->
+    <g transform="translate(0, 25)">
+      <!-- Nueva -->
+      <g transform="translate(0, 0)">
+        <rect x="0" y="0" width="180" height="55" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,2"/>
+        <rect x="0" y="0" width="4" height="55" rx="2" fill="#3b82f6"/>
+        <text x="15" y="20" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="600">🎯 Nueva</text>
+        <text x="15" y="38" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">Recién creada, pendiente</text>
+        <text x="15" y="50" fill="#64748b" font-family="system-ui, sans-serif" font-size="8">de confirmación</text>
+      </g>
+      
+      <!-- Confirmada -->
+      <g transform="translate(195, 0)">
+        <rect x="0" y="0" width="180" height="55" rx="6" fill="#14532d" stroke="#22c55e" stroke-width="1"/>
+        <rect x="0" y="0" width="4" height="55" rx="2" fill="#22c55e"/>
+        <text x="15" y="20" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="600">✓ Confirmada</text>
+        <text x="15" y="38" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">Clase aprobada y activa</text>
+        <text x="15" y="50" fill="#64748b" font-family="system-ui, sans-serif" font-size="8">en el horario</text>
+      </g>
+      
+      <!-- Pendiente -->
+      <g transform="translate(390, 0)">
+        <rect x="0" y="0" width="180" height="55" rx="6" fill="#422006" stroke="#eab308" stroke-width="1" stroke-dasharray="6,3" opacity="0.85"/>
+        <rect x="0" y="0" width="4" height="55" rx="2" fill="#eab308"/>
+        <text x="15" y="20" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="600">⏳ Pendiente</text>
+        <text x="15" y="38" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="9">Esperando aprobación</text>
+        <text x="15" y="50" fill="#64748b" font-family="system-ui, sans-serif" font-size="8">del coordinador</text>
+      </g>
+      
+      <!-- Conflicto -->
+      <g transform="translate(585, 0)">
+        <rect x="0" y="0" width="180" height="55" rx="6" fill="#450a0a" stroke="#ef4444" stroke-width="2">
+          <animate attributeName="stroke-opacity" values="1;0.4;1" dur="1s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="0" y="0" width="4" height="55" rx="2" fill="#ef4444"/>
+        <text x="15" y="20" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="11" font-weight="600">⚠️ Conflicto</text>
+        <text x="15" y="38" fill="#fca5a5" font-family="system-ui, sans-serif" font-size="9">Tiene solapamiento con</text>
+        <text x="15" y="50" fill="#fca5a5" font-family="system-ui, sans-serif" font-size="8">otra clase o recurso</text>
+      </g>
+      
+      <!-- Bloqueada -->
+      <g transform="translate(780, 0)">
+        <rect x="0" y="0" width="180" height="55" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="1" opacity="0.7"/>
+        <rect x="0" y="0" width="4" height="55" rx="2" fill="#64748b"/>
+        <text x="15" y="20" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11" font-weight="600">🔒 Bloqueada</text>
+        <text x="15" y="38" fill="#64748b" font-family="system-ui, sans-serif" font-size="9">No editable por el</text>
+        <text x="15" y="50" fill="#64748b" font-family="system-ui, sans-serif" font-size="8">instructor (solo lectura)</text>
+      </g>
+      
+      <!-- Cancelada -->
+      <g transform="translate(975, 0)">
+        <rect x="0" y="0" width="180" height="55" rx="6" fill="#1e293b" stroke="#7f1d1d" stroke-width="1" opacity="0.5"/>
+        <rect x="0" y="0" width="4" height="55" rx="2" fill="#7f1d1d"/>
+        <text x="15" y="20" fill="#78716c" font-family="system-ui, sans-serif" font-size="11" font-weight="600" text-decoration="line-through">❌ Cancelada</text>
+        <text x="15" y="38" fill="#57534e" font-family="system-ui, sans-serif" font-size="9">Clase eliminada del</text>
+        <text x="15" y="50" fill="#57534e" font-family="system-ui, sans-serif" font-size="8">horario vigente</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- SECCIÓN 5: ATAJOS DE TECLADO -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(30, 640)">
+    <text x="0" y="0" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="16" font-weight="600">⌨️ Atajos de Teclado</text>
+    
+    <g transform="translate(0, 25)">
+      <!-- Navegación -->
+      <g transform="translate(0, 0)">
+        <text x="0" y="0" fill="#64748b" font-family="system-ui, sans-serif" font-size="10" font-weight="600">NAVEGACIÓN</text>
+        
+        <g transform="translate(0, 15)">
+          <rect x="0" y="0" width="30" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="15" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="10">←</text>
+          <text x="40" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Día anterior</text>
+          
+          <rect x="120" y="0" width="30" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="135" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="10">→</text>
+          <text x="160" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Siguiente día</text>
+        </g>
+        
+        <g transform="translate(0, 42)">
+          <rect x="0" y="0" width="30" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="15" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="10">T</text>
+          <text x="40" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Ir a hoy</text>
+        </g>
+      </g>
+      
+      <!-- Vistas -->
+      <g transform="translate(280, 0)">
+        <text x="0" y="0" fill="#64748b" font-family="system-ui, sans-serif" font-size="10" font-weight="600">VISTAS</text>
+        
+        <g transform="translate(0, 15)">
+          <rect x="0" y="0" width="30" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="15" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="10">D</text>
+          <text x="40" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Vista día</text>
+          
+          <rect x="120" y="0" width="30" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="135" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="10">W</text>
+          <text x="160" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Vista semana</text>
+        </g>
+        
+        <g transform="translate(0, 42)">
+          <rect x="0" y="0" width="30" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="15" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="10">M</text>
+          <text x="40" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Vista mes</text>
+        </g>
+      </g>
+      
+      <!-- Acciones -->
+      <g transform="translate(560, 0)">
+        <text x="0" y="0" fill="#64748b" font-family="system-ui, sans-serif" font-size="10" font-weight="600">ACCIONES</text>
+        
+        <g transform="translate(0, 15)">
+          <rect x="0" y="0" width="30" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="15" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="10">N</text>
+          <text x="40" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Nueva clase</text>
+          
+          <rect x="140" y="0" width="45" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="162" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="9">Enter</text>
+          <text x="195" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Abrir detalles</text>
+        </g>
+        
+        <g transform="translate(0, 42)">
+          <rect x="0" y="0" width="30" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="15" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="9">Del</text>
+          <text x="40" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Eliminar</text>
+          
+          <rect x="140" y="0" width="35" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="157" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="9">Esc</text>
+          <text x="185" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Cerrar modal</text>
+        </g>
+      </g>
+      
+      <!-- Edición -->
+      <g transform="translate(860, 0)">
+        <text x="0" y="0" fill="#64748b" font-family="system-ui, sans-serif" font-size="10" font-weight="600">EDICIÓN</text>
+        
+        <g transform="translate(0, 15)">
+          <rect x="0" y="0" width="50" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="25" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="9">Ctrl+C</text>
+          <text x="60" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Copiar</text>
+          
+          <rect x="110" y="0" width="50" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="135" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="9">Ctrl+V</text>
+          <text x="170" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Pegar</text>
+        </g>
+        
+        <g transform="translate(0, 42)">
+          <rect x="0" y="0" width="50" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="25" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="9">Ctrl+Z</text>
+          <text x="60" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Deshacer</text>
+          
+          <rect x="130" y="0" width="50" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+          <text x="155" y="15" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="9">Ctrl+Y</text>
+          <text x="190" y="15" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10">Rehacer</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- SECCIÓN 6: DETECCIÓN DE CONFLICTOS -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(30, 780)">
+    <text x="0" y="0" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="16" font-weight="600">⚠️ Sistema de Detección de Conflictos</text>
+    
+    <g transform="translate(0, 30)">
+      <!-- Conflicto Instructor -->
+      <g transform="translate(0, 0)">
+        <rect x="0" y="0" width="280" height="70" rx="8" fill="#450a0a" stroke="#ef4444" stroke-width="1"/>
+        <circle cx="25" cy="35" r="15" fill="#ef4444"/>
+        <text x="25" y="40" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="16">🔴</text>
+        <text x="50" y="22" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Conflicto de Instructor</text>
+        <text x="50" y="38" fill="#fca5a5" font-family="system-ui, sans-serif" font-size="10">El instructor ya tiene clase</text>
+        <text x="50" y="52" fill="#fca5a5" font-family="system-ui, sans-serif" font-size="10">asignada en este horario</text>
+        <text x="50" y="65" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="8" font-style="italic">Severidad: CRÍTICO</text>
+      </g>
+      
+      <!-- Conflicto Salón -->
+      <g transform="translate(300, 0)">
+        <rect x="0" y="0" width="280" height="70" rx="8" fill="#450a0a" stroke="#ef4444" stroke-width="1"/>
+        <circle cx="25" cy="35" r="15" fill="#ef4444"/>
+        <text x="25" y="40" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="16">🔴</text>
+        <text x="50" y="22" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Conflicto de Salón</text>
+        <text x="50" y="38" fill="#fca5a5" font-family="system-ui, sans-serif" font-size="10">El ambiente está ocupado</text>
+        <text x="50" y="52" fill="#fca5a5" font-family="system-ui, sans-serif" font-size="10">por otra clase programada</text>
+        <text x="50" y="65" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="8" font-style="italic">Severidad: CRÍTICO</text>
+      </g>
+      
+      <!-- Conflicto Grupo -->
+      <g transform="translate(600, 0)">
+        <rect x="0" y="0" width="280" height="70" rx="8" fill="#3d2914" stroke="#f97316" stroke-width="1"/>
+        <circle cx="25" cy="35" r="15" fill="#f97316"/>
+        <text x="25" y="40" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="16">🟠</text>
+        <text x="50" y="22" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Conflicto de Grupo</text>
+        <text x="50" y="38" fill="#fed7aa" font-family="system-ui, sans-serif" font-size="10">El grupo ya tiene otra</text>
+        <text x="50" y="52" fill="#fed7aa" font-family="system-ui, sans-serif" font-size="10">clase asignada simultáneamente</text>
+        <text x="50" y="65" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="8" font-style="italic">Severidad: ADVERTENCIA</text>
+      </g>
+      
+      <!-- Sugerencia -->
+      <g transform="translate(900, 0)">
+        <rect x="0" y="0" width="260" height="70" rx="8" fill="#422006" stroke="#eab308" stroke-width="1"/>
+        <circle cx="25" cy="35" r="15" fill="#eab308"/>
+        <text x="25" y="40" text-anchor="middle" fill="#1e293b" font-family="system-ui, sans-serif" font-size="16">🟡</text>
+        <text x="50" y="22" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Sugerencia</text>
+        <text x="50" y="38" fill="#fef08a" font-family="system-ui, sans-serif" font-size="10">Hay salones más cercanos</text>
+        <text x="50" y="52" fill="#fef08a" font-family="system-ui, sans-serif" font-size="10">disponibles para el grupo</text>
+        <text x="50" y="65" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="8" font-style="italic">Severidad: SUGERENCIA</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  <text x="600" y="880" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="10">
+    SICORA - Sistema Integrado de Gestión de Competencias y Resultados de Aprendizaje | Calendario Académico v1.0
+  </text>
+</svg>
