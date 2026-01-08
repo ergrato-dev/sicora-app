@@ -1,0 +1,318 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 750" fill="none">
+  <style>
+    .title { font: bold 18px sans-serif; fill: #e2e8f0; }
+    .subtitle { font: 14px sans-serif; fill: #94a3b8; }
+    .label { font: 12px sans-serif; fill: #cbd5e1; }
+    .label-sm { font: 10px sans-serif; fill: #94a3b8; }
+    .label-bold { font: bold 11px sans-serif; fill: #e2e8f0; }
+    .code { font: 11px monospace; fill: #a5f3fc; }
+    .success { fill: #4ade80; }
+    .warning { fill: #fbbf24; }
+    .error { fill: #f87171; }
+    .box { stroke: #475569; stroke-width: 1.5; fill: #1e293b; rx: 8; }
+    .box-primary { stroke: #3b82f6; stroke-width: 2; fill: #1e3a5f; rx: 8; }
+    .box-success { stroke: #22c55e; stroke-width: 2; fill: #14532d; rx: 8; }
+    .box-warning { stroke: #f59e0b; stroke-width: 2; fill: #451a03; rx: 8; }
+    .box-error { stroke: #ef4444; stroke-width: 2; fill: #450a0a; rx: 8; }
+    .box-purple { stroke: #8b5cf6; stroke-width: 2; fill: #2e1065; rx: 8; }
+    .calendar-cell { stroke: #334155; stroke-width: 1; fill: #0f172a; }
+    .calendar-header { fill: #1e293b; }
+    .event-blue { fill: #3b82f6; rx: 4; }
+    .event-green { fill: #22c55e; rx: 4; }
+    .event-purple { fill: #8b5cf6; rx: 4; }
+    .event-orange { fill: #f97316; rx: 4; }
+    .arrow { stroke: #64748b; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+    .arrow-success { stroke: #22c55e; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+    .line-dashed { stroke: #475569; stroke-width: 1; stroke-dasharray: 4,4; }
+  </style>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#22c55e"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="950" height="750" fill="#0f172a"/>
+  
+  <!-- Header -->
+  <text x="475" y="30" text-anchor="middle" class="title">Sistema de Horarios Académicos - Calendario Interactivo</text>
+  <text x="475" y="50" text-anchor="middle" class="subtitle">Flujo: Selección guiada → Validación de conflictos → Programación</text>
+
+  <!-- Left Panel: Flow -->
+  <rect x="20" y="70" width="280" height="350" class="box"/>
+  <text x="160" y="95" text-anchor="middle" class="label-bold" fill="#60a5fa">FLUJO DE PROGRAMACIÓN</text>
+  
+  <!-- Step 1 -->
+  <rect x="40" y="115" width="240" height="50" class="box-primary"/>
+  <text x="60" y="138" class="label-sm" fill="#60a5fa">1. COORDINACIÓN</text>
+  <text x="60" y="155" class="label-sm">• Configura trimestre activo</text>
+  
+  <!-- Step 2 -->
+  <rect x="40" y="175" width="240" height="50" class="box-purple"/>
+  <text x="60" y="198" class="label-sm" fill="#a78bfa">2. ASIGNACIÓN</text>
+  <text x="60" y="215" class="label-sm">• Instructor ↔ Fichas/Competencias</text>
+  
+  <!-- Step 3 -->
+  <rect x="40" y="235" width="240" height="70" class="box-success"/>
+  <text x="60" y="258" class="label-sm" fill="#4ade80">3. INSTRUCTOR PROGRAMA</text>
+  <text x="60" y="275" class="label-sm">• Selecciona slot en calendario</text>
+  <text x="60" y="290" class="label-sm">• Elige: Sede → Ambiente → RA</text>
+  
+  <!-- Step 4 -->
+  <rect x="40" y="315" width="240" height="50" class="box-warning"/>
+  <text x="60" y="338" class="label-sm" fill="#fbbf24">4. VALIDACIÓN CONFLICTOS</text>
+  <text x="60" y="355" class="label-sm">• Ambiente, Instructor, Ficha</text>
+  
+  <!-- Step 5 -->
+  <rect x="40" y="375" width="240" height="35" class="box"/>
+  <text x="60" y="398" class="label-sm">5. GUARDAR PROGRAMACIÓN</text>
+
+  <!-- Arrows between steps -->
+  <path d="M 160 165 L 160 175" class="arrow"/>
+  <path d="M 160 225 L 160 235" class="arrow"/>
+  <path d="M 160 305 L 160 315" class="arrow"/>
+  <path d="M 160 365 L 160 375" class="arrow"/>
+
+  <!-- Center: Calendar View -->
+  <rect x="320" y="70" width="380" height="350" class="box"/>
+  <text x="510" y="95" text-anchor="middle" class="label-bold" fill="#60a5fa">VISTA CALENDARIO</text>
+  
+  <!-- Calendar header -->
+  <rect x="340" y="110" width="340" height="30" rx="4" class="calendar-header"/>
+  <text x="360" y="130" class="label-sm">◀</text>
+  <text x="510" y="130" text-anchor="middle" class="label" fill="#e2e8f0">Enero 2026</text>
+  <text x="660" y="130" class="label-sm">▶</text>
+  
+  <!-- Calendar day headers -->
+  <g transform="translate(340, 145)">
+    <rect x="0" y="0" width="48" height="20" class="calendar-header"/>
+    <text x="24" y="14" text-anchor="middle" class="label-sm">Lun</text>
+    <rect x="49" y="0" width="48" height="20" class="calendar-header"/>
+    <text x="73" y="14" text-anchor="middle" class="label-sm">Mar</text>
+    <rect x="98" y="0" width="48" height="20" class="calendar-header"/>
+    <text x="122" y="14" text-anchor="middle" class="label-sm">Mié</text>
+    <rect x="147" y="0" width="48" height="20" class="calendar-header"/>
+    <text x="171" y="14" text-anchor="middle" class="label-sm">Jue</text>
+    <rect x="196" y="0" width="48" height="20" class="calendar-header"/>
+    <text x="220" y="14" text-anchor="middle" class="label-sm">Vie</text>
+    <rect x="245" y="0" width="48" height="20" class="calendar-header"/>
+    <text x="269" y="14" text-anchor="middle" class="label-sm">Sáb</text>
+    <rect x="294" y="0" width="46" height="20" class="calendar-header"/>
+    <text x="317" y="14" text-anchor="middle" class="label-sm">Dom</text>
+  </g>
+  
+  <!-- Calendar grid row 1 -->
+  <g transform="translate(340, 165)">
+    <rect x="0" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="42" y="12" text-anchor="end" class="label-sm">6</text>
+    <rect x="4" y="18" width="40" height="32" class="event-blue"/>
+    <text x="24" y="32" text-anchor="middle" class="label-sm" fill="white">ADSO</text>
+    <text x="24" y="44" text-anchor="middle" class="label-sm" fill="white">7-9</text>
+    
+    <rect x="49" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="91" y="12" text-anchor="end" class="label-sm">7</text>
+    <rect x="53" y="18" width="40" height="32" class="event-green"/>
+    <text x="73" y="32" text-anchor="middle" class="label-sm" fill="white">TDS</text>
+    <text x="73" y="44" text-anchor="middle" class="label-sm" fill="white">10-12</text>
+    
+    <rect x="98" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="140" y="12" text-anchor="end" class="label-sm">8</text>
+    <rect x="102" y="18" width="40" height="32" class="event-purple"/>
+    <text x="122" y="32" text-anchor="middle" class="label-sm" fill="white">BD</text>
+    <text x="122" y="44" text-anchor="middle" class="label-sm" fill="white">14-16</text>
+    
+    <rect x="147" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="189" y="12" text-anchor="end" class="label-sm">9</text>
+    
+    <rect x="196" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="238" y="12" text-anchor="end" class="label-sm">10</text>
+    <rect x="200" y="18" width="40" height="32" class="event-orange"/>
+    <text x="220" y="32" text-anchor="middle" class="label-sm" fill="white">ADS</text>
+    <text x="220" y="44" text-anchor="middle" class="label-sm" fill="white">8-10</text>
+    
+    <rect x="245" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="287" y="12" text-anchor="end" class="label-sm">11</text>
+    
+    <rect x="294" y="0" width="46" height="55" class="calendar-cell"/>
+    <text x="334" y="12" text-anchor="end" class="label-sm">12</text>
+  </g>
+  
+  <!-- Calendar grid row 2 -->
+  <g transform="translate(340, 220)">
+    <rect x="0" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="42" y="12" text-anchor="end" class="label-sm">13</text>
+    <rect x="4" y="18" width="40" height="32" class="event-blue"/>
+    <text x="24" y="32" text-anchor="middle" class="label-sm" fill="white">ADSO</text>
+    <text x="24" y="44" text-anchor="middle" class="label-sm" fill="white">7-9</text>
+    
+    <rect x="49" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="91" y="12" text-anchor="end" class="label-sm">14</text>
+    
+    <rect x="98" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="140" y="12" text-anchor="end" class="label-sm">15</text>
+    <rect x="102" y="18" width="40" height="32" class="event-purple"/>
+    <text x="122" y="32" text-anchor="middle" class="label-sm" fill="white">BD</text>
+    <text x="122" y="44" text-anchor="middle" class="label-sm" fill="white">14-16</text>
+    
+    <rect x="147" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="189" y="12" text-anchor="end" class="label-sm">16</text>
+    
+    <rect x="196" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="238" y="12" text-anchor="end" class="label-sm">17</text>
+    
+    <rect x="245" y="0" width="48" height="55" class="calendar-cell"/>
+    <text x="287" y="12" text-anchor="end" class="label-sm">18</text>
+    
+    <rect x="294" y="0" width="46" height="55" class="calendar-cell"/>
+    <text x="334" y="12" text-anchor="end" class="label-sm">19</text>
+  </g>
+  
+  <!-- Legend -->
+  <g transform="translate(340, 290)">
+    <rect x="0" y="0" width="340" height="45" rx="4" fill="#1e293b" stroke="#334155"/>
+    <text x="10" y="18" class="label-sm">Leyenda:</text>
+    <rect x="60" y="8" width="20" height="12" class="event-blue"/>
+    <text x="85" y="18" class="label-sm">ADSO</text>
+    <rect x="130" y="8" width="20" height="12" class="event-green"/>
+    <text x="155" y="18" class="label-sm">TDS</text>
+    <rect x="190" y="8" width="20" height="12" class="event-purple"/>
+    <text x="215" y="18" class="label-sm">BD</text>
+    <rect x="245" y="8" width="20" height="12" class="event-orange"/>
+    <text x="270" y="18" class="label-sm">ADS</text>
+    <text x="10" y="38" class="label-sm" fill="#94a3b8">Click en día vacío para programar</text>
+  </g>
+  
+  <!-- View toggles -->
+  <g transform="translate(340, 345)">
+    <rect x="80" y="0" width="50" height="24" rx="4" fill="#3b82f6"/>
+    <text x="105" y="16" text-anchor="middle" class="label-sm" fill="white">Mes</text>
+    <rect x="135" y="0" width="60" height="24" rx="4" fill="#1e293b" stroke="#475569"/>
+    <text x="165" y="16" text-anchor="middle" class="label-sm">Semana</text>
+    <rect x="200" y="0" width="45" height="24" rx="4" fill="#1e293b" stroke="#475569"/>
+    <text x="222" y="16" text-anchor="middle" class="label-sm">Día</text>
+  </g>
+
+  <!-- Right Panel: Selectors -->
+  <rect x="720" y="70" width="210" height="350" class="box"/>
+  <text x="825" y="95" text-anchor="middle" class="label-bold" fill="#4ade80">SELECTORES (NO ESCRIBIR)</text>
+  
+  <!-- Selector 1: Sede -->
+  <rect x="735" y="115" width="180" height="55" rx="4" fill="#1e293b" stroke="#22c55e"/>
+  <text x="750" y="135" class="label-sm" fill="#4ade80">🏢 Sede</text>
+  <rect x="745" y="142" width="160" height="22" rx="3" fill="#0f172a" stroke="#475569"/>
+  <text x="755" y="158" class="label-sm">Sede Formación ▼</text>
+  
+  <!-- Selector 2: Ambiente -->
+  <rect x="735" y="180" width="180" height="55" rx="4" fill="#1e293b" stroke="#22c55e"/>
+  <text x="750" y="200" class="label-sm" fill="#4ade80">🖥️ Ambiente</text>
+  <rect x="745" y="207" width="160" height="22" rx="3" fill="#0f172a" stroke="#475569"/>
+  <text x="755" y="223" class="label-sm">A-201 Sistemas ▼</text>
+  
+  <!-- Selector 3: Ficha -->
+  <rect x="735" y="245" width="180" height="55" rx="4" fill="#1e293b" stroke="#22c55e"/>
+  <text x="750" y="265" class="label-sm" fill="#4ade80">📚 Ficha</text>
+  <rect x="745" y="272" width="160" height="22" rx="3" fill="#0f172a" stroke="#475569"/>
+  <text x="755" y="288" class="label-sm">2834567 - ADSO ▼</text>
+  
+  <!-- Selector 4: RA -->
+  <rect x="735" y="310" width="180" height="55" rx="4" fill="#1e293b" stroke="#22c55e"/>
+  <text x="750" y="330" class="label-sm" fill="#4ade80">🎯 Resultado Aprendizaje</text>
+  <rect x="745" y="337" width="160" height="22" rx="3" fill="#0f172a" stroke="#475569"/>
+  <text x="755" y="353" class="label-sm">220501012-01 ▼</text>
+  
+  <!-- Info text -->
+  <text x="825" y="390" text-anchor="middle" class="label-sm" fill="#94a3b8">Solo selección de listas</text>
+  <text x="825" y="405" text-anchor="middle" class="label-sm" fill="#94a3b8">predefinidas</text>
+
+  <!-- Bottom: Conflict Detection -->
+  <rect x="20" y="440" width="910" height="150" class="box"/>
+  <text x="475" y="465" text-anchor="middle" class="label-bold" fill="#f59e0b">SISTEMA DE DETECCIÓN DE CONFLICTOS</text>
+  
+  <!-- Conflict type boxes -->
+  <g transform="translate(40, 480)">
+    <!-- Ambiente -->
+    <rect x="0" y="0" width="200" height="90" class="box-error"/>
+    <text x="100" y="20" text-anchor="middle" class="label" fill="#f87171">🏢 AMBIENTE OCUPADO</text>
+    <line x1="10" y1="30" x2="190" y2="30" class="line-dashed"/>
+    <text x="15" y="48" class="label-sm">El ambiente A-201 ya está</text>
+    <text x="15" y="63" class="label-sm">asignado a Ficha 2834568</text>
+    <text x="15" y="78" class="label-sm">de 7:00 a 9:00</text>
+    <circle cx="180" cy="75" r="8" fill="#ef4444"/>
+    <text x="180" y="79" text-anchor="middle" class="label-sm" fill="white">!</text>
+  </g>
+  
+  <g transform="translate(260, 480)">
+    <!-- Instructor -->
+    <rect x="0" y="0" width="200" height="90" class="box-error"/>
+    <text x="100" y="20" text-anchor="middle" class="label" fill="#f87171">👤 INSTRUCTOR OCUPADO</text>
+    <line x1="10" y1="30" x2="190" y2="30" class="line-dashed"/>
+    <text x="15" y="48" class="label-sm">Ya tienes una clase</text>
+    <text x="15" y="63" class="label-sm">programada en este</text>
+    <text x="15" y="78" class="label-sm">horario</text>
+    <circle cx="180" cy="75" r="8" fill="#ef4444"/>
+    <text x="180" y="79" text-anchor="middle" class="label-sm" fill="white">!</text>
+  </g>
+  
+  <g transform="translate(480, 480)">
+    <!-- Ficha -->
+    <rect x="0" y="0" width="200" height="90" class="box-error"/>
+    <text x="100" y="20" text-anchor="middle" class="label" fill="#f87171">📚 FICHA OCUPADA</text>
+    <line x1="10" y1="30" x2="190" y2="30" class="line-dashed"/>
+    <text x="15" y="48" class="label-sm">La ficha 2834567 ya</text>
+    <text x="15" y="63" class="label-sm">tiene clase con otro</text>
+    <text x="15" y="78" class="label-sm">instructor</text>
+    <circle cx="180" cy="75" r="8" fill="#ef4444"/>
+    <text x="180" y="79" text-anchor="middle" class="label-sm" fill="white">!</text>
+  </g>
+  
+  <g transform="translate(700, 480)">
+    <!-- Capacidad -->
+    <rect x="0" y="0" width="200" height="90" class="box-warning"/>
+    <text x="100" y="20" text-anchor="middle" class="label" fill="#fbbf24">⚠️ CAPACIDAD</text>
+    <line x1="10" y1="30" x2="190" y2="30" class="line-dashed"/>
+    <text x="15" y="48" class="label-sm">Ambiente: 35 personas</text>
+    <text x="15" y="63" class="label-sm">Ficha: 38 aprendices</text>
+    <text x="15" y="78" class="label-sm" fill="#fbbf24">(Permite guardar)</text>
+    <circle cx="180" cy="75" r="8" fill="#f59e0b"/>
+    <text x="180" y="79" text-anchor="middle" class="label-sm" fill="white">⚠</text>
+  </g>
+
+  <!-- Bottom: Validation Result -->
+  <rect x="20" y="610" width="910" height="120" class="box"/>
+  <text x="475" y="635" text-anchor="middle" class="label-bold" fill="#60a5fa">RESULTADO DE VALIDACIÓN</text>
+  
+  <!-- Success case -->
+  <g transform="translate(40, 650)">
+    <rect x="0" y="0" width="280" height="60" class="box-success"/>
+    <text x="140" y="20" text-anchor="middle" class="label" fill="#4ade80">✓ SIN CONFLICTOS</text>
+    <text x="15" y="40" class="label-sm">• Ambiente disponible</text>
+    <text x="15" y="55" class="label-sm">• Sin cruces de horario</text>
+    <rect x="200" y="35" width="70" height="22" rx="4" fill="#22c55e"/>
+    <text x="235" y="50" text-anchor="middle" class="label-sm" fill="white">Guardar</text>
+  </g>
+  
+  <!-- Warning case -->
+  <g transform="translate(340, 650)">
+    <rect x="0" y="0" width="280" height="60" class="box-warning"/>
+    <text x="140" y="20" text-anchor="middle" class="label" fill="#fbbf24">⚠ CON ADVERTENCIAS</text>
+    <text x="15" y="40" class="label-sm">• Capacidad excedida (warning)</text>
+    <text x="15" y="55" class="label-sm">• Permite guardar</text>
+    <rect x="200" y="35" width="70" height="22" rx="4" fill="#f59e0b"/>
+    <text x="235" y="50" text-anchor="middle" class="label-sm" fill="white">Guardar</text>
+  </g>
+  
+  <!-- Error case -->
+  <g transform="translate(640, 650)">
+    <rect x="0" y="0" width="280" height="60" class="box-error"/>
+    <text x="140" y="20" text-anchor="middle" class="label" fill="#f87171">✗ CON ERRORES</text>
+    <text x="15" y="40" class="label-sm">• Conflicto de ambiente/horario</text>
+    <text x="15" y="55" class="label-sm">• No permite guardar</text>
+    <rect x="200" y="35" width="70" height="22" rx="4" fill="#475569"/>
+    <text x="235" y="50" text-anchor="middle" class="label-sm" fill="#64748b">Guardar</text>
+  </g>
+
+</svg>

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { LogoSenaNav } from './LogoSena';
 import { UserMenu } from './UserMenu';
 import { Breadcrumb } from './Breadcrumb';
 import { cn } from '../utils/cn';
@@ -89,10 +88,18 @@ export function InstitutionalHeader({
       <div className='bg-sena-primary-700 text-white'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
-            {/* Logo y título institucional */}
+            {/* Logo/Avatar y título institucional */}
             <div className='flex items-center space-x-4'>
-              {logo && <img src={logo} alt={name} className='h-10 w-auto' />}
-              {!logo && <LogoSenaNav size='md' />}
+              {/* Avatar del sistema - usa inicial del nombre si no hay logo */}
+              <div className='h-10 w-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden'>
+                {logo ? (
+                  <img src={logo} alt={name} className='h-full w-full object-cover' />
+                ) : (
+                  <span className='text-lg font-bold text-white'>
+                    {name.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
               <div className='hidden md:block'>
                 <h1 className='text-lg font-sena-heading font-semibold'>{name}</h1>
                 <p className='text-xs text-sena-primary-200 font-sena-body'>{subtitle}</p>
