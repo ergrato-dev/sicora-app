@@ -1,0 +1,490 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6366f1"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#10b981"/>
+    </marker>
+  </defs>
+  
+  <!-- Fondo -->
+  <rect width="1200" height="900" fill="#0f172a"/>
+  
+  <!-- Título principal -->
+  <text x="600" y="45" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="28" font-weight="bold">
+    DataTable - Elementos UI/UX para Tablas Configurables
+  </text>
+  <text x="600" y="70" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="14">
+    Guía completa de componentes y funcionalidades profesionales
+  </text>
+  
+  <!-- Grid 3x4 de secciones -->
+  
+  <!-- Fila 1 -->
+  
+  <!-- 1. Estructura Visual -->
+  <g transform="translate(30, 100)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="270" height="40" rx="12" fill="#6366f1"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="bold">
+      1. ESTRUCTURA VISUAL
+    </text>
+    
+    <!-- Items -->
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#22c55e"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">Responsive: mobile/tablet/desktop</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#22c55e"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">Densidad: compact/comfortable/spacious</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#22c55e"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">Sticky header con scroll interno</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#22c55e"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Columnas redimensionables</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#22c55e"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Zebra striping (filas alternadas)</text>
+      
+      <circle cx="8" cy="106" r="4" fill="#22c55e"/>
+      <text x="20" y="110" fill="#e2e8f0" font-family="system-ui" font-size="11">Altura máxima configurable</text>
+    </g>
+  </g>
+  
+  <!-- 2. Paginación -->
+  <g transform="translate(320, 100)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="270" height="40" rx="12" fill="#f59e0b"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#1e293b" font-family="system-ui" font-size="14" font-weight="bold">
+      2. PAGINACIÓN
+    </text>
+    
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#f59e0b"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">Items por página: 10, 25, 50, 100</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#f59e0b"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">Primera | Anterior | # | Siguiente | Última</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#f59e0b"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">Info: "Mostrando 1-10 de 100"</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#f59e0b"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Skeleton loading durante carga</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#f59e0b"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Posición: top / bottom / both</text>
+    </g>
+    
+    <!-- Mini preview paginación -->
+    <g transform="translate(30, 145)">
+      <rect x="0" y="0" width="20" height="18" rx="3" fill="#334155"/>
+      <rect x="25" y="0" width="20" height="18" rx="3" fill="#334155"/>
+      <rect x="50" y="0" width="20" height="18" rx="3" fill="#f59e0b"/>
+      <rect x="75" y="0" width="20" height="18" rx="3" fill="#334155"/>
+      <rect x="100" y="0" width="20" height="18" rx="3" fill="#334155"/>
+      <text x="10" y="13" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="10">‹</text>
+      <text x="35" y="13" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="10">1</text>
+      <text x="60" y="13" text-anchor="middle" fill="#1e293b" font-family="system-ui" font-size="10" font-weight="bold">2</text>
+      <text x="85" y="13" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="10">3</text>
+      <text x="110" y="13" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="10">›</text>
+    </g>
+  </g>
+  
+  <!-- 3. Filtros -->
+  <g transform="translate(610, 100)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="270" height="40" rx="12" fill="#06b6d4"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#1e293b" font-family="system-ui" font-size="14" font-weight="bold">
+      3. FILTROS
+    </text>
+    
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#06b6d4"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">Global search con debounce</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#06b6d4"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">Por columna: text, number, date</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#06b6d4"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">Por columna: select, boolean, range</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#06b6d4"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Chips removibles (filtros activos)</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#06b6d4"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Reset: limpiar todos los filtros</text>
+    </g>
+    
+    <!-- Mini chips -->
+    <g transform="translate(20, 145)">
+      <rect x="0" y="0" width="70" height="20" rx="10" fill="#164e63"/>
+      <text x="35" y="14" text-anchor="middle" fill="#06b6d4" font-family="system-ui" font-size="9">Estado: Activo ×</text>
+      <rect x="80" y="0" width="55" height="20" rx="10" fill="#164e63"/>
+      <text x="107" y="14" text-anchor="middle" fill="#06b6d4" font-family="system-ui" font-size="9">Rol: Admin ×</text>
+    </g>
+  </g>
+  
+  <!-- 4. Ordenación -->
+  <g transform="translate(900, 100)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="270" height="40" rx="12" fill="#a855f7"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="bold">
+      4. ORDENACIÓN
+    </text>
+    
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#a855f7"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">Indicadores visuales: ↑ ↓ ↕</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#a855f7"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">Multi-column: Shift + Click</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#a855f7"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">Estados: ASC → DESC → NONE</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#a855f7"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Función de sort personalizable</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#a855f7"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Persistencia del estado</text>
+    </g>
+    
+    <!-- Sort indicator -->
+    <g transform="translate(90, 140)">
+      <rect x="0" y="0" width="90" height="28" rx="4" fill="#334155"/>
+      <text x="10" y="18" fill="#e2e8f0" font-family="system-ui" font-size="11">Nombre</text>
+      <path d="M70,8 L75,16 L80,8" fill="none" stroke="#a855f7" stroke-width="2"/>
+    </g>
+  </g>
+  
+  <!-- Fila 2 -->
+  
+  <!-- 5. Selección -->
+  <g transform="translate(30, 300)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="270" height="40" rx="12" fill="#ec4899"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="bold">
+      5. SELECCIÓN DE FILAS
+    </text>
+    
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#ec4899"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">Checkbox en primera columna</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#ec4899"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">Select all / none en header</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#ec4899"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">Acciones bulk sobre seleccionadas</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#ec4899"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Indicador: "3 seleccionados"</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#ec4899"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Estado indeterminate (parcial)</text>
+    </g>
+    
+    <!-- Mini checkbox preview -->
+    <g transform="translate(30, 145)">
+      <rect x="0" y="0" width="16" height="16" rx="3" fill="#ec4899"/>
+      <path d="M4,8 L7,11 L12,5" fill="none" stroke="#fff" stroke-width="2"/>
+      <text x="25" y="13" fill="#94a3b8" font-family="system-ui" font-size="10">Juan García</text>
+      
+      <rect x="100" y="0" width="16" height="16" rx="3" fill="#334155" stroke="#64748b"/>
+      <text x="125" y="13" fill="#94a3b8" font-family="system-ui" font-size="10">María López</text>
+    </g>
+  </g>
+  
+  <!-- 6. Edición -->
+  <g transform="translate(320, 300)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="270" height="40" rx="12" fill="#14b8a6"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#1e293b" font-family="system-ui" font-size="14" font-weight="bold">
+      6. EDICIÓN INLINE
+    </text>
+    
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#14b8a6"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">Double-click para editar celda</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#14b8a6"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">Modal o Drawer para edición completa</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#14b8a6"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">Validación en tiempo real</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#14b8a6"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Estados: Saving, Error, Success</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#14b8a6"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Cancelar / Guardar claros</text>
+    </g>
+    
+    <!-- Mini input edit -->
+    <g transform="translate(30, 145)">
+      <rect x="0" y="0" width="120" height="24" rx="4" fill="#0d3a35" stroke="#14b8a6" stroke-width="2"/>
+      <text x="8" y="16" fill="#e2e8f0" font-family="system-ui" font-size="11">Juan García_</text>
+      <rect x="130" y="0" width="50" height="24" rx="4" fill="#14b8a6"/>
+      <text x="155" y="16" text-anchor="middle" fill="#0f172a" font-family="system-ui" font-size="10" font-weight="bold">Guardar</text>
+    </g>
+  </g>
+  
+  <!-- 7. Acciones -->
+  <g transform="translate(610, 300)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="270" height="40" rx="12" fill="#ef4444"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="bold">
+      7. ACCIONES
+    </text>
+    
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#ef4444"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">Columna: Ver, Editar, Eliminar</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#ef4444"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">Dropdown para más opciones</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#ef4444"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">Confirmación para destructivas</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#ef4444"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Tooltips descriptivos</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#ef4444"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Disabled según permisos</text>
+    </g>
+    
+    <!-- Mini action buttons -->
+    <g transform="translate(60, 145)">
+      <rect x="0" y="0" width="28" height="24" rx="4" fill="#334155"/>
+      <text x="14" y="16" text-anchor="middle" fill="#6366f1" font-family="system-ui" font-size="12">👁</text>
+      <rect x="35" y="0" width="28" height="24" rx="4" fill="#334155"/>
+      <text x="49" y="16" text-anchor="middle" fill="#f59e0b" font-family="system-ui" font-size="12">✎</text>
+      <rect x="70" y="0" width="28" height="24" rx="4" fill="#334155"/>
+      <text x="84" y="16" text-anchor="middle" fill="#ef4444" font-family="system-ui" font-size="12">🗑</text>
+      <rect x="105" y="0" width="28" height="24" rx="4" fill="#334155"/>
+      <text x="119" y="16" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="12">⋯</text>
+    </g>
+  </g>
+  
+  <!-- 8. Estados y Feedback -->
+  <g transform="translate(900, 300)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="270" height="40" rx="12" fill="#3b82f6"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="bold">
+      8. ESTADOS Y FEEDBACK
+    </text>
+    
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#3b82f6"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">Loading: skeleton rows</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#3b82f6"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">Empty: ilustración + CTA</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#3b82f6"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">Error: mensaje + retry</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#3b82f6"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Success: toast notifications</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#3b82f6"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Optimistic updates</text>
+    </g>
+    
+    <!-- Mini skeleton -->
+    <g transform="translate(30, 140)">
+      <rect x="0" y="0" width="60" height="12" rx="2" fill="#334155"/>
+      <rect x="70" y="0" width="80" height="12" rx="2" fill="#334155"/>
+      <rect x="160" y="0" width="40" height="12" rx="2" fill="#334155"/>
+      <rect x="0" y="18" width="55" height="12" rx="2" fill="#475569"/>
+      <rect x="70" y="18" width="70" height="12" rx="2" fill="#475569"/>
+      <rect x="160" y="18" width="35" height="12" rx="2" fill="#475569"/>
+    </g>
+  </g>
+  
+  <!-- Fila 3 -->
+  
+  <!-- 9. Exportación -->
+  <g transform="translate(175, 500)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="270" height="40" rx="12" fill="#84cc16"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#1e293b" font-family="system-ui" font-size="14" font-weight="bold">
+      9. EXPORTACIÓN
+    </text>
+    
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#84cc16"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">Formatos: CSV, Excel, PDF, JSON</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#84cc16"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">Exportar selección o todo</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#84cc16"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">Indicador de progreso</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#84cc16"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Nombre de archivo configurable</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#84cc16"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Columnas seleccionables</text>
+    </g>
+    
+    <!-- Export buttons -->
+    <g transform="translate(30, 145)">
+      <rect x="0" y="0" width="45" height="22" rx="4" fill="#365314"/>
+      <text x="22" y="15" text-anchor="middle" fill="#84cc16" font-family="system-ui" font-size="10" font-weight="bold">CSV</text>
+      <rect x="55" y="0" width="45" height="22" rx="4" fill="#365314"/>
+      <text x="77" y="15" text-anchor="middle" fill="#84cc16" font-family="system-ui" font-size="10" font-weight="bold">Excel</text>
+      <rect x="110" y="0" width="45" height="22" rx="4" fill="#365314"/>
+      <text x="132" y="15" text-anchor="middle" fill="#84cc16" font-family="system-ui" font-size="10" font-weight="bold">PDF</text>
+    </g>
+  </g>
+  
+  <!-- 10. Configuración -->
+  <g transform="translate(465, 500)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="270" height="40" rx="12" fill="#64748b"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="bold">
+      10. CONFIGURACIÓN
+    </text>
+    
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#94a3b8"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">Show/Hide columnas</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#94a3b8"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">Reordenar columnas (drag and drop)</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#94a3b8"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">Persistir preferencias (localStorage)</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#94a3b8"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Tema claro / oscuro</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#94a3b8"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Anchos de columna personalizables</text>
+    </g>
+    
+    <!-- Settings icon -->
+    <g transform="translate(110, 140)">
+      <circle cx="25" cy="18" r="16" fill="#334155"/>
+      <text x="25" y="24" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="18">⚙</text>
+    </g>
+  </g>
+  
+  <!-- 11. Accesibilidad -->
+  <g transform="translate(755, 500)">
+    <rect width="270" height="180" rx="12" fill="#1e293b" stroke="#10b981" stroke-width="3"/>
+    <rect width="270" height="40" rx="12" fill="#10b981"/>
+    <rect x="0" y="28" width="270" height="12" fill="#1e293b"/>
+    <text x="135" y="26" text-anchor="middle" fill="#064e3b" font-family="system-ui" font-size="14" font-weight="bold">
+      ♿ ACCESIBILIDAD (WCAG 2.1)
+    </text>
+    
+    <g transform="translate(15, 55)">
+      <circle cx="8" cy="6" r="4" fill="#10b981"/>
+      <text x="20" y="10" fill="#e2e8f0" font-family="system-ui" font-size="11">role="grid" + aria-label</text>
+      
+      <circle cx="8" cy="26" r="4" fill="#10b981"/>
+      <text x="20" y="30" fill="#e2e8f0" font-family="system-ui" font-size="11">aria-sort en headers ordenables</text>
+      
+      <circle cx="8" cy="46" r="4" fill="#10b981"/>
+      <text x="20" y="50" fill="#e2e8f0" font-family="system-ui" font-size="11">aria-selected en filas</text>
+      
+      <circle cx="8" cy="66" r="4" fill="#10b981"/>
+      <text x="20" y="70" fill="#e2e8f0" font-family="system-ui" font-size="11">Navegación por teclado</text>
+      
+      <circle cx="8" cy="86" r="4" fill="#10b981"/>
+      <text x="20" y="90" fill="#e2e8f0" font-family="system-ui" font-size="11">Screen reader friendly</text>
+      
+      <circle cx="8" cy="106" r="4" fill="#10b981"/>
+      <text x="20" y="110" fill="#e2e8f0" font-family="system-ui" font-size="11">Focus visible indicators</text>
+    </g>
+  </g>
+  
+  <!-- Sección inferior: Arquitectura -->
+  <g transform="translate(30, 710)">
+    <rect width="1140" height="170" rx="12" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+    
+    <text x="570" y="30" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="16" font-weight="bold">
+      ARQUITECTURA DEL COMPONENTE
+    </text>
+    
+    <!-- Componentes -->
+    <g transform="translate(50, 55)">
+      <!-- DataTable -->
+      <rect x="0" y="0" width="120" height="50" rx="8" fill="#6366f1"/>
+      <text x="60" y="22" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="12" font-weight="bold">DataTable</text>
+      <text x="60" y="38" text-anchor="middle" fill="#c7d2fe" font-family="system-ui" font-size="9">Componente Principal</text>
+      
+      <!-- Arrow -->
+      <line x1="120" y1="25" x2="160" y2="25" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+      
+      <!-- useDataTable -->
+      <rect x="170" y="0" width="120" height="50" rx="8" fill="#a855f7"/>
+      <text x="230" y="22" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="12" font-weight="bold">useDataTable</text>
+      <text x="230" y="38" text-anchor="middle" fill="#e9d5ff" font-family="system-ui" font-size="9">Hook de Estado</text>
+      
+      <!-- Arrow -->
+      <line x1="290" y1="25" x2="330" y2="25" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+      
+      <!-- Types -->
+      <rect x="340" y="0" width="120" height="50" rx="8" fill="#06b6d4"/>
+      <text x="400" y="22" text-anchor="middle" fill="#0f172a" font-family="system-ui" font-size="12" font-weight="bold">Types</text>
+      <text x="400" y="38" text-anchor="middle" fill="#164e63" font-family="system-ui" font-size="9">datatable.types.ts</text>
+      
+      <!-- Arrow -->
+      <line x1="460" y1="25" x2="500" y2="25" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+      
+      <!-- Variants -->
+      <rect x="510" y="0" width="120" height="50" rx="8" fill="#f59e0b"/>
+      <text x="570" y="22" text-anchor="middle" fill="#0f172a" font-family="system-ui" font-size="12" font-weight="bold">Variants</text>
+      <text x="570" y="38" text-anchor="middle" fill="#78350f" font-family="system-ui" font-size="9">CVA Styles</text>
+      
+      <!-- Arrow -->
+      <line x1="630" y1="25" x2="670" y2="25" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+      
+      <!-- Sub-components -->
+      <rect x="680" y="0" width="120" height="50" rx="8" fill="#10b981"/>
+      <text x="740" y="22" text-anchor="middle" fill="#0f172a" font-family="system-ui" font-size="12" font-weight="bold">Sub-Components</text>
+      <text x="740" y="38" text-anchor="middle" fill="#064e3b" font-family="system-ui" font-size="9">Toolbar, Pagination...</text>
+      
+      <!-- Arrow -->
+      <line x1="800" y1="25" x2="840" y2="25" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+      
+      <!-- Context -->
+      <rect x="850" y="0" width="120" height="50" rx="8" fill="#ec4899"/>
+      <text x="910" y="22" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="12" font-weight="bold">Context</text>
+      <text x="910" y="38" text-anchor="middle" fill="#fce7f3" font-family="system-ui" font-size="9">DataTableContext</text>
+    </g>
+    
+    <!-- Features -->
+    <g transform="translate(50, 115)">
+      <text x="0" y="12" fill="#94a3b8" font-family="system-ui" font-size="11">
+        Archivos: DataTable.tsx • datatable-variants.ts • useDataTable.ts • datatable.types.ts
+      </text>
+      <text x="0" y="30" fill="#94a3b8" font-family="system-ui" font-size="11">
+        Dependencias: React 19 • Next.js 16 • Framer Motion • Radix UI • Lucide Icons • CVA • Tailwind CSS
+      </text>
+    </g>
+  </g>
+  
+  <!-- Footer -->
+  <text x="600" y="890" text-anchor="middle" fill="#475569" font-family="system-ui" font-size="11">
+    SICORA Frontend - Componente DataTable Profesional - Actualizado: Enero 2026
+  </text>
+</svg>
