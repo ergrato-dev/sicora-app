@@ -315,13 +315,13 @@ export function useAuth(): UseAuthReturn {
 export function useRequireAuth() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
-  const [isReady, setIsReady] = useState(false);
+
+  // Calcular isReady directamente sin useEffect
+  const isReady = isAuthenticated;
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login');
-    } else {
-      setIsReady(true);
     }
   }, [isAuthenticated, router]);
 
@@ -344,15 +344,9 @@ export function useRequireAuth() {
  */
 export function useRequireRole(allowedRoles: string[]) {
   const { user, isAuthenticated } = useAuthStore();
-  const [hasAccess, setHasAccess] = useState(false);
 
-  useEffect(() => {
-    if (isAuthenticated && user?.role) {
-      setHasAccess(allowedRoles.includes(user.role));
-    } else {
-      setHasAccess(false);
-    }
-  }, [isAuthenticated, user?.role, allowedRoles]);
+  // Calcular hasAccess directamente sin useEffect
+  const hasAccess = isAuthenticated && user?.role ? allowedRoles.includes(user.role) : false;
 
   return {
     hasAccess,

@@ -137,11 +137,16 @@ export function useFocusTrap(enabled: boolean = true) {
  * };
  */
 export function useReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+    // Inicialización lazy para SSR
+    if (globalThis.window !== undefined) {
+      return globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
+    const mediaQuery = globalThis.matchMedia('(prefers-reduced-motion: reduce)');
 
     const handler = (event: MediaQueryListEvent) => {
       setPrefersReducedMotion(event.matches);

@@ -343,7 +343,7 @@ class HttpClient {
       : controller.signal;
 
     // Preparar init
-    let init: RequestInit = {
+    const init: RequestInit = {
       method,
       headers: this.prepareHeaders(options.headers, requestId),
       signal,

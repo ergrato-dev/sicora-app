@@ -306,7 +306,7 @@ export function InstitutionalFooter({
                   <p className='text-gray-600 text-xs font-sena-body leading-relaxed'>
                     <strong>Todos los datos son sintéticos y ficticios.</strong> Este sistema es
                     únicamente para demostración y no representa información real de ninguna
-                    institución. El código se proporciona "tal como está" sin garantías. Use bajo su
+                    institución. El código se proporciona &ldquo;tal como está&rdquo; sin garantías. Use bajo su
                     propio riesgo.
                   </p>
                 </div>

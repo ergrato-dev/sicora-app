@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 /**
  * Banner pegajoso de disclaimer para builds de EPTI
@@ -8,16 +8,14 @@ interface StickyDisclaimerBannerProps {
 }
 
 export function StickyDisclaimerBanner({ className }: StickyDisclaimerBannerProps) {
-  const [isDismissed, setIsDismissed] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
-
-  useEffect(() => {
-    // Verificar si el usuario ya había cerrado el banner
-    const dismissed = localStorage.getItem('epti-disclaimer-dismissed');
-    if (dismissed === 'true') {
-      setIsDismissed(true);
+  const [isDismissed, setIsDismissed] = useState(() => {
+    // Inicialización lazy para evitar setState en useEffect
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('epti-disclaimer-dismissed') === 'true';
     }
-  }, []);
+    return false;
+  });
+  const [isMinimized, setIsMinimized] = useState(false);
 
   // Solo mostrar en builds de EPTI
   const IS_SENA_BUILD = false;

@@ -61,7 +61,7 @@ export function DisclaimerBanner({
                 ⚖️ Exención de Responsabilidad Legal:
               </p>
               <ul className='list-disc pl-5 space-y-1 text-sena-neutral-600'>
-                <li>El código y ejemplos se proporcionan "TAL COMO ESTÁN"</li>
+                <li>El código y ejemplos se proporcionan &ldquo;TAL COMO ESTÁN&rdquo;</li>
                 <li>Sin garantías de ningún tipo, expresas o implícitas</li>
                 <li>Use bajo su propio riesgo y responsabilidad</li>
                 <li>Valide y adapte todo código antes de uso en producción</li>
