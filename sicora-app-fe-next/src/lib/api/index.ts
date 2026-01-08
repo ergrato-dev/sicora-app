@@ -31,6 +31,7 @@ export { default as attendanceApi } from './attendance';
 export { default as evaluationsApi } from './evaluations';
 export { default as justificationsApi } from './justifications';
 export { default as alertsApi } from './alerts';
+export * as evalinApi from './evalin';
 
 // ============================================================================
 // RE-EXPORTS SELECTIVOS PARA RETROCOMPATIBILIDAD
