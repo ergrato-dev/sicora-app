@@ -34,12 +34,15 @@ import (
 
 	"mevalservice/internal/application/usecases"
 	"mevalservice/internal/infrastructure/database"
+	infraerrors "mevalservice/internal/infrastructure/errors"
 	"mevalservice/internal/infrastructure/repositories"
 	"mevalservice/internal/jobs"
 	"mevalservice/internal/presentation/handlers"
 	"mevalservice/internal/presentation/middleware"
 	"mevalservice/internal/presentation/routes"
 	"mevalservice/internal/services"
+
+	apperrors "sicora-be-go/pkg/errors"
 )
 
 func main() {
@@ -48,21 +51,34 @@ func main() {
 		log.Println("No .env file found, using system environment variables")
 	}
 
+	// Initialize error handling context
+	env := os.Getenv("APP_ENV")
+	if env == "" {
+		env = "development"
+	}
+	infraerrors.InitServiceContext("1.0.0", env)
+
+	// Determine if development mode
+	isDev := env != "production"
+
 	// Initialize database
 	db, err := database.NewDatabase()
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Printf("Error closing database connection: %v", err)
-		}
-	}()
 
 	// Run migrations
 	if err := db.AutoMigrate(); err != nil {
 		log.Fatalf("Failed to run database migrations: %v", err)
 	}
+
+	// Setup service components (logger, health checker, shutdown manager)
+	serviceSetup := infraerrors.NewServiceSetup(db.DB, isDev)
+
+	// Register database cleanup in shutdown manager
+	serviceSetup.ShutdownManager.Register("database", 1, func(ctx context.Context) error {
+		return db.Close()
+	})
 
 	// Initialize repositories
 	repos := repositories.NewRepositories(db)
@@ -83,11 +99,16 @@ func main() {
 	healthHandler := handlers.NewHealthHandler()
 
 	// Initialize Gin router
-	if os.Getenv("APP_ENV") == "production" {
+	if env == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
 	router := gin.New()
+
+	// Apply V2 middlewares first
+	router.Use(infraerrors.RequestContextMiddleware())
+	router.Use(infraerrors.RecoveryMiddlewareV2(serviceSetup.Logger))
+	router.Use(infraerrors.LoggingMiddlewareV2(serviceSetup.Logger))
 
 	// SECURITY: Rate limiting - 30 req/min por IP
 	rateLimiter := middleware.NewRateLimiter(30, time.Minute)
@@ -95,13 +116,14 @@ func main() {
 	// SECURITY: Middleware en orden correcto
 	router.Use(middleware.RequestID())
 	router.Use(middleware.SecurityHeaders())
-	router.Use(gin.Recovery())
-	router.Use(middleware.RequestLogger())
 	router.Use(rateLimiter.RateLimitMiddleware())
 	router.Use(middleware.SecureCORS())
 
 	// Setup routes
 	routes.SetupRoutes(router, committeeHandler, studentCaseHandler, improvementPlanHandler, sanctionHandler, appealHandler, healthHandler)
+
+	// Register health routes
+	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
 
 	// Initialize notification service
 	notificationService := services.NewMockNotificationService()
@@ -122,9 +144,15 @@ func main() {
 	)
 
 	if err := jobScheduler.Start(); err != nil {
-		log.Printf("Warning: Failed to start job scheduler: %v", err)
+		serviceSetup.Logger.Warn(context.Background(), "Failed to start job scheduler",
+			apperrors.Str("error", err.Error()))
 	}
-	defer jobScheduler.Stop()
+
+	// Register job scheduler shutdown
+	serviceSetup.ShutdownManager.Register("job-scheduler", 5, func(ctx context.Context) error {
+		jobScheduler.Stop()
+		return nil
+	})
 
 	// Configure server
 	port := os.Getenv("PORT")
@@ -137,27 +165,35 @@ func main() {
 		Handler: router,
 	}
 
-	// Start server in a goroutine
+	// Register server shutdown
+	serviceSetup.ShutdownManager.Register("http-server", 10, func(ctx context.Context) error {
+		return srv.Shutdown(ctx)
+	})
+
+	// Setup signal handling
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// Start server in goroutine
 	go func() {
-		log.Printf("Starting MEvalService on port %s", port)
+		serviceSetup.Logger.Info(context.Background(), "MEvalService starting",
+			apperrors.Str("port", port),
+			apperrors.Str("environment", env),
+		)
+
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Failed to start server: %v", err)
+			serviceSetup.Logger.Fatal(context.Background(), "Failed to start server", err)
 		}
 	}()
 
-	// Wait for interrupt signal to gracefully shutdown the server
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("Shutting down server...")
+	// Wait for shutdown signal
+	<-sigChan
+	serviceSetup.Logger.Info(context.Background(), "Shutdown signal received, closing services...")
 
-	// Give the server 5 seconds to finish requests
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+	// Execute graceful shutdown
+	if err := serviceSetup.ShutdownManager.Shutdown(); err != nil {
+		serviceSetup.Logger.Error(context.Background(), "Shutdown completed with errors", err)
+	} else {
+		serviceSetup.Logger.Info(context.Background(), "MEvalService shutdown completed successfully")
 	}
-
-	log.Println("Server exited")
 }
