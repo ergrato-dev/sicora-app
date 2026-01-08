@@ -546,3 +546,100 @@ export interface AlertsFilter {
   page?: number;
   limit?: number;
 }
+
+// ============================================================================
+// MAPPERS Y UTILIDADES
+// ============================================================================
+
+import type { ClaseProgramada, ClassStatus } from './calendar.types';
+
+/**
+ * Mapea el estado de ClaseProgramada a TodaySchedule status
+ */
+function mapClassStatusToScheduleStatus(
+  status: ClassStatus,
+  startTime: string,
+  endTime: string
+): TodaySchedule['status'] {
+  if (status === 'cancelada') return 'cancelled';
+  
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+  const startDateTime = new Date(`${today}T${startTime}`);
+  const endDateTime = new Date(`${today}T${endTime}`);
+  
+  if (now < startDateTime) return 'upcoming';
+  if (now >= startDateTime && now <= endDateTime) return 'in_progress';
+  return 'completed';
+}
+
+/**
+ * Convierte ClaseProgramada del Calendar a TodaySchedule para el Dashboard
+ * 
+ * @param clase - Clase programada del sistema de calendario
+ * @param instructorName - Nombre del instructor (requiere lookup externo)
+ * @param venueName - Nombre del ambiente (requiere lookup externo)
+ * @param venueCode - Código del ambiente
+ * @param fichaCode - Código de la ficha/grupo
+ * @returns TodaySchedule para mostrar en el dashboard
+ * 
+ * @example
+ * ```ts
+ * const schedules = clases.map(clase => 
+ *   mapClaseProgramadaToTodaySchedule(
+ *     clase,
+ *     instructorsMap[clase.instructorId],
+ *     ambientesMap[clase.ambienteId].nombre,
+ *     ambientesMap[clase.ambienteId].codigo,
+ *     gruposMap[clase.grupoId].ficha
+ *   )
+ * );
+ * ```
+ */
+export function mapClaseProgramadaToTodaySchedule(
+  clase: ClaseProgramada,
+  instructorName: string,
+  venueName: string,
+  venueCode: string,
+  fichaCode: string
+): TodaySchedule {
+  const startTime = `${String(clase.horaInicio.hour).padStart(2, '0')}:${String(clase.horaInicio.minutes).padStart(2, '0')}`;
+  const endTime = `${String(clase.horaFin.hour).padStart(2, '0')}:${String(clase.horaFin.minutes).padStart(2, '0')}`;
+  
+  return {
+    id: clase.id,
+    subject: clase.resultadoAprendizaje.nombre,
+    instructor_name: instructorName,
+    venue_name: venueName,
+    venue_code: venueCode,
+    start_time: startTime,
+    end_time: endTime,
+    ficha: fichaCode,
+    status: mapClassStatusToScheduleStatus(clase.estado, startTime, endTime),
+  };
+}
+
+/**
+ * Filtra clases para obtener solo las de hoy
+ */
+export function filterTodayClasses(clases: ClaseProgramada[]): ClaseProgramada[] {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  return clases.filter(clase => {
+    const claseDate = new Date(clase.fecha);
+    claseDate.setHours(0, 0, 0, 0);
+    return claseDate.getTime() === today.getTime();
+  });
+}
+
+/**
+ * Ordena clases por hora de inicio
+ */
+export function sortClassesByTime(clases: ClaseProgramada[]): ClaseProgramada[] {
+  return [...clases].sort((a, b) => {
+    const aMinutes = a.horaInicio.hour * 60 + a.horaInicio.minutes;
+    const bMinutes = b.horaInicio.hour * 60 + b.horaInicio.minutes;
+    return aMinutes - bMinutes;
+  });
+}
