@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,6 +18,7 @@ import (
 	infraCache "scheduleservice/internal/infrastructure/cache"
 	"scheduleservice/internal/infrastructure/database"
 	"scheduleservice/internal/infrastructure/database/repositories"
+	infraerrors "scheduleservice/internal/infrastructure/errors"
 	"scheduleservice/internal/presentation/middleware"
 	"scheduleservice/internal/presentation/routes"
 
@@ -47,11 +47,16 @@ import (
 // @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
-	// Setup logger
+	// Setup logger (legacy for compatibility)
 	logger := log.New(os.Stdout, "[SCHEDULESERVICE] ", log.LstdFlags|log.Lshortfile)
 
 	// Load configuration
 	config := configs.LoadConfig()
+
+	// Initialize centralized error system
+	version := "1.0.0"
+	env := config.Server.Mode
+	infraerrors.InitServiceContext(version, env)
 
 	// Set Gin mode
 	gin.SetMode(config.Server.Mode)
@@ -61,7 +66,10 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+	// Note: db.Close() will be handled by shutdown manager
+
+	// Setup service infrastructure (health checks, shutdown, logging)
+	serviceSetup := infraerrors.NewServiceSetup(db.DB, version, env)
 
 	// Run migrations
 	if err := db.Migrate(); err != nil {
@@ -166,10 +174,11 @@ func main() {
 	rateLimiter := middleware.NewRateLimiter(30, time.Minute)
 
 	// Global middleware - SECURITY FIRST
+	router.Use(infraerrors.RequestContextMiddleware()) // Context propagation (nuevo)
 	router.Use(middleware.RequestIDMiddleware())
 	router.Use(middleware.SecurityHeadersMiddleware())
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
+	router.Use(infraerrors.LoggingMiddlewareV2(serviceSetup.Logger))  // Structured logging (nuevo)
+	router.Use(infraerrors.RecoveryMiddlewareV2(serviceSetup.Logger)) // Panic recovery (nuevo)
 	router.Use(rateLimiter.RateLimitMiddleware())
 
 	// CORS middleware - SECURITY: Origen específico en producción
@@ -183,8 +192,8 @@ func main() {
 	}
 	router.Use(middleware.SecureCORSMiddleware(allowedOrigins))
 
-	// Setup health routes
-	routes.SetupHealthRoutes(router)
+	// Setup health routes (nuevo sistema con Kubernetes probes)
+	serviceSetup.Health.RegisterRoutes(router)
 
 	// Setup schedule routes with bulk operations
 	routes.SetupScheduleRoutes(
@@ -226,6 +235,9 @@ func main() {
 		WriteTimeout: time.Duration(config.Server.WriteTimeout) * time.Second,
 	}
 
+	// Register components for graceful shutdown
+	serviceSetup.RegisterComponents(db.DB, server)
+
 	// Start server in a goroutine
 	go func() {
 		logger.Printf("🚀 ScheduleService started successfully!")
@@ -233,6 +245,8 @@ func main() {
 		logger.Printf("🌍 Environment: %s", config.Server.Mode)
 		logger.Printf("📚 API Documentation: http://localhost:%s/swagger/index.html", config.Server.Port)
 		logger.Printf("❤️ Health Check: http://localhost:%s/health", config.Server.Port)
+		logger.Printf("📊 Readiness: http://localhost:%s/ready", config.Server.Port)
+		logger.Printf("📊 Liveness: http://localhost:%s/live", config.Server.Port)
 		logger.Printf("📋 Bulk Operations Available:")
 		logger.Printf("   - POST /api/v1/schedules/bulk - Create multiple schedules")
 		logger.Printf("   - POST /api/v1/schedules/upload-csv - Upload CSV file")
@@ -249,12 +263,9 @@ func main() {
 
 	logger.Println("🔄 Shutting down server...")
 
-	// Give outstanding requests 30 seconds to complete
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		logger.Fatalf("❌ Server forced to shutdown: %v", err)
+	// Graceful shutdown with centralized manager
+	if err := serviceSetup.Shutdown.Shutdown(); err != nil {
+		logger.Printf("❌ Shutdown error: %v", err)
 	}
 
 	logger.Println("✅ Server exited gracefully")

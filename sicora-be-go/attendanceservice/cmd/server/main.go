@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,8 +13,11 @@ import (
 	"attendanceservice/internal/application/usecases"
 	"attendanceservice/internal/infrastructure/database"
 	"attendanceservice/internal/infrastructure/database/repositories"
+	infraerrors "attendanceservice/internal/infrastructure/errors"
 	"attendanceservice/internal/presentation/handlers"
 	"attendanceservice/internal/presentation/routes"
+
+	apperrors "sicora-be-go/pkg/errors"
 
 	_ "attendanceservice/docs"
 )
@@ -46,6 +50,16 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
+	// Initialize error handling context
+	env := os.Getenv("APP_ENV")
+	if env == "" {
+		env = "development"
+	}
+	infraerrors.InitServiceContext("1.0.0", env)
+
+	// Determine if development mode
+	isDev := env == "development"
+
 	// Configurar base de datos
 	dbConfig := database.Config{
 		Host:     config.Database.Host,
@@ -72,6 +86,14 @@ func main() {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
 
+	// Setup service components (logger, health checker, shutdown manager)
+	serviceSetup := infraerrors.NewServiceSetup(db.DB, isDev)
+
+	// Register database cleanup in shutdown manager
+	serviceSetup.ShutdownManager.Register("database", 1, func(ctx context.Context) error {
+		return db.Close()
+	})
+
 	// Inicializar repositorios
 	attendanceRepo := repositories.NewAttendanceRepository(db.DB)
 	justificationRepo := repositories.NewJustificationRepository(db.DB)
@@ -91,7 +113,7 @@ func main() {
 	qrCodeHandler := handlers.NewQRCodeHandler(qrCodeUseCase)
 	healthHandler := handlers.NewHealthHandler()
 
-	// Configurar rutas
+	// Configurar rutas con middlewares V2
 	router := routes.SetupRoutes(
 		config,
 		attendanceHandler,
@@ -100,6 +122,14 @@ func main() {
 		qrCodeHandler,
 		healthHandler,
 	)
+
+	// Apply V2 middlewares
+	router.Use(infraerrors.RequestContextMiddleware())
+	router.Use(infraerrors.RecoveryMiddlewareV2(serviceSetup.Logger))
+	router.Use(infraerrors.LoggingMiddlewareV2(serviceSetup.Logger))
+
+	// Register health routes
+	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
 
 	// Crear contexto para el servicio programador
 	ctx, cancel := context.WithCancel(context.Background())
@@ -113,24 +143,44 @@ func main() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
+	// Create HTTP server for graceful shutdown
+	server := &http.Server{
+		Addr:    config.GetServerAddress(),
+		Handler: router,
+	}
+
+	// Register server shutdown
+	serviceSetup.ShutdownManager.Register("http-server", 10, func(ctx context.Context) error {
+		return server.Shutdown(ctx)
+	})
+
+	// Register QR scheduler shutdown
+	serviceSetup.ShutdownManager.Register("qr-scheduler", 5, func(ctx context.Context) error {
+		qrScheduler.Stop()
+		cancel()
+		return nil
+	})
+
 	// Iniciar servidor en una goroutine
 	go func() {
-		log.Printf("🚀 AttendanceService starting on %s", config.GetServerAddress())
-		log.Printf("📋 Swagger docs available at: http://%s/swagger/index.html", config.GetServerAddress())
-		log.Printf("🔧 Health check available at: http://%s/health", config.GetServerAddress())
-		
-		if err := router.Run(config.GetServerAddress()); err != nil {
-			log.Fatalf("Failed to start server: %v", err)
+		serviceSetup.Logger.Info(ctx, "AttendanceService starting",
+			apperrors.Str("address", config.GetServerAddress()),
+			apperrors.Str("swagger", "http://"+config.GetServerAddress()+"/swagger/index.html"),
+		)
+
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			serviceSetup.Logger.Fatal(ctx, "Failed to start server", err)
 		}
 	}()
 
 	// Esperar señal de terminación
 	<-sigChan
-	log.Println("🛑 Recibida señal de terminación, cerrando servicios...")
-	
-	// Detener servicios
-	qrScheduler.Stop()
-	cancel()
-	
-	log.Println("✅ AttendanceService cerrado correctamente")
+	serviceSetup.Logger.Info(ctx, "Shutdown signal received, closing services...")
+
+	// Execute graceful shutdown
+	if err := serviceSetup.ShutdownManager.Shutdown(); err != nil {
+		serviceSetup.Logger.Error(ctx, "Shutdown completed with errors", err)
+	} else {
+		serviceSetup.Logger.Info(ctx, "AttendanceService shutdown completed successfully")
+	}
 }
