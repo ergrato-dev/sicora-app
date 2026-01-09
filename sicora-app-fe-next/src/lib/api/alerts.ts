@@ -3,7 +3,7 @@
  * Sistema de notificaciones y alertas
  */
 
-import { httpClient, buildQueryString } from './client';
+import { httpClient } from '../api-client';
 import type {
   Alert,
   AlertSummary,
@@ -19,6 +19,22 @@ import type {
 } from '@/types/alert.types';
 
 const BASE_PATH = '/api/v1/alerts';
+
+/**
+ * Construir query string desde parámetros
+ */
+function buildQueryString(params: Record<string, unknown>): string {
+  const searchParams = new URLSearchParams();
+  
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      searchParams.append(key, String(value));
+    }
+  });
+
+  const queryString = searchParams.toString();
+  return queryString ? `?${queryString}` : '';
+}
 
 // ============================================================================
 // CRUD BÁSICO
