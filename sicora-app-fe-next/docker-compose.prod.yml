@@ -1,0 +1,47 @@
+# =============================================================================
+# Docker Compose - SICORA Frontend Next.js (Producción)
+# Sprint 17-18: Despliegue
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Frontend Next.js
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://api-gateway:8002}
+        - NEXT_PUBLIC_AI_SERVICE_URL=${NEXT_PUBLIC_AI_SERVICE_URL:-http://ai-service:8010}
+        - NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV:-production}
+    image: sicora-frontend:${TAG:-latest}
+    container_name: sicora-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://api-gateway:8002}
+      - NEXT_PUBLIC_AI_SERVICE_URL=${NEXT_PUBLIC_AI_SERVICE_URL:-http://ai-service:8010}
+    networks:
+      - sicora-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+networks:
+  sicora-network:
+    external: true
+    name: sicora-network

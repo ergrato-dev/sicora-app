@@ -6,7 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
+    "lighthouse": "lhci autorun",
+    "docker:build": "docker build -t sicora-frontend .",
+    "docker:run": "docker run -p 3000:3000 sicora-frontend"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -33,6 +41,8 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.14.0",
+    "@playwright/test": "^1.49.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

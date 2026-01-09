@@ -1,0 +1,5 @@
+# Playwright E2E - Ignorar archivos generados
+.auth/
+playwright-report/
+playwright-results/
+test-results/
