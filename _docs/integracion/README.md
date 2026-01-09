@@ -2,9 +2,13 @@
 
 ## 📋 Documentos en esta Sección
 
+### 🚀 Pre-Deploy
+
+- [**Plan de Pruebas Pre-Deploy**](./PLAN_PRUEBAS_PRE_DEPLOY.md) ⭐ **NUEVO** - Checklist completo antes de deploy
+
 ### Arquitectura Multi-Stack
 
-- [Coordinación Multi-Stack Base de Datos](./COORDINACION_MULTISTACK_BASE_DATOS.md) ⭐ **NUEVO**
+- [Coordinación Multi-Stack Base de Datos](./COORDINACION_MULTISTACK_BASE_DATOS.md)
 
 ### Reportes de Integración
 

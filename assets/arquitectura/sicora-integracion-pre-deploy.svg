@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <defs>
+    <style>
+      .title { font: bold 24px sans-serif; fill: #ffffff; }
+      .subtitle { font: 16px sans-serif; fill: #9ca3af; }
+      .label { font: bold 14px sans-serif; fill: #ffffff; }
+      .port { font: 12px monospace; fill: #10b981; }
+      .tech { font: 11px sans-serif; fill: #6b7280; }
+      .phase { font: bold 12px sans-serif; fill: #f59e0b; }
+      .arrow { stroke: #4b5563; stroke-width: 2; fill: none; }
+      .arrow-head { fill: #4b5563; }
+      .box-fe { fill: #1e3a5f; stroke: #3b82f6; stroke-width: 2; rx: 8; }
+      .box-gw { fill: #3f1f5c; stroke: #8b5cf6; stroke-width: 2; rx: 8; }
+      .box-be { fill: #1f3d1f; stroke: #22c55e; stroke-width: 2; rx: 8; }
+      .box-db { fill: #3d2f1f; stroke: #f59e0b; stroke-width: 2; rx: 8; }
+      .box-infra { fill: #1f2937; stroke: #6b7280; stroke-width: 1; rx: 4; }
+      .connector { stroke: #4b5563; stroke-width: 1.5; stroke-dasharray: 4,4; }
+      .connector-solid { stroke: #4b5563; stroke-width: 2; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrow-head"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#111827"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" class="title">SICORA - Arquitectura de Integración</text>
+  <text x="600" y="65" text-anchor="middle" class="subtitle">Plan de Pruebas Pre-Deploy</text>
+  
+  <!-- Phase Labels -->
+  <text x="100" y="100" class="phase">FASE 4: Frontend</text>
+  <text x="100" y="230" class="phase">FASE 3: API Gateway</text>
+  <text x="100" y="380" class="phase">FASE 2: Microservicios</text>
+  <text x="100" y="680" class="phase">FASE 1: Infraestructura</text>
+  
+  <!-- Frontend Layer -->
+  <rect x="200" y="110" width="800" height="80" class="box-fe"/>
+  <text x="600" y="145" text-anchor="middle" class="label">sicora-app-fe-next</text>
+  <text x="600" y="165" text-anchor="middle" class="tech">Next.js 16 + React 19 + Tailwind v4</text>
+  <text x="600" y="180" text-anchor="middle" class="port">:3000</text>
+  
+  <!-- Arrow from Frontend to Gateway -->
+  <line x1="600" y1="190" x2="600" y2="240" class="connector-solid" marker-end="url(#arrowhead)"/>
+  
+  <!-- API Gateway Layer -->
+  <rect x="200" y="240" width="800" height="80" class="box-gw"/>
+  <text x="600" y="275" text-anchor="middle" class="label">API Gateway (FastAPI)</text>
+  <text x="600" y="295" text-anchor="middle" class="tech">Routing + Auth + Rate Limiting</text>
+  <text x="600" y="310" text-anchor="middle" class="port">:8000</text>
+  
+  <!-- Arrow from Gateway to Services -->
+  <line x1="600" y1="320" x2="600" y2="380" class="connector-solid"/>
+  
+  <!-- Branch lines to microservices -->
+  <line x1="600" y1="350" x2="180" y2="350" class="connector"/>
+  <line x1="600" y1="350" x2="1020" y2="350" class="connector"/>
+  
+  <!-- Vertical lines to each service -->
+  <line x1="220" y1="350" x2="220" y2="400" class="connector" marker-end="url(#arrowhead)"/>
+  <line x1="380" y1="350" x2="380" y2="400" class="connector" marker-end="url(#arrowhead)"/>
+  <line x1="540" y1="350" x2="540" y2="400" class="connector" marker-end="url(#arrowhead)"/>
+  <line x1="700" y1="350" x2="700" y2="400" class="connector" marker-end="url(#arrowhead)"/>
+  <line x1="860" y1="350" x2="860" y2="400" class="connector" marker-end="url(#arrowhead)"/>
+  <line x1="1020" y1="350" x2="1020" y2="400" class="connector" marker-end="url(#arrowhead)"/>
+  
+  <!-- Microservices Layer -->
+  <!-- User Service -->
+  <rect x="150" y="400" width="140" height="100" class="box-be"/>
+  <text x="220" y="435" text-anchor="middle" class="label">userservice</text>
+  <text x="220" y="455" text-anchor="middle" class="tech">FastAPI</text>
+  <text x="220" y="470" text-anchor="middle" class="port">:8001</text>
+  <text x="220" y="490" text-anchor="middle" class="tech">Usuarios, Auth</text>
+  
+  <!-- Schedule Service -->
+  <rect x="310" y="400" width="140" height="100" class="box-be"/>
+  <text x="380" y="435" text-anchor="middle" class="label">scheduleservice</text>
+  <text x="380" y="455" text-anchor="middle" class="tech">FastAPI</text>
+  <text x="380" y="470" text-anchor="middle" class="port">:8002</text>
+  <text x="380" y="490" text-anchor="middle" class="tech">Horarios</text>
+  
+  <!-- Attendance Service -->
+  <rect x="470" y="400" width="140" height="100" class="box-be"/>
+  <text x="540" y="435" text-anchor="middle" class="label">attendanceservice</text>
+  <text x="540" y="455" text-anchor="middle" class="tech">FastAPI</text>
+  <text x="540" y="470" text-anchor="middle" class="port">:8003</text>
+  <text x="540" y="490" text-anchor="middle" class="tech">Asistencia</text>
+  
+  <!-- Evalin Service -->
+  <rect x="630" y="400" width="140" height="100" class="box-be"/>
+  <text x="700" y="435" text-anchor="middle" class="label">evalinservice</text>
+  <text x="700" y="455" text-anchor="middle" class="tech">FastAPI</text>
+  <text x="700" y="470" text-anchor="middle" class="port">:8030</text>
+  <text x="700" y="490" text-anchor="middle" class="tech">Evaluaciones</text>
+  
+  <!-- KB Service -->
+  <rect x="790" y="400" width="140" height="100" class="box-be"/>
+  <text x="860" y="435" text-anchor="middle" class="label">kbservice</text>
+  <text x="860" y="455" text-anchor="middle" class="tech">FastAPI</text>
+  <text x="860" y="470" text-anchor="middle" class="port">:8005</text>
+  <text x="860" y="490" text-anchor="middle" class="tech">Knowledge Base</text>
+  
+  <!-- AI Service -->
+  <rect x="950" y="400" width="140" height="100" class="box-be"/>
+  <text x="1020" y="435" text-anchor="middle" class="label">aiservice</text>
+  <text x="1020" y="455" text-anchor="middle" class="tech">FastAPI</text>
+  <text x="1020" y="470" text-anchor="middle" class="port">:8006</text>
+  <text x="1020" y="490" text-anchor="middle" class="tech">AI/ML</text>
+  
+  <!-- Connection lines from services to databases -->
+  <line x1="220" y1="500" x2="220" y2="560" class="connector"/>
+  <line x1="380" y1="500" x2="380" y2="560" class="connector"/>
+  <line x1="540" y1="500" x2="540" y2="560" class="connector"/>
+  <line x1="700" y1="500" x2="700" y2="560" class="connector"/>
+  <line x1="860" y1="500" x2="860" y2="560" class="connector"/>
+  <line x1="1020" y1="500" x2="1020" y2="560" class="connector"/>
+  
+  <!-- Horizontal line connecting to databases -->
+  <line x1="220" y1="560" x2="1020" y2="560" class="connector"/>
+  
+  <!-- Vertical lines to databases -->
+  <line x1="350" y1="560" x2="350" y2="700" class="connector" marker-end="url(#arrowhead)"/>
+  <line x1="600" y1="560" x2="600" y2="700" class="connector" marker-end="url(#arrowhead)"/>
+  <line x1="850" y1="560" x2="850" y2="700" class="connector" marker-end="url(#arrowhead)"/>
+  
+  <!-- Database Layer -->
+  <!-- PostgreSQL -->
+  <rect x="200" y="700" width="300" height="100" class="box-db"/>
+  <text x="350" y="740" text-anchor="middle" class="label">PostgreSQL 18</text>
+  <text x="350" y="760" text-anchor="middle" class="tech">Base de datos principal</text>
+  <text x="350" y="780" text-anchor="middle" class="port">:5433</text>
+  <text x="350" y="795" text-anchor="middle" class="tech">users, schedules, attendance, evalin, kb, ai</text>
+  
+  <!-- Redis -->
+  <rect x="520" y="700" width="160" height="100" class="box-db"/>
+  <text x="600" y="740" text-anchor="middle" class="label">Redis 7</text>
+  <text x="600" y="760" text-anchor="middle" class="tech">Cache + Sessions</text>
+  <text x="600" y="780" text-anchor="middle" class="port">:6379</text>
+  
+  <!-- MongoDB -->
+  <rect x="700" y="700" width="300" height="100" class="box-db"/>
+  <text x="850" y="740" text-anchor="middle" class="label">MongoDB 8</text>
+  <text x="850" y="760" text-anchor="middle" class="tech">Datos no estructurados</text>
+  <text x="850" y="780" text-anchor="middle" class="port">:27017</text>
+  <text x="850" y="795" text-anchor="middle" class="tech">logs, analytics, embeddings</text>
+  
+  <!-- Legend -->
+  <rect x="20" y="820" width="1160" height="60" fill="#1f2937" rx="4"/>
+  <text x="40" y="845" class="tech" fill="#ffffff">Leyenda:</text>
+  
+  <rect x="120" y="835" width="20" height="15" class="box-fe"/>
+  <text x="150" y="847" class="tech" fill="#ffffff">Frontend</text>
+  
+  <rect x="230" y="835" width="20" height="15" class="box-gw"/>
+  <text x="260" y="847" class="tech" fill="#ffffff">Gateway</text>
+  
+  <rect x="340" y="835" width="20" height="15" class="box-be"/>
+  <text x="370" y="847" class="tech" fill="#ffffff">Backend</text>
+  
+  <rect x="450" y="835" width="20" height="15" class="box-db"/>
+  <text x="480" y="847" class="tech" fill="#ffffff">Database</text>
+  
+  <text x="600" y="847" class="tech" fill="#9ca3af">|</text>
+  
+  <text x="650" y="847" class="tech" fill="#10b981">:XXXX = Puerto</text>
+  
+  <line x1="780" y1="842" x2="820" y2="842" class="connector"/>
+  <text x="830" y="847" class="tech" fill="#ffffff">Conexión</text>
+  
+  <line x1="920" y1="842" x2="960" y2="842" class="connector-solid" marker-end="url(#arrowhead)"/>
+  <text x="970" y="847" class="tech" fill="#ffffff">Flujo de datos</text>
+</svg>
