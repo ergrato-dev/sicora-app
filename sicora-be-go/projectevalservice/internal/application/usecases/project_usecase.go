@@ -31,7 +31,7 @@ func (uc *ProjectUseCase) CreateProject(ctx context.Context, project *entities.P
 	}
 
 	if !project.Status.IsValid() {
-		project.Status = entities.ProjectStatusActive
+		project.Status = entities.ProjectStatusActivo
 	}
 
 	return uc.projectRepo.Create(ctx, project)
@@ -93,6 +93,6 @@ func (uc *ProjectUseCase) ArchiveProject(ctx context.Context, id uuid.UUID) erro
 		return errors.ErrProjectNotFound
 	}
 
-	project.Status = entities.ProjectStatusArchived
+	project.Status = entities.ProjectStatusArchivado
 	return uc.projectRepo.Update(ctx, project)
 }

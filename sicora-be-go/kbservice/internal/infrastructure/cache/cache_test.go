@@ -32,9 +32,9 @@ func createTestFAQ(id uuid.UUID, question, answer string, category entities.Docu
 		Question: question,
 		Answer:   answer,
 		Category: category,
-		Audience: entities.AudienceAll,
-		Status:   entities.FAQStatusPublished,
-		Priority: entities.FAQPriorityMedium,
+		Audience: entities.AudienceTodos,
+		Status:   entities.FAQStatusPublicado,
+		Priority: entities.FAQPriorityMedia,
 	}
 }
 
@@ -45,9 +45,9 @@ func createTestDocument(id uuid.UUID, title, content string, category entities.D
 		Title:    title,
 		Content:  content,
 		Category: category,
-		Type:     entities.DocumentTypeUserGuide,
-		Audience: entities.AudienceAll,
-		Status:   entities.DocumentStatusPublished,
+		Type:     entities.DocumentTypeGuiaUsuario,
+		Audience: entities.AudienceTodos,
+		Status:   entities.DocumentStatusPublicado,
 		Slug:     "test-document-" + id.String()[:8],
 	}
 }

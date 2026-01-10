@@ -4,17 +4,17 @@ package valueobjects
 type EvaluationStatus string
 
 const (
-	EvaluationStatusDraft     EvaluationStatus = "DRAFT"     // Borrador, en progreso
-	EvaluationStatusSubmitted EvaluationStatus = "SUBMITTED" // Enviada, completa
-	EvaluationStatusValidated EvaluationStatus = "VALIDATED" // Validada por administrador
-	EvaluationStatusCompleted EvaluationStatus = "COMPLETED" // Completada (alias para submitted)
-	EvaluationStatusPending   EvaluationStatus = "PENDING"   // Pendiente
+	EvaluationStatusBorrador   EvaluationStatus = "BORRADOR"   // Borrador, en progreso
+	EvaluationStatusEnviada    EvaluationStatus = "ENVIADA"    // Enviada, completa
+	EvaluationStatusValidada   EvaluationStatus = "VALIDADA"   // Validada por administrador
+	EvaluationStatusCompletada EvaluationStatus = "COMPLETADA" // Completada (alias para enviada)
+	EvaluationStatusPendiente  EvaluationStatus = "PENDIENTE"  // Pendiente
 )
 
 // IsValid verifica si el estado de la evaluación es válido
 func (es EvaluationStatus) IsValid() bool {
 	switch es {
-	case EvaluationStatusDraft, EvaluationStatusSubmitted, EvaluationStatusValidated, EvaluationStatusCompleted, EvaluationStatusPending:
+	case EvaluationStatusBorrador, EvaluationStatusEnviada, EvaluationStatusValidada, EvaluationStatusCompletada, EvaluationStatusPendiente:
 		return true
 	default:
 		return false
@@ -28,20 +28,20 @@ func (es EvaluationStatus) String() string {
 
 // CanBeModified indica si la evaluación puede ser modificada
 func (es EvaluationStatus) CanBeModified() bool {
-	return es == EvaluationStatusDraft
+	return es == EvaluationStatusBorrador
 }
 
 // CanBeSubmitted indica si la evaluación puede ser enviada
 func (es EvaluationStatus) CanBeSubmitted() bool {
-	return es == EvaluationStatusDraft
+	return es == EvaluationStatusBorrador
 }
 
 // CanBeValidated indica si la evaluación puede ser validada
 func (es EvaluationStatus) CanBeValidated() bool {
-	return es == EvaluationStatusSubmitted
+	return es == EvaluationStatusEnviada
 }
 
 // IsComplete indica si la evaluación está completa
 func (es EvaluationStatus) IsComplete() bool {
-	return es == EvaluationStatusSubmitted || es == EvaluationStatusValidated
+	return es == EvaluationStatusEnviada || es == EvaluationStatusValidada
 }

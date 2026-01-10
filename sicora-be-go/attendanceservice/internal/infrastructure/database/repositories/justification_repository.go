@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	justificationStatusPending  = "PENDING"
-	justificationStatusApproved = "APPROVED"
-	justificationStatusRejected = "REJECTED"
+	justificationStatusPendiente = "PENDIENTE"
+	justificationStatusAprobada  = "APROBADA"
+	justificationStatusRechazada = "RECHAZADA"
 )
 
 type justificationRepository struct {
@@ -94,7 +94,7 @@ func (r *justificationRepository) Delete(ctx context.Context, id uuid.UUID) erro
 func (r *justificationRepository) GetPendingJustifications(ctx context.Context, limit, offset int) ([]*entities.Justification, error) {
 	var models []models.Justification
 	err := r.db.WithContext(ctx).
-		Where("status = ?", justificationStatusPending).
+		Where("status = ?", justificationStatusPendiente).
 		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).
@@ -116,7 +116,7 @@ func (r *justificationRepository) ApproveJustification(ctx context.Context, id u
 	return r.db.WithContext(ctx).Model(&models.Justification{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
-			"status":      justificationStatusApproved,
+			"status":      justificationStatusAprobada,
 			"reviewed_by": approverID,
 			"review_date": now,
 			"updated_at":  now,
@@ -129,7 +129,7 @@ func (r *justificationRepository) RejectJustification(ctx context.Context, id uu
 	return r.db.WithContext(ctx).Model(&models.Justification{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
-			"status":          justificationStatusRejected,
+			"status":          justificationStatusRechazada,
 			"reviewed_by":     approverID,
 			"review_date":     now,
 			"review_comments": reason,

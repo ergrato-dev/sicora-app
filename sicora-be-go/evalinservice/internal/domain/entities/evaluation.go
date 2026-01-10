@@ -7,6 +7,7 @@ import (
 
 	"evalinservice/internal/domain/exceptions"
 	"evalinservice/internal/domain/valueobjects"
+
 	"github.com/google/uuid"
 )
 
@@ -72,7 +73,7 @@ func NewEvaluation(studentID, instructorID, periodID, questionnaireID uuid.UUID)
 		QuestionnaireID: questionnaireID,
 		Responses:       make([]EvaluationResponse, 0),
 		GeneralComment:  "",
-		Status:          valueobjects.EvaluationStatusDraft,
+		Status:          valueobjects.EvaluationStatusBorrador,
 		SubmittedAt:     nil,
 		CreatedAt:       now,
 		UpdatedAt:       now,
@@ -147,7 +148,7 @@ func (e *Evaluation) Submit() error {
 	// Validar que la evaluación esté completa se hace en el caso de uso
 	// usando las preguntas del cuestionario
 
-	e.Status = valueobjects.EvaluationStatusSubmitted
+	e.Status = valueobjects.EvaluationStatusEnviada
 	now := time.Now()
 	e.SubmittedAt = &now
 	e.UpdatedAt = now
@@ -160,7 +161,7 @@ func (e *Evaluation) Validate() error {
 		return exceptions.NewValidationError("status", "la evaluación no puede ser validada desde su estado actual")
 	}
 
-	e.Status = valueobjects.EvaluationStatusValidated
+	e.Status = valueobjects.EvaluationStatusValidada
 	e.UpdatedAt = time.Now()
 	return nil
 }

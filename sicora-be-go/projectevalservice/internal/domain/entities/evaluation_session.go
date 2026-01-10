@@ -89,49 +89,49 @@ type SessionEvaluation struct {
 type EvaluationSessionType string
 
 const (
-	EvaluationSessionTypeIdeaPresentation  EvaluationSessionType = "idea_presentation"
-	EvaluationSessionTypeProgressReview    EvaluationSessionType = "progress_review"
-	EvaluationSessionTypeFinalPresentation EvaluationSessionType = "final_presentation"
-	EvaluationSessionTypeMidTermReview     EvaluationSessionType = "midterm_review"
+	EvaluationSessionTypePresentacionIdea   EvaluationSessionType = "PRESENTACION_IDEA"
+	EvaluationSessionTypeRevisionProgreso   EvaluationSessionType = "REVISION_PROGRESO"
+	EvaluationSessionTypePresentacionFinal  EvaluationSessionType = "PRESENTACION_FINAL"
+	EvaluationSessionTypeRevisionIntermedia EvaluationSessionType = "REVISION_INTERMEDIA"
 )
 
 type EvaluationSessionStatus string
 
 const (
-	EvaluationSessionStatusScheduled  EvaluationSessionStatus = "scheduled"
-	EvaluationSessionStatusConfirmed  EvaluationSessionStatus = "confirmed"
-	EvaluationSessionStatusInProgress EvaluationSessionStatus = "in_progress"
-	EvaluationSessionStatusCompleted  EvaluationSessionStatus = "completed"
-	EvaluationSessionStatusCancelled  EvaluationSessionStatus = "cancelled"
-	EvaluationSessionStatusPostponed  EvaluationSessionStatus = "postponed"
+	EvaluationSessionStatusProgramada EvaluationSessionStatus = "PROGRAMADA"
+	EvaluationSessionStatusConfirmada EvaluationSessionStatus = "CONFIRMADA"
+	EvaluationSessionStatusEnProgreso EvaluationSessionStatus = "EN_PROGRESO"
+	EvaluationSessionStatusCompletada EvaluationSessionStatus = "COMPLETADA"
+	EvaluationSessionStatusCancelada  EvaluationSessionStatus = "CANCELADA"
+	EvaluationSessionStatusPostpuesta EvaluationSessionStatus = "POSTPUESTA"
 )
 
 type JurorRole string
 
 const (
-	JurorRoleChair     JurorRole = "chair"
-	JurorRoleEvaluator JurorRole = "evaluator"
-	JurorRoleObserver  JurorRole = "observer"
+	JurorRolePresidente JurorRole = "PRESIDENTE"
+	JurorRoleEvaluador  JurorRole = "EVALUADOR"
+	JurorRoleObservador JurorRole = "OBSERVADOR"
 )
 
 type JurorStatus string
 
 const (
-	JurorStatusAssigned  JurorStatus = "assigned"
-	JurorStatusConfirmed JurorStatus = "confirmed"
-	JurorStatusDeclined  JurorStatus = "declined"
-	JurorStatusAttended  JurorStatus = "attended"
-	JurorStatusAbsent    JurorStatus = "absent"
+	JurorStatusAsignado   JurorStatus = "ASIGNADO"
+	JurorStatusConfirmado JurorStatus = "CONFIRMADO"
+	JurorStatusDeclinado  JurorStatus = "DECLINADO"
+	JurorStatusAsistio    JurorStatus = "ASISTIO"
+	JurorStatusAusente    JurorStatus = "AUSENTE"
 )
 
 type ParticipantStatus string
 
 const (
-	ParticipantStatusRegistered ParticipantStatus = "registered"
-	ParticipantStatusConfirmed  ParticipantStatus = "confirmed"
-	ParticipantStatusPresented  ParticipantStatus = "presented"
-	ParticipantStatusAbsent     ParticipantStatus = "absent"
-	ParticipantStatusExcused    ParticipantStatus = "excused"
+	ParticipantStatusRegistrado ParticipantStatus = "REGISTRADO"
+	ParticipantStatusConfirmado ParticipantStatus = "CONFIRMADO"
+	ParticipantStatusPresento   ParticipantStatus = "PRESENTO"
+	ParticipantStatusAusente    ParticipantStatus = "AUSENTE"
+	ParticipantStatusExcusado   ParticipantStatus = "EXCUSADO"
 )
 
 // Methods
@@ -141,7 +141,7 @@ func (est EvaluationSessionType) String() string {
 
 func (est EvaluationSessionType) IsValid() bool {
 	switch est {
-	case EvaluationSessionTypeIdeaPresentation, EvaluationSessionTypeProgressReview, EvaluationSessionTypeFinalPresentation, EvaluationSessionTypeMidTermReview:
+	case EvaluationSessionTypePresentacionIdea, EvaluationSessionTypeRevisionProgreso, EvaluationSessionTypePresentacionFinal, EvaluationSessionTypeRevisionIntermedia:
 		return true
 	default:
 		return false
@@ -154,7 +154,7 @@ func (ess EvaluationSessionStatus) String() string {
 
 func (ess EvaluationSessionStatus) IsValid() bool {
 	switch ess {
-	case EvaluationSessionStatusScheduled, EvaluationSessionStatusConfirmed, EvaluationSessionStatusInProgress, EvaluationSessionStatusCompleted, EvaluationSessionStatusCancelled, EvaluationSessionStatusPostponed:
+	case EvaluationSessionStatusProgramada, EvaluationSessionStatusConfirmada, EvaluationSessionStatusEnProgreso, EvaluationSessionStatusCompletada, EvaluationSessionStatusCancelada, EvaluationSessionStatusPostpuesta:
 		return true
 	default:
 		return false
@@ -162,17 +162,17 @@ func (ess EvaluationSessionStatus) IsValid() bool {
 }
 
 func (es *EvaluationSession) CanBeModified() bool {
-	return es.Status == EvaluationSessionStatusScheduled || es.Status == EvaluationSessionStatusPostponed
+	return es.Status == EvaluationSessionStatusProgramada || es.Status == EvaluationSessionStatusPostpuesta
 }
 
 func (es *EvaluationSession) CanStart() bool {
-	return es.Status == EvaluationSessionStatusConfirmed && time.Now().After(es.StartTime.Add(-15*time.Minute))
+	return es.Status == EvaluationSessionStatusConfirmada && time.Now().After(es.StartTime.Add(-15*time.Minute))
 }
 
 func (es *EvaluationSession) GetConfirmedJurors() []SessionJuror {
 	var confirmed []SessionJuror
 	for _, juror := range es.Jurors {
-		if juror.Status == JurorStatusConfirmed || juror.Status == JurorStatusAttended {
+		if juror.Status == JurorStatusConfirmado || juror.Status == JurorStatusAsistio {
 			confirmed = append(confirmed, juror)
 		}
 	}
@@ -189,5 +189,5 @@ func (es *EvaluationSession) GetDuration() time.Duration {
 
 func (es *EvaluationSession) IsInProgress() bool {
 	now := time.Now()
-	return es.Status == EvaluationSessionStatusInProgress && now.After(es.StartTime) && now.Before(es.EndTime)
+	return es.Status == EvaluationSessionStatusEnProgreso && now.After(es.StartTime) && now.Before(es.EndTime)
 }

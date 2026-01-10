@@ -53,9 +53,9 @@ func (r *qrCodeRepository) GetActiveByStudent(ctx context.Context, studentID, sc
 	var qrCode entities.AttendanceQRCode
 	err := r.db.WithContext(ctx).Where(
 		"student_id = ? AND schedule_id = ? AND status = ? AND is_active = ? AND expires_at > ?",
-		studentID, scheduleID, entities.QRCodeStatusActive, true, time.Now(),
+		studentID, scheduleID, entities.QRCodeStatusActivo, true, time.Now(),
 	).First(&qrCode).Error
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (r *qrCodeRepository) GetByStudentAndSchedule(ctx context.Context, studentI
 		"student_id = ? AND schedule_id = ? AND is_active = ?",
 		studentID, scheduleID, true,
 	).Order("created_at DESC").Find(&qrCodes).Error
-	
+
 	return qrCodes, err
 }
 
@@ -90,9 +90,9 @@ func (r *qrCodeRepository) Delete(ctx context.Context, id uuid.UUID) error {
 func (r *qrCodeRepository) ExpireOldCodes(ctx context.Context) error {
 	now := time.Now()
 	return r.db.WithContext(ctx).Model(&entities.AttendanceQRCode{}).
-		Where("expires_at < ? AND status = ? AND is_active = ?", now, entities.QRCodeStatusActive, true).
+		Where("expires_at < ? AND status = ? AND is_active = ?", now, entities.QRCodeStatusActivo, true).
 		Updates(map[string]interface{}{
-			"status":     entities.QRCodeStatusExpired,
+			"status":     entities.QRCodeStatusExpirado,
 			"updated_at": now,
 		}).Error
 }
@@ -102,9 +102,9 @@ func (r *qrCodeRepository) GetExpiredCodes(ctx context.Context, olderThan time.T
 	var qrCodes []*entities.AttendanceQRCode
 	err := r.db.WithContext(ctx).Where(
 		"expires_at < ? AND status IN (?) AND is_active = ?",
-		olderThan, []entities.QRCodeStatus{entities.QRCodeStatusExpired, entities.QRCodeStatusUsed}, true,
+		olderThan, []entities.QRCodeStatus{entities.QRCodeStatusExpirado, entities.QRCodeStatusUsado}, true,
 	).Find(&qrCodes).Error
-	
+
 	return qrCodes, err
 }
 
@@ -118,9 +118,9 @@ func (r *qrCodeRepository) GetActiveBySchedule(ctx context.Context, scheduleID u
 	var qrCodes []*entities.AttendanceQRCode
 	err := r.db.WithContext(ctx).Where(
 		"schedule_id = ? AND status = ? AND is_active = ? AND expires_at > ?",
-		scheduleID, entities.QRCodeStatusActive, true, time.Now(),
+		scheduleID, entities.QRCodeStatusActivo, true, time.Now(),
 	).Find(&qrCodes).Error
-	
+
 	return qrCodes, err
 }
 
@@ -131,7 +131,7 @@ func (r *qrCodeRepository) DeactivateByStudent(ctx context.Context, studentID uu
 		Where("student_id = ? AND is_active = ?", studentID, true).
 		Updates(map[string]interface{}{
 			"is_active":  false,
-			"status":     entities.QRCodeStatusExpired,
+			"status":     entities.QRCodeStatusExpirado,
 			"updated_at": now,
 		}).Error
 }
@@ -153,8 +153,8 @@ func (r *qrCodeRepository) GetUsageStats(ctx context.Context, scheduleID uuid.UU
 
 	// Total usados
 	err = r.db.WithContext(ctx).Model(&entities.AttendanceQRCode{}).
-		Where("schedule_id = ? AND status = ? AND created_at BETWEEN ? AND ?", 
-			scheduleID, entities.QRCodeStatusUsed, startDate, endDate).
+		Where("schedule_id = ? AND status = ? AND created_at BETWEEN ? AND ?",
+			scheduleID, entities.QRCodeStatusUsado, startDate, endDate).
 		Count(&stats.TotalUsed).Error
 	if err != nil {
 		return nil, err
@@ -162,8 +162,8 @@ func (r *qrCodeRepository) GetUsageStats(ctx context.Context, scheduleID uuid.UU
 
 	// Total expirados
 	err = r.db.WithContext(ctx).Model(&entities.AttendanceQRCode{}).
-		Where("schedule_id = ? AND status = ? AND created_at BETWEEN ? AND ?", 
-			scheduleID, entities.QRCodeStatusExpired, startDate, endDate).
+		Where("schedule_id = ? AND status = ? AND created_at BETWEEN ? AND ?",
+			scheduleID, entities.QRCodeStatusExpirado, startDate, endDate).
 		Count(&stats.TotalExpired).Error
 	if err != nil {
 		return nil, err
@@ -181,8 +181,8 @@ func (r *qrCodeRepository) GetUsageStats(ctx context.Context, scheduleID uuid.UU
 		FROM attendance_qrcodes 
 		WHERE schedule_id = ? AND status = ? AND used_at IS NOT NULL 
 		AND created_at BETWEEN ? AND ?`,
-		scheduleID, entities.QRCodeStatusUsed, startDate, endDate).Scan(&avgUsageTime).Error
-	
+		scheduleID, entities.QRCodeStatusUsado, startDate, endDate).Scan(&avgUsageTime).Error
+
 	if err == nil && avgUsageTime.Valid {
 		stats.AverageUsageTime = avgUsageTime.Float64
 	}
@@ -197,8 +197,8 @@ func (r *qrCodeRepository) GetUsageStats(ctx context.Context, scheduleID uuid.UU
 		GROUP BY EXTRACT(HOUR FROM used_at)
 		ORDER BY COUNT(*) DESC
 		LIMIT 1`,
-		scheduleID, entities.QRCodeStatusUsed, startDate, endDate).Scan(&peakHour).Error
-	
+		scheduleID, entities.QRCodeStatusUsado, startDate, endDate).Scan(&peakHour).Error
+
 	if err == nil && peakHour.Valid {
 		stats.PeakUsageHour = int(peakHour.Int64)
 	}
@@ -211,8 +211,8 @@ func (r *qrCodeRepository) GetUsageStats(ctx context.Context, scheduleID uuid.UU
 		AND created_at BETWEEN ? AND ?
 		GROUP BY DATE(used_at)
 		ORDER BY day`,
-		scheduleID, entities.QRCodeStatusUsed, startDate, endDate).Rows()
-	
+		scheduleID, entities.QRCodeStatusUsado, startDate, endDate).Rows()
+
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {

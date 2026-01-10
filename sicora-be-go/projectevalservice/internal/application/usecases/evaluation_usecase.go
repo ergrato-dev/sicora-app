@@ -41,7 +41,7 @@ func (uc *EvaluationUseCase) CreateEvaluation(ctx context.Context, evaluation *e
 		return errors.ErrEvaluationAlreadyExists
 	}
 
-	evaluation.Status = entities.EvaluationStatusDraft
+	evaluation.Status = entities.EvaluationStatusBorrador
 	return uc.evaluationRepo.Create(ctx, evaluation)
 }
 
@@ -104,7 +104,7 @@ func (uc *EvaluationUseCase) CompleteEvaluation(ctx context.Context, id uuid.UUI
 		return err
 	}
 
-	submission.Status = entities.SubmissionStatusEvaluated
+	submission.Status = entities.SubmissionStatusEvaluada
 	return uc.submissionRepo.Update(ctx, submission)
 }
 
@@ -118,11 +118,11 @@ func (uc *EvaluationUseCase) PublishEvaluation(ctx context.Context, id uuid.UUID
 		return errors.ErrEvaluationNotFound
 	}
 
-	if evaluation.Status != entities.EvaluationStatusCompleted {
+	if evaluation.Status != entities.EvaluationStatusCompletada {
 		return errors.ErrEvaluationNotAllowed
 	}
 
-	evaluation.Status = entities.EvaluationStatusPublished
+	evaluation.Status = entities.EvaluationStatusPublicada
 	return uc.evaluationRepo.Update(ctx, evaluation)
 }
 

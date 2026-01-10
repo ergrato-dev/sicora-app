@@ -4,17 +4,17 @@ package valueobjects
 type QuestionType string
 
 const (
-	QuestionTypeLikert         QuestionType = "LIKERT"          // Escala 1-5
-	QuestionTypeText           QuestionType = "TEXT"            // Respuesta libre
-	QuestionTypeMultipleChoice QuestionType = "MULTIPLE_CHOICE" // Selección múltiple
-	QuestionTypeSingleChoice   QuestionType = "SINGLE_CHOICE"   // Selección única
-	QuestionTypeBoolean        QuestionType = "BOOLEAN"         // Sí/No
+	QuestionTypeEscalaLikert      QuestionType = "ESCALA_LIKERT"      // Escala 1-5
+	QuestionTypeTexto             QuestionType = "TEXTO"              // Respuesta libre
+	QuestionTypeSeleccionMultiple QuestionType = "SELECCION_MULTIPLE" // Selección múltiple
+	QuestionTypeSeleccionUnica    QuestionType = "SELECCION_UNICA"    // Selección única
+	QuestionTypeSiNo              QuestionType = "SI_NO"              // Sí/No
 )
 
 // IsValid verifica si el tipo de pregunta es válido
 func (qt QuestionType) IsValid() bool {
 	switch qt {
-	case QuestionTypeLikert, QuestionTypeText, QuestionTypeMultipleChoice, QuestionTypeSingleChoice, QuestionTypeBoolean:
+	case QuestionTypeEscalaLikert, QuestionTypeTexto, QuestionTypeSeleccionMultiple, QuestionTypeSeleccionUnica, QuestionTypeSiNo:
 		return true
 	default:
 		return false
@@ -29,14 +29,14 @@ func (qt QuestionType) String() string {
 // GetValidOptions retorna las opciones válidas para el tipo de pregunta
 func (qt QuestionType) GetValidOptions() []string {
 	switch qt {
-	case QuestionTypeLikert:
+	case QuestionTypeEscalaLikert:
 		return []string{"1", "2", "3", "4", "5"}
-	case QuestionTypeBoolean:
-		return []string{"true", "false"}
-	case QuestionTypeMultipleChoice, QuestionTypeSingleChoice:
+	case QuestionTypeSiNo:
+		return []string{"SI", "NO"}
+	case QuestionTypeSeleccionMultiple, QuestionTypeSeleccionUnica:
 		// Se definen en la pregunta específica
 		return nil
-	case QuestionTypeText:
+	case QuestionTypeTexto:
 		// Respuesta libre
 		return nil
 	default:
@@ -46,10 +46,10 @@ func (qt QuestionType) GetValidOptions() []string {
 
 // RequiresOptions indica si el tipo de pregunta requiere opciones predefinidas
 func (qt QuestionType) RequiresOptions() bool {
-	return qt == QuestionTypeMultipleChoice || qt == QuestionTypeSingleChoice
+	return qt == QuestionTypeSeleccionMultiple || qt == QuestionTypeSeleccionUnica
 }
 
 // AllowsMultipleAnswers indica si el tipo permite múltiples respuestas
 func (qt QuestionType) AllowsMultipleAnswers() bool {
-	return qt == QuestionTypeMultipleChoice
+	return qt == QuestionTypeSeleccionMultiple
 }

@@ -14,18 +14,18 @@ import (
 )
 
 var (
-	ErrDocumentNotFound     = errors.New("document not found")
-	ErrDocumentExists       = errors.New("document already exists")
-	ErrUnauthorized         = errors.New("unauthorized")
-	ErrInvalidStatus        = errors.New("invalid status transition")
-	ErrValidationFailed     = errors.New("validation failed")
+	ErrDocumentNotFound = errors.New("document not found")
+	ErrDocumentExists   = errors.New("document already exists")
+	ErrUnauthorized     = errors.New("unauthorized")
+	ErrInvalidStatus    = errors.New("invalid status transition")
+	ErrValidationFailed = errors.New("validation failed")
 )
 
 // DocumentUseCase defines the business logic for document operations
 type DocumentUseCase struct {
-	documentRepo repositories.DocumentRepository
+	documentRepo  repositories.DocumentRepository
 	analyticsRepo repositories.AnalyticsRepository
-	aiService    AIService
+	aiService     AIService
 	searchService SearchService
 }
 
@@ -76,7 +76,7 @@ func (uc *DocumentUseCase) CreateDocument(ctx context.Context, req *dto.CreateDo
 		Type:            req.Type,
 		Category:        req.Category,
 		Audience:        req.Audience,
-		Status:          entities.DocumentStatusDraft,
+		Status:          entities.DocumentStatusBorrador,
 		Tags:            req.Tags,
 		MetaTitle:       req.MetaTitle,
 		MetaDescription: req.MetaDescription,
@@ -212,7 +212,7 @@ func (uc *DocumentUseCase) UpdateDocument(ctx context.Context, id uuid.UUID, req
 	}
 
 	// Create version if this is a published document
-	if document.Status == entities.DocumentStatusPublished {
+	if document.Status == entities.DocumentStatusPublicado {
 		version := &entities.DocumentVersion{
 			ID:           uuid.New(),
 			DocumentID:   document.ID,
@@ -225,7 +225,7 @@ func (uc *DocumentUseCase) UpdateDocument(ctx context.Context, id uuid.UUID, req
 			AuthorID:     document.AuthorID,
 			CreatedAt:    time.Now(),
 		}
-		
+
 		if err := uc.documentRepo.CreateVersion(ctx, version); err != nil {
 			return nil, fmt.Errorf("failed to create version backup: %w", err)
 		}
@@ -332,7 +332,7 @@ func (uc *DocumentUseCase) SearchDocuments(ctx context.Context, req *dto.SearchD
 		Categories: req.Categories,
 		Types:      req.Types,
 		Audiences:  req.Audiences,
-		Statuses:   []entities.DocumentStatus{entities.DocumentStatusPublished}, // Only search published
+		Statuses:   []entities.DocumentStatus{entities.DocumentStatusPublicado}, // Only search published
 		Tags:       req.Tags,
 		DateFrom:   req.DateFrom,
 		DateTo:     req.DateTo,
@@ -421,7 +421,7 @@ func (uc *DocumentUseCase) SubmitForReview(ctx context.Context, documentID, revi
 	}
 
 	// Check status transition
-	if document.Status != entities.DocumentStatusDraft {
+	if document.Status != entities.DocumentStatusBorrador {
 		return fmt.Errorf("%w: can only submit draft documents for review", ErrInvalidStatus)
 	}
 
@@ -444,7 +444,7 @@ func (uc *DocumentUseCase) ApproveDocument(ctx context.Context, documentID, revi
 	}
 
 	// Check status
-	if document.Status != entities.DocumentStatusReview {
+	if document.Status != entities.DocumentStatusEnRevision {
 		return fmt.Errorf("%w: can only approve documents under review", ErrInvalidStatus)
 	}
 
@@ -477,7 +477,7 @@ func (uc *DocumentUseCase) PublishDocument(ctx context.Context, documentID uuid.
 	}
 
 	// Check status
-	if document.Status != entities.DocumentStatusApproved {
+	if document.Status != entities.DocumentStatusAprobado {
 		return fmt.Errorf("%w: can only publish approved documents", ErrInvalidStatus)
 	}
 

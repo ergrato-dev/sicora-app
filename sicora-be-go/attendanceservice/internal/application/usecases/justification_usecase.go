@@ -51,7 +51,7 @@ func (uc *JustificationUseCase) CreateJustification(ctx context.Context, req *dt
 		StudentID:    req.StudentID,
 		Reason:       req.Reason,
 		Description:  req.Description,
-		Status:       entities.JustificationStatusPending,
+		Status:       entities.JustificationStatusPendiente,
 		IsActive:     true,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
@@ -82,7 +82,7 @@ func (uc *JustificationUseCase) UpdateJustification(ctx context.Context, id uuid
 	}
 
 	// Solo se puede actualizar si está pendiente
-	if justification.Status != entities.JustificationStatusPending {
+	if justification.Status != entities.JustificationStatusPendiente {
 		return nil, errors.New("cannot update justification that is not pending")
 	}
 
@@ -184,7 +184,7 @@ func (uc *JustificationUseCase) ApproveJustification(ctx context.Context, id uui
 	}
 
 	// Verificar que está pendiente
-	if justification.Status != entities.JustificationStatusPending {
+	if justification.Status != entities.JustificationStatusPendiente {
 		return nil, errors.New("justification is not pending")
 	}
 
@@ -199,10 +199,10 @@ func (uc *JustificationUseCase) ApproveJustification(ctx context.Context, id uui
 		return nil, err
 	}
 
-	// Actualizar el estado de asistencia asociado a "JUSTIFIED"
+	// Actualizar el estado de asistencia asociado a "JUSTIFICADO"
 	attendance, err := uc.attendanceRepo.GetByID(ctx, justification.AttendanceID)
 	if err == nil && attendance != nil {
-		attendance.Status = entities.AttendanceStatusJustified
+		attendance.Status = entities.AttendanceStatusJustificado
 		attendance.UpdatedAt = time.Now()
 		uc.attendanceRepo.Update(ctx, attendance)
 	}
@@ -222,7 +222,7 @@ func (uc *JustificationUseCase) RejectJustification(ctx context.Context, id uuid
 	}
 
 	// Verificar que está pendiente
-	if justification.Status != entities.JustificationStatusPending {
+	if justification.Status != entities.JustificationStatusPendiente {
 		return nil, errors.New("justification is not pending")
 	}
 
@@ -252,7 +252,7 @@ func (uc *JustificationUseCase) DeleteJustification(ctx context.Context, id uuid
 	}
 
 	// Solo se puede eliminar si está pendiente
-	if justification.Status != entities.JustificationStatusPending {
+	if justification.Status != entities.JustificationStatusPendiente {
 		return errors.New("cannot delete justification that is not pending")
 	}
 

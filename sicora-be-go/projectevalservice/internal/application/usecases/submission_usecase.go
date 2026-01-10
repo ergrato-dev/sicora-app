@@ -41,7 +41,7 @@ func (uc *SubmissionUseCase) CreateSubmission(ctx context.Context, submission *e
 		return errors.ErrSubmissionAlreadyExists
 	}
 
-	submission.Status = entities.SubmissionStatusSubmitted
+	submission.Status = entities.SubmissionStatusEnviada
 	return uc.submissionRepo.Create(ctx, submission)
 }
 
@@ -67,7 +67,7 @@ func (uc *SubmissionUseCase) UpdateSubmission(ctx context.Context, submission *e
 		return errors.ErrSubmissionNotFound
 	}
 
-	if existing.Status == entities.SubmissionStatusEvaluated {
+	if existing.Status == entities.SubmissionStatusEvaluada {
 		return errors.ErrSubmissionNotAllowed
 	}
 
@@ -88,7 +88,7 @@ func (uc *SubmissionUseCase) DeleteSubmission(ctx context.Context, id uuid.UUID)
 		return errors.ErrSubmissionNotFound
 	}
 
-	if existing.Status == entities.SubmissionStatusEvaluated {
+	if existing.Status == entities.SubmissionStatusEvaluada {
 		return errors.ErrSubmissionNotAllowed
 	}
 
@@ -113,6 +113,6 @@ func (uc *SubmissionUseCase) MarkAsEvaluating(ctx context.Context, id uuid.UUID)
 		return errors.ErrSubmissionNotAllowed
 	}
 
-	submission.Status = entities.SubmissionStatusEvaluating
+	submission.Status = entities.SubmissionStatusEnEvaluacion
 	return uc.submissionRepo.Update(ctx, submission)
 }

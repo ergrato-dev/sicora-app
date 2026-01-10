@@ -6,6 +6,7 @@ import (
 
 	"evalinservice/internal/domain/exceptions"
 	"evalinservice/internal/domain/valueobjects"
+
 	"github.com/google/uuid"
 )
 
@@ -37,7 +38,7 @@ func NewEvaluationPeriod(name, description string, startDate, endDate time.Time,
 		Description:     strings.TrimSpace(description),
 		StartDate:       startDate,
 		EndDate:         endDate,
-		Status:          valueobjects.PeriodStatusDraft,
+		Status:          valueobjects.PeriodStatusBorrador,
 		QuestionnaireID: questionnaireID,
 		FichaID:         fichaID,
 		IsActive:        false, // Se activa cuando el estado pasa a ACTIVE
@@ -162,7 +163,7 @@ func (p *EvaluationPeriod) Activate() error {
 		return exceptions.NewValidationError("status", "el período no puede ser activado desde su estado actual")
 	}
 
-	p.Status = valueobjects.PeriodStatusActive
+	p.Status = valueobjects.PeriodStatusActivo
 	p.IsActive = true
 	p.UpdatedAt = time.Now()
 	return nil
@@ -174,7 +175,7 @@ func (p *EvaluationPeriod) Close() error {
 		return exceptions.NewValidationError("status", "el período no puede ser cerrado desde su estado actual")
 	}
 
-	p.Status = valueobjects.PeriodStatusClosed
+	p.Status = valueobjects.PeriodStatusCerrado
 	p.IsActive = false
 	p.UpdatedAt = time.Now()
 	return nil

@@ -63,7 +63,7 @@ func (uc *ProjectDocumentUseCase) CreateDocument(ctx context.Context, req *Creat
 	if err != nil {
 		return nil, domainErrors.ErrStakeholderNotFound
 	}
-	if stakeholder.Status != entities.StakeholderStatusActive {
+	if stakeholder.Status != entities.StakeholderStatusActivo {
 		return nil, domainErrors.ErrStakeholderNotAllowed
 	}
 

@@ -26,10 +26,10 @@ type Submission struct {
 type SubmissionStatus string
 
 const (
-	SubmissionStatusSubmitted  SubmissionStatus = "submitted"
-	SubmissionStatusEvaluating SubmissionStatus = "evaluating"
-	SubmissionStatusEvaluated  SubmissionStatus = "evaluated"
-	SubmissionStatusRejected   SubmissionStatus = "rejected"
+	SubmissionStatusEnviada      SubmissionStatus = "ENVIADA"
+	SubmissionStatusEnEvaluacion SubmissionStatus = "EN_EVALUACION"
+	SubmissionStatusEvaluada     SubmissionStatus = "EVALUADA"
+	SubmissionStatusRechazada    SubmissionStatus = "RECHAZADA"
 )
 
 func (ss SubmissionStatus) String() string {
@@ -38,7 +38,7 @@ func (ss SubmissionStatus) String() string {
 
 func (ss SubmissionStatus) IsValid() bool {
 	switch ss {
-	case SubmissionStatusSubmitted, SubmissionStatusEvaluating, SubmissionStatusEvaluated, SubmissionStatusRejected:
+	case SubmissionStatusEnviada, SubmissionStatusEnEvaluacion, SubmissionStatusEvaluada, SubmissionStatusRechazada:
 		return true
 	default:
 		return false
@@ -46,9 +46,9 @@ func (ss SubmissionStatus) IsValid() bool {
 }
 
 func (s *Submission) CanBeEvaluated() bool {
-	return s.Status == SubmissionStatusSubmitted || s.Status == SubmissionStatusEvaluating
+	return s.Status == SubmissionStatusEnviada || s.Status == SubmissionStatusEnEvaluacion
 }
 
 func (s *Submission) IsEvaluated() bool {
-	return s.Status == SubmissionStatusEvaluated
+	return s.Status == SubmissionStatusEvaluada
 }

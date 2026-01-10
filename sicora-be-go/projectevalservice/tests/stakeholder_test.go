@@ -13,8 +13,8 @@ import (
 func TestNewStakeholder(t *testing.T) {
 	projectID := uuid.New()
 	userID := uuid.New()
-	role := entities.StakeholderRoleCoordinator
-	stakeholderType := entities.StakeholderTypeInternal
+	role := entities.StakeholderRoleCoordinador
+	stakeholderType := entities.StakeholderTypeInterno
 
 	stakeholder := entities.NewStakeholder(projectID, userID, role, stakeholderType)
 
@@ -22,7 +22,7 @@ func TestNewStakeholder(t *testing.T) {
 	assert.Equal(t, userID, stakeholder.UserID)
 	assert.Equal(t, role, stakeholder.Role)
 	assert.Equal(t, stakeholderType, stakeholder.Type)
-	assert.Equal(t, entities.StakeholderStatusActive, stakeholder.Status)
+	assert.Equal(t, entities.StakeholderStatusActivo, stakeholder.Status)
 	assert.Equal(t, 1, stakeholder.AccessLevel)
 	assert.False(t, stakeholder.CanEvaluate)
 	assert.False(t, stakeholder.CanReview)
@@ -35,8 +35,8 @@ func TestStakeholder_IsValid(t *testing.T) {
 		stakeholder := entities.NewStakeholder(
 			uuid.New(),
 			uuid.New(),
-			entities.StakeholderRoleCoordinator,
-			entities.StakeholderTypeInternal,
+			entities.StakeholderRoleCoordinador,
+			entities.StakeholderTypeInterno,
 		)
 
 		err := stakeholder.IsValid()
@@ -47,8 +47,8 @@ func TestStakeholder_IsValid(t *testing.T) {
 		stakeholder := entities.NewStakeholder(
 			uuid.Nil,
 			uuid.New(),
-			entities.StakeholderRoleCoordinator,
-			entities.StakeholderTypeInternal,
+			entities.StakeholderRoleCoordinador,
+			entities.StakeholderTypeInterno,
 		)
 
 		err := stakeholder.IsValid()
@@ -60,8 +60,8 @@ func TestStakeholder_IsValid(t *testing.T) {
 		stakeholder := entities.NewStakeholder(
 			uuid.New(),
 			uuid.Nil,
-			entities.StakeholderRoleCoordinator,
-			entities.StakeholderTypeInternal,
+			entities.StakeholderRoleCoordinador,
+			entities.StakeholderTypeInterno,
 		)
 
 		err := stakeholder.IsValid()
@@ -74,7 +74,7 @@ func TestStakeholder_IsValid(t *testing.T) {
 			uuid.New(),
 			uuid.New(),
 			"invalid_role",
-			entities.StakeholderTypeInternal,
+			entities.StakeholderTypeInterno,
 		)
 
 		err := stakeholder.IsValid()
@@ -86,8 +86,8 @@ func TestStakeholder_IsValid(t *testing.T) {
 		stakeholder := entities.NewStakeholder(
 			uuid.New(),
 			uuid.New(),
-			entities.StakeholderRoleCoordinator,
-			entities.StakeholderTypeInternal,
+			entities.StakeholderRoleCoordinador,
+			entities.StakeholderTypeInterno,
 		)
 		stakeholder.AccessLevel = 6
 
@@ -101,11 +101,11 @@ func TestStakeholder_IsValidRole(t *testing.T) {
 	stakeholder := &entities.Stakeholder{}
 
 	validRoles := []entities.StakeholderRole{
-		entities.StakeholderRoleCoordinator,
-		entities.StakeholderRoleJuror,
-		entities.StakeholderRoleManager,
-		entities.StakeholderRoleExternal,
-		entities.StakeholderRoleObserver,
+		entities.StakeholderRoleCoordinador,
+		entities.StakeholderRoleJurado,
+		entities.StakeholderRoleGestor,
+		entities.StakeholderRoleExterno,
+		entities.StakeholderRoleObservador,
 	}
 
 	for _, role := range validRoles {
@@ -119,10 +119,10 @@ func TestStakeholder_IsValidType(t *testing.T) {
 	stakeholder := &entities.Stakeholder{}
 
 	validTypes := []entities.StakeholderType{
-		entities.StakeholderTypeInternal,
-		entities.StakeholderTypeExternal,
-		entities.StakeholderTypeIndustry,
-		entities.StakeholderTypeAcademic,
+		entities.StakeholderTypeInterno,
+		entities.StakeholderTypeExterno,
+		entities.StakeholderTypeIndustria,
+		entities.StakeholderTypeAcademico,
 	}
 
 	for _, stakeholderType := range validTypes {
@@ -136,10 +136,10 @@ func TestStakeholder_IsValidStatus(t *testing.T) {
 	stakeholder := &entities.Stakeholder{}
 
 	validStatuses := []entities.StakeholderStatus{
-		entities.StakeholderStatusActive,
-		entities.StakeholderStatusInactive,
-		entities.StakeholderStatusPending,
-		entities.StakeholderStatusBlocked,
+		entities.StakeholderStatusActivo,
+		entities.StakeholderStatusInactivo,
+		entities.StakeholderStatusPendiente,
+		entities.StakeholderStatusBloqueado,
 	}
 
 	for _, status := range validStatuses {
@@ -151,7 +151,7 @@ func TestStakeholder_IsValidStatus(t *testing.T) {
 
 func TestStakeholder_CanPerformAction(t *testing.T) {
 	stakeholder := &entities.Stakeholder{
-		Status:      entities.StakeholderStatusActive,
+		Status:      entities.StakeholderStatusActivo,
 		CanEvaluate: true,
 		CanReview:   true,
 		CanApprove:  false,
@@ -163,7 +163,7 @@ func TestStakeholder_CanPerformAction(t *testing.T) {
 	assert.False(t, stakeholder.CanPerformAction("invalid_action"))
 
 	// Test inactive stakeholder
-	stakeholder.Status = entities.StakeholderStatusInactive
+	stakeholder.Status = entities.StakeholderStatusInactivo
 	assert.False(t, stakeholder.CanPerformAction("evaluate"))
 	assert.False(t, stakeholder.CanPerformAction("review"))
 }
@@ -182,44 +182,44 @@ func TestStakeholder_UpdateLastActive(t *testing.T) {
 func TestStakeholder_Activate(t *testing.T) {
 	t.Run("Activate pending stakeholder", func(t *testing.T) {
 		stakeholder := &entities.Stakeholder{
-			Status: entities.StakeholderStatusPending,
+			Status: entities.StakeholderStatusPendiente,
 		}
 
 		err := stakeholder.Activate()
 		assert.NoError(t, err)
-		assert.Equal(t, entities.StakeholderStatusActive, stakeholder.Status)
+		assert.Equal(t, entities.StakeholderStatusActivo, stakeholder.Status)
 	})
 
 	t.Run("Cannot activate blocked stakeholder", func(t *testing.T) {
 		stakeholder := &entities.Stakeholder{
-			Status: entities.StakeholderStatusBlocked,
+			Status: entities.StakeholderStatusBloqueado,
 		}
 
 		err := stakeholder.Activate()
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "cannot activate blocked stakeholder")
-		assert.Equal(t, entities.StakeholderStatusBlocked, stakeholder.Status)
+		assert.Equal(t, entities.StakeholderStatusBloqueado, stakeholder.Status)
 	})
 }
 
 func TestStakeholder_Deactivate(t *testing.T) {
 	stakeholder := &entities.Stakeholder{
-		Status: entities.StakeholderStatusActive,
+		Status: entities.StakeholderStatusActivo,
 	}
 
 	stakeholder.Deactivate()
-	assert.Equal(t, entities.StakeholderStatusInactive, stakeholder.Status)
+	assert.Equal(t, entities.StakeholderStatusInactivo, stakeholder.Status)
 }
 
 func TestStakeholder_Block(t *testing.T) {
 	stakeholder := &entities.Stakeholder{
-		Status: entities.StakeholderStatusActive,
+		Status: entities.StakeholderStatusActivo,
 	}
 
 	reason := "Inappropriate behavior"
 	stakeholder.Block(reason)
 
-	assert.Equal(t, entities.StakeholderStatusBlocked, stakeholder.Status)
+	assert.Equal(t, entities.StakeholderStatusBloqueado, stakeholder.Status)
 	assert.Equal(t, reason, stakeholder.Notes)
 }
 
@@ -239,11 +239,11 @@ func TestStakeholder_HasHighAccessLevel(t *testing.T) {
 func TestStakeholder_RoleCheckers(t *testing.T) {
 	stakeholder := &entities.Stakeholder{}
 
-	stakeholder.Role = entities.StakeholderRoleCoordinator
+	stakeholder.Role = entities.StakeholderRoleCoordinador
 	assert.True(t, stakeholder.IsCoordinator())
 	assert.False(t, stakeholder.IsJuror())
 
-	stakeholder.Role = entities.StakeholderRoleJuror
+	stakeholder.Role = entities.StakeholderRoleJurado
 	assert.False(t, stakeholder.IsCoordinator())
 	assert.True(t, stakeholder.IsJuror())
 }
@@ -251,15 +251,15 @@ func TestStakeholder_RoleCheckers(t *testing.T) {
 func TestStakeholder_IsExternal(t *testing.T) {
 	stakeholder := &entities.Stakeholder{}
 
-	stakeholder.Type = entities.StakeholderTypeInternal
+	stakeholder.Type = entities.StakeholderTypeInterno
 	assert.False(t, stakeholder.IsExternal())
 
-	stakeholder.Type = entities.StakeholderTypeExternal
+	stakeholder.Type = entities.StakeholderTypeExterno
 	assert.True(t, stakeholder.IsExternal())
 
-	stakeholder.Type = entities.StakeholderTypeIndustry
+	stakeholder.Type = entities.StakeholderTypeIndustria
 	assert.True(t, stakeholder.IsExternal())
 
-	stakeholder.Type = entities.StakeholderTypeAcademic
+	stakeholder.Type = entities.StakeholderTypeAcademico
 	assert.False(t, stakeholder.IsExternal())
 }

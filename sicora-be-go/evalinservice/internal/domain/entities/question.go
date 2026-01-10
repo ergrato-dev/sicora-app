@@ -6,6 +6,7 @@ import (
 
 	"evalinservice/internal/domain/exceptions"
 	"evalinservice/internal/domain/valueobjects"
+
 	"github.com/google/uuid"
 )
 
@@ -138,15 +139,15 @@ func (q *Question) ValidateResponse(response string) error {
 
 	// Validar según el tipo de pregunta
 	switch q.Type {
-	case valueobjects.QuestionTypeLikert:
+	case valueobjects.QuestionTypeEscalaLikert:
 		return q.validateLikertResponse(response)
-	case valueobjects.QuestionTypeBoolean:
+	case valueobjects.QuestionTypeSiNo:
 		return q.validateBooleanResponse(response)
-	case valueobjects.QuestionTypeSingleChoice:
+	case valueobjects.QuestionTypeSeleccionUnica:
 		return q.validateSingleChoiceResponse(response)
-	case valueobjects.QuestionTypeMultipleChoice:
+	case valueobjects.QuestionTypeSeleccionMultiple:
 		return q.validateMultipleChoiceResponse(response)
-	case valueobjects.QuestionTypeText:
+	case valueobjects.QuestionTypeTexto:
 		return q.validateTextResponse(response)
 	default:
 		return exceptions.NewInvalidQuestionTypeError(string(q.Type))

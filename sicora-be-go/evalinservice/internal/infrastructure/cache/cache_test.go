@@ -67,7 +67,7 @@ func createTestPeriod(id uuid.UUID, name string) *entities.EvaluationPeriod {
 		Description:     "Test period",
 		StartDate:       now,
 		EndDate:         now.AddDate(0, 1, 0),
-		Status:          valueobjects.PeriodStatusActive,
+		Status:          valueobjects.PeriodStatusActivo,
 		QuestionnaireID: uuid.New(),
 		FichaID:         uuid.New(),
 		IsActive:        true,

@@ -388,7 +388,7 @@ func (r *faqRepository) UpdateScores(ctx context.Context, faqID uuid.UUID) error
 func (r *faqRepository) GetPopularFAQs(ctx context.Context, category *entities.DocumentCategory, limit int) ([]entities.FAQ, error) {
 	var faqs []entities.FAQ
 	query := r.db.WithContext(ctx).
-		Where("status = ? AND deleted_at IS NULL", entities.FAQStatusPublished)
+		Where("status = ? AND deleted_at IS NULL", entities.FAQStatusPublicado)
 
 	if category != nil {
 		query = query.Where("category = ?", *category)
@@ -420,7 +420,7 @@ func (r *faqRepository) GetTrendingFAQs(ctx context.Context, category *entities.
 
 	query := r.db.WithContext(ctx).
 		Where("status = ? AND deleted_at IS NULL AND last_viewed_at >= ?",
-			entities.FAQStatusPublished, since)
+			entities.FAQStatusPublicado, since)
 
 	if category != nil {
 		query = query.Where("category = ?", *category)
@@ -447,7 +447,7 @@ func (r *faqRepository) GetRelatedFAQs(ctx context.Context, faqID uuid.UUID, lim
 	if len(sourceFAQ.RelatedFAQs) > 0 {
 		err := r.db.WithContext(ctx).
 			Where("id IN ? AND status = ? AND deleted_at IS NULL",
-				sourceFAQ.RelatedFAQs, entities.FAQStatusPublished).
+				sourceFAQ.RelatedFAQs, entities.FAQStatusPublicado).
 			Limit(limit).
 			Find(&faqs).Error
 		return faqs, err
@@ -456,7 +456,7 @@ func (r *faqRepository) GetRelatedFAQs(ctx context.Context, faqID uuid.UUID, lim
 	// Otherwise, find FAQs in the same category
 	err := r.db.WithContext(ctx).
 		Where("id != ? AND category = ? AND status = ? AND deleted_at IS NULL",
-			faqID, sourceFAQ.Category, entities.FAQStatusPublished).
+			faqID, sourceFAQ.Category, entities.FAQStatusPublicado).
 		Order("overall_score DESC").
 		Limit(limit).
 		Find(&faqs).Error
@@ -471,7 +471,7 @@ func (r *faqRepository) PublishFAQ(ctx context.Context, faqID uuid.UUID) error {
 		Model(&entities.FAQ{}).
 		Where("id = ?", faqID).
 		Updates(map[string]interface{}{
-			"status":       entities.FAQStatusPublished,
+			"status":       entities.FAQStatusPublicado,
 			"published_at": &now,
 			"updated_at":   now,
 		}).Error
@@ -491,7 +491,7 @@ func (r *faqRepository) ConvertSuggestionToFAQ(ctx context.Context, suggestionID
 		Category:  suggestion.Category,
 		Audience:  suggestion.Audience,
 		Tags:      suggestion.Tags,
-		Status:    entities.FAQStatusDraft,
+		Status:    entities.FAQStatusBorrador,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -506,9 +506,9 @@ func (r *faqRepository) ConvertSuggestionToFAQ(ctx context.Context, suggestionID
 		Model(&entities.FAQSuggestion{}).
 		Where("id = ?", suggestionID).
 		Updates(map[string]interface{}{
-			"status":          "APPROVED",
+			"status":           "APPROVED",
 			"converted_to_faq": faq.ID,
-			"updated_at":      now,
+			"updated_at":       now,
 		})
 
 	return faq, nil

@@ -139,8 +139,8 @@ func (r *evaluationRepository) GetEvaluationsByStatus(ctx context.Context, statu
 func (r *evaluationRepository) GetCompletedEvaluations(ctx context.Context) ([]*entities.Evaluation, error) {
 	var models []models.Evaluation
 	result := r.db.WithContext(ctx).Preload("Submission").Preload("Submission.Project").Where("status IN ?", []string{
-		string(entities.EvaluationStatusCompleted),
-		string(entities.EvaluationStatusPublished),
+		string(entities.EvaluationStatusCompletada),
+		string(entities.EvaluationStatusPublicada),
 	}).Find(&models)
 	if result.Error != nil {
 		return nil, result.Error

@@ -193,7 +193,7 @@ func (uc *AttendanceUseCase) RegisterQRCodeAttendance(ctx context.Context, req *
 		QRCodeData:  req.QRCodeData,
 		Date:        now,
 		CheckInTime: &now,
-		Status:      entities.AttendanceStatusPresent,
+		Status:      entities.AttendanceStatusPresente,
 		IsActive:    true,
 		CreatedAt:   now,
 		UpdatedAt:   now,
@@ -253,7 +253,7 @@ func (uc *AttendanceUseCase) DeleteAttendance(ctx context.Context, id uuid.UUID)
 // checkAndGenerateAlerts verifica y genera alertas según el patrón de asistencia
 func (uc *AttendanceUseCase) checkAndGenerateAlerts(ctx context.Context, attendance *entities.AttendanceRecord) {
 	// Verificar ausencias consecutivas
-	if attendance.Status == entities.AttendanceStatusAbsent {
+	if attendance.Status == entities.AttendanceStatusAusente {
 		// Obtener registros recientes para verificar patrón
 		endDate := attendance.Date
 		startDate := endDate.AddDate(0, 0, -7) // Últimos 7 días
@@ -265,7 +265,7 @@ func (uc *AttendanceUseCase) checkAndGenerateAlerts(ctx context.Context, attenda
 
 		consecutiveAbsences := 0
 		for i := len(recentAttendances) - 1; i >= 0; i-- {
-			if recentAttendances[i].Status == entities.AttendanceStatusAbsent {
+			if recentAttendances[i].Status == entities.AttendanceStatusAusente {
 				consecutiveAbsences++
 			} else {
 				break
@@ -277,8 +277,8 @@ func (uc *AttendanceUseCase) checkAndGenerateAlerts(ctx context.Context, attenda
 			alert := &entities.AttendanceAlert{
 				ID:          uuid.New(),
 				StudentID:   attendance.StudentID,
-				Type:        entities.AlertTypeConsecutive,
-				Level:       entities.AlertLevelHigh,
+				Type:        entities.AlertTypeConsecutivo,
+				Level:       entities.AlertLevelAlto,
 				Title:       "Ausencias Consecutivas Detectadas",
 				Description: "Se han detectado ausencias consecutivas que requieren atención",
 				IsRead:      false,

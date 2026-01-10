@@ -52,9 +52,9 @@ type Evaluation struct {
 type EvaluationStatus string
 
 const (
-	EvaluationStatusDraft     EvaluationStatus = "draft"
-	EvaluationStatusCompleted EvaluationStatus = "completed"
-	EvaluationStatusPublished EvaluationStatus = "published"
+	EvaluationStatusBorrador   EvaluationStatus = "BORRADOR"
+	EvaluationStatusCompletada EvaluationStatus = "COMPLETADA"
+	EvaluationStatusPublicada  EvaluationStatus = "PUBLICADA"
 )
 
 func (es EvaluationStatus) String() string {
@@ -63,7 +63,7 @@ func (es EvaluationStatus) String() string {
 
 func (es EvaluationStatus) IsValid() bool {
 	switch es {
-	case EvaluationStatusDraft, EvaluationStatusCompleted, EvaluationStatusPublished:
+	case EvaluationStatusBorrador, EvaluationStatusCompletada, EvaluationStatusPublicada:
 		return true
 	default:
 		return false
@@ -110,15 +110,15 @@ func (e *Evaluation) CalculateGrade() {
 func (e *Evaluation) Complete() {
 	e.CalculateTotalScore()
 	e.CalculateGrade()
-	e.Status = EvaluationStatusCompleted
+	e.Status = EvaluationStatusCompletada
 	now := time.Now()
 	e.EvaluatedAt = &now
 }
 
 func (e *Evaluation) CanBeModified() bool {
-	return e.Status == EvaluationStatusDraft
+	return e.Status == EvaluationStatusBorrador
 }
 
 func (e *Evaluation) IsCompleted() bool {
-	return e.Status == EvaluationStatusCompleted || e.Status == EvaluationStatusPublished
+	return e.Status == EvaluationStatusCompletada || e.Status == EvaluationStatusPublicada
 }

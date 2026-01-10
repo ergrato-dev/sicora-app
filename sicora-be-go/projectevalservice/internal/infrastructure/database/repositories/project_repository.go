@@ -95,7 +95,7 @@ func (r *projectRepository) Delete(ctx context.Context, id uuid.UUID) error {
 
 func (r *projectRepository) GetActiveProjects(ctx context.Context) ([]*entities.Project, error) {
 	var models []models.Project
-	result := r.db.WithContext(ctx).Where("status = ?", string(entities.ProjectStatusActive)).Find(&models)
+	result := r.db.WithContext(ctx).Where("status = ?", string(entities.ProjectStatusActivo)).Find(&models)
 	if result.Error != nil {
 		return nil, result.Error
 	}

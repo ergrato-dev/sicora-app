@@ -87,7 +87,7 @@ func (uc *ReportUseCase) GenerateReport(ctx context.Context, id uuid.UUID) error
 		return fmt.Errorf("report not found: %w", err)
 	}
 
-	if report.Status != valueobjects.ReportStatusPending {
+	if report.Status != valueobjects.ReportStatusPendiente {
 		return exceptions.NewValidationError("status", "report is not in pending status")
 	}
 
@@ -105,9 +105,9 @@ func (uc *ReportUseCase) processReportGeneration(ctx context.Context, report *en
 	results := make(map[string]interface{})
 
 	switch report.Type {
-	case valueobjects.ReportTypeInstructorPerformance:
+	case valueobjects.ReportTypeRendimientoInstructor:
 		results = uc.generateInstructorPerformanceReport(ctx, report)
-	case valueobjects.ReportTypePeriodSummary:
+	case valueobjects.ReportTypeResumenPeriodo:
 		results = uc.generatePeriodSummaryReport(ctx, report)
 	default:
 		report.SetFailed("unsupported report type")
@@ -156,7 +156,7 @@ func (uc *ReportUseCase) DeleteReport(ctx context.Context, id uuid.UUID) error {
 		return fmt.Errorf("report not found: %w", err)
 	}
 
-	if report.Status == valueobjects.ReportStatusGenerating {
+	if report.Status == valueobjects.ReportStatusGenerando {
 		return exceptions.NewValidationError("status", "cannot delete report that is being generated")
 	}
 

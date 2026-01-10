@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"evalinservice/internal/domain/valueobjects"
+
 	"github.com/google/uuid"
 )
 
@@ -31,7 +32,7 @@ func NewReport(periodID, generatedBy uuid.UUID, reportType valueobjects.ReportTy
 		ID:          uuid.New(),
 		PeriodID:    periodID,
 		Type:        reportType,
-		Status:      valueobjects.ReportStatusPending,
+		Status:      valueobjects.ReportStatusPendiente,
 		Title:       title,
 		Description: description,
 		Parameters:  parameters,
@@ -42,12 +43,12 @@ func NewReport(periodID, generatedBy uuid.UUID, reportType valueobjects.ReportTy
 }
 
 func (r *Report) SetGenerating() {
-	r.Status = valueobjects.ReportStatusGenerating
+	r.Status = valueobjects.ReportStatusGenerando
 	r.UpdatedAt = time.Now()
 }
 
 func (r *Report) SetCompleted(filePath string, results map[string]interface{}) {
-	r.Status = valueobjects.ReportStatusCompleted
+	r.Status = valueobjects.ReportStatusCompletado
 	r.FilePath = filePath
 	r.Results = results
 	now := time.Now()
@@ -56,7 +57,7 @@ func (r *Report) SetCompleted(filePath string, results map[string]interface{}) {
 }
 
 func (r *Report) SetFailed(errorMessage string) {
-	r.Status = valueobjects.ReportStatusFailed
+	r.Status = valueobjects.ReportStatusFallido
 	r.ErrorMessage = errorMessage
 	r.UpdatedAt = time.Now()
 }

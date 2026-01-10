@@ -11,12 +11,12 @@ import (
 
 func TestProject_IsActive(t *testing.T) {
 	project := &entities.Project{
-		Status: entities.ProjectStatusActive,
+		Status: entities.ProjectStatusActivo,
 	}
 
 	assert.True(t, project.IsActive())
 
-	project.Status = entities.ProjectStatusInactive
+	project.Status = entities.ProjectStatusInactivo
 	assert.False(t, project.IsActive())
 }
 
@@ -33,26 +33,26 @@ func TestProject_IsDeliveryDatePassed(t *testing.T) {
 
 func TestProject_CanReceiveSubmissions(t *testing.T) {
 	project := &entities.Project{
-		Status:       entities.ProjectStatusActive,
+		Status:       entities.ProjectStatusActivo,
 		DeliveryDate: time.Now().Add(24 * time.Hour), // Tomorrow
 	}
 
 	assert.True(t, project.CanReceiveSubmissions())
 
 	// Test inactive project
-	project.Status = entities.ProjectStatusInactive
+	project.Status = entities.ProjectStatusInactivo
 	assert.False(t, project.CanReceiveSubmissions())
 
 	// Test past delivery date
-	project.Status = entities.ProjectStatusActive
+	project.Status = entities.ProjectStatusActivo
 	project.DeliveryDate = time.Now().Add(-24 * time.Hour) // Yesterday
 	assert.False(t, project.CanReceiveSubmissions())
 }
 
 func TestProjectStatus_IsValid(t *testing.T) {
-	assert.True(t, entities.ProjectStatusActive.IsValid())
-	assert.True(t, entities.ProjectStatusInactive.IsValid())
-	assert.True(t, entities.ProjectStatusArchived.IsValid())
+	assert.True(t, entities.ProjectStatusActivo.IsValid())
+	assert.True(t, entities.ProjectStatusInactivo.IsValid())
+	assert.True(t, entities.ProjectStatusArchivado.IsValid())
 
 	invalidStatus := entities.ProjectStatus("invalid")
 	assert.False(t, invalidStatus.IsValid())
@@ -60,18 +60,18 @@ func TestProjectStatus_IsValid(t *testing.T) {
 
 func TestSubmission_CanBeEvaluated(t *testing.T) {
 	submission := &entities.Submission{
-		Status: entities.SubmissionStatusSubmitted,
+		Status: entities.SubmissionStatusEnviada,
 	}
 
 	assert.True(t, submission.CanBeEvaluated())
 
-	submission.Status = entities.SubmissionStatusEvaluating
+	submission.Status = entities.SubmissionStatusEnEvaluacion
 	assert.True(t, submission.CanBeEvaluated())
 
-	submission.Status = entities.SubmissionStatusEvaluated
+	submission.Status = entities.SubmissionStatusEvaluada
 	assert.False(t, submission.CanBeEvaluated())
 
-	submission.Status = entities.SubmissionStatusRejected
+	submission.Status = entities.SubmissionStatusRechazada
 	assert.False(t, submission.CanBeEvaluated())
 }
 
@@ -128,12 +128,12 @@ func TestEvaluation_Complete(t *testing.T) {
 		DeploymentScore:    70.0,
 		SecurityScore:      85.0,
 		PerformanceScore:   90.0,
-		Status:             entities.EvaluationStatusDraft,
+		Status:             entities.EvaluationStatusBorrador,
 	}
 
 	evaluation.Complete()
 
-	assert.Equal(t, entities.EvaluationStatusCompleted, evaluation.Status)
+	assert.Equal(t, entities.EvaluationStatusCompletada, evaluation.Status)
 	assert.NotZero(t, evaluation.TotalScore)
 	assert.NotEmpty(t, evaluation.Grade)
 	assert.NotNil(t, evaluation.EvaluatedAt)

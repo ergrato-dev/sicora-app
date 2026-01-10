@@ -4,15 +4,15 @@ package valueobjects
 type PeriodStatus string
 
 const (
-	PeriodStatusDraft  PeriodStatus = "DRAFT"  // Borrador, en preparación
-	PeriodStatusActive PeriodStatus = "ACTIVE" // Activo, acepta evaluaciones
-	PeriodStatusClosed PeriodStatus = "CLOSED" // Cerrado, no acepta más evaluaciones
+	PeriodStatusBorrador PeriodStatus = "BORRADOR" // Borrador, en preparación
+	PeriodStatusActivo   PeriodStatus = "ACTIVO"   // Activo, acepta evaluaciones
+	PeriodStatusCerrado  PeriodStatus = "CERRADO"  // Cerrado, no acepta más evaluaciones
 )
 
 // IsValid verifica si el estado del período es válido
 func (ps PeriodStatus) IsValid() bool {
 	switch ps {
-	case PeriodStatusDraft, PeriodStatusActive, PeriodStatusClosed:
+	case PeriodStatusBorrador, PeriodStatusActivo, PeriodStatusCerrado:
 		return true
 	default:
 		return false
@@ -26,20 +26,20 @@ func (ps PeriodStatus) String() string {
 
 // CanAcceptEvaluations indica si el período puede aceptar evaluaciones
 func (ps PeriodStatus) CanAcceptEvaluations() bool {
-	return ps == PeriodStatusActive
+	return ps == PeriodStatusActivo
 }
 
 // CanBeModified indica si el período puede ser modificado
 func (ps PeriodStatus) CanBeModified() bool {
-	return ps == PeriodStatusDraft
+	return ps == PeriodStatusBorrador
 }
 
 // CanBeActivated indica si el período puede ser activado
 func (ps PeriodStatus) CanBeActivated() bool {
-	return ps == PeriodStatusDraft
+	return ps == PeriodStatusBorrador
 }
 
 // CanBeClosed indica si el período puede ser cerrado
 func (ps PeriodStatus) CanBeClosed() bool {
-	return ps == PeriodStatusActive
+	return ps == PeriodStatusActivo
 }

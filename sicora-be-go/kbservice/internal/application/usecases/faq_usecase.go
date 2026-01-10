@@ -51,7 +51,7 @@ func (uc *FAQUseCase) CreateFAQ(ctx context.Context, req *dto.CreateFAQRequest) 
 		Audience:   req.Audience,
 		Tags:       req.Tags,
 		Keywords:   req.Keywords,
-		Status:     entities.FAQStatusDraft,
+		Status:     entities.FAQStatusBorrador,
 		Priority:   req.Priority,
 		AuthorID:   req.AuthorID,
 		SourceType: req.SourceType,
@@ -63,7 +63,7 @@ func (uc *FAQUseCase) CreateFAQ(ctx context.Context, req *dto.CreateFAQRequest) 
 
 	// Set default priority if not provided
 	if faq.Priority == "" {
-		faq.Priority = entities.FAQPriorityMedium
+		faq.Priority = entities.FAQPriorityMedia
 	}
 
 	// Generate AI-enhanced content if AI service is available
@@ -242,7 +242,7 @@ func (uc *FAQUseCase) SearchFAQs(ctx context.Context, req *dto.SearchFAQsRequest
 		Query:      req.Query,
 		Categories: req.Categories,
 		Audiences:  req.Audiences,
-		Statuses:   []entities.FAQStatus{entities.FAQStatusPublished}, // Only search published
+		Statuses:   []entities.FAQStatus{entities.FAQStatusPublicado}, // Only search published
 		Priorities: req.Priorities,
 		Tags:       req.Tags,
 		DateFrom:   req.DateFrom,
@@ -446,7 +446,7 @@ func (uc *FAQUseCase) PublishFAQ(ctx context.Context, faqID uuid.UUID, userID uu
 	}
 
 	// Check status
-	if faq.Status == entities.FAQStatusPublished {
+	if faq.Status == entities.FAQStatusPublicado {
 		return fmt.Errorf("%w: FAQ is already published", ErrInvalidStatus)
 	}
 
@@ -515,7 +515,7 @@ func (uc *FAQUseCase) CreateFAQFromSuggestion(ctx context.Context, suggestionID,
 
 	// Set the current user as author
 	faq.AuthorID = userID
-	faq.Status = entities.FAQStatusDraft
+	faq.Status = entities.FAQStatusBorrador
 	faq.CreatedAt = time.Now()
 	faq.UpdatedAt = time.Now()
 

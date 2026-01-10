@@ -10,29 +10,29 @@ import (
 type StakeholderRole string
 
 const (
-	StakeholderRoleCoordinator StakeholderRole = "coordinator"
-	StakeholderRoleJuror       StakeholderRole = "juror"
-	StakeholderRoleManager     StakeholderRole = "manager"
-	StakeholderRoleExternal    StakeholderRole = "external"
-	StakeholderRoleObserver    StakeholderRole = "observer"
+	StakeholderRoleCoordinador StakeholderRole = "COORDINADOR"
+	StakeholderRoleJurado      StakeholderRole = "JURADO"
+	StakeholderRoleGestor      StakeholderRole = "GESTOR"
+	StakeholderRoleExterno     StakeholderRole = "EXTERNO"
+	StakeholderRoleObservador  StakeholderRole = "OBSERVADOR"
 )
 
 type StakeholderType string
 
 const (
-	StakeholderTypeInternal StakeholderType = "internal"
-	StakeholderTypeExternal StakeholderType = "external"
-	StakeholderTypeIndustry StakeholderType = "industry"
-	StakeholderTypeAcademic StakeholderType = "academic"
+	StakeholderTypeInterno   StakeholderType = "INTERNO"
+	StakeholderTypeExterno   StakeholderType = "EXTERNO"
+	StakeholderTypeIndustria StakeholderType = "INDUSTRIA"
+	StakeholderTypeAcademico StakeholderType = "ACADEMICO"
 )
 
 type StakeholderStatus string
 
 const (
-	StakeholderStatusActive   StakeholderStatus = "active"
-	StakeholderStatusInactive StakeholderStatus = "inactive"
-	StakeholderStatusPending  StakeholderStatus = "pending"
-	StakeholderStatusBlocked  StakeholderStatus = "blocked"
+	StakeholderStatusActivo    StakeholderStatus = "ACTIVO"
+	StakeholderStatusInactivo  StakeholderStatus = "INACTIVO"
+	StakeholderStatusPendiente StakeholderStatus = "PENDIENTE"
+	StakeholderStatusBloqueado StakeholderStatus = "BLOQUEADO"
 )
 
 type Stakeholder struct {
@@ -69,7 +69,7 @@ func NewStakeholder(projectID, userID uuid.UUID, role StakeholderRole, stakehold
 		UserID:      userID,
 		Role:        role,
 		Type:        stakeholderType,
-		Status:      StakeholderStatusActive,
+		Status:      StakeholderStatusActivo,
 		AccessLevel: 1,
 		AssignedAt:  time.Now(),
 		CreatedAt:   time.Now(),
@@ -101,11 +101,11 @@ func (s *Stakeholder) IsValid() error {
 
 func (s *Stakeholder) IsValidRole(role StakeholderRole) bool {
 	validRoles := []StakeholderRole{
-		StakeholderRoleCoordinator,
-		StakeholderRoleJuror,
-		StakeholderRoleManager,
-		StakeholderRoleExternal,
-		StakeholderRoleObserver,
+		StakeholderRoleCoordinador,
+		StakeholderRoleJurado,
+		StakeholderRoleGestor,
+		StakeholderRoleExterno,
+		StakeholderRoleObservador,
 	}
 	for _, validRole := range validRoles {
 		if role == validRole {
@@ -117,10 +117,10 @@ func (s *Stakeholder) IsValidRole(role StakeholderRole) bool {
 
 func (s *Stakeholder) IsValidType(stakeholderType StakeholderType) bool {
 	validTypes := []StakeholderType{
-		StakeholderTypeInternal,
-		StakeholderTypeExternal,
-		StakeholderTypeIndustry,
-		StakeholderTypeAcademic,
+		StakeholderTypeInterno,
+		StakeholderTypeExterno,
+		StakeholderTypeIndustria,
+		StakeholderTypeAcademico,
 	}
 	for _, validType := range validTypes {
 		if stakeholderType == validType {
@@ -132,10 +132,10 @@ func (s *Stakeholder) IsValidType(stakeholderType StakeholderType) bool {
 
 func (s *Stakeholder) IsValidStatus(status StakeholderStatus) bool {
 	validStatuses := []StakeholderStatus{
-		StakeholderStatusActive,
-		StakeholderStatusInactive,
-		StakeholderStatusPending,
-		StakeholderStatusBlocked,
+		StakeholderStatusActivo,
+		StakeholderStatusInactivo,
+		StakeholderStatusPendiente,
+		StakeholderStatusBloqueado,
 	}
 	for _, validStatus := range validStatuses {
 		if status == validStatus {
@@ -148,11 +148,11 @@ func (s *Stakeholder) IsValidStatus(status StakeholderStatus) bool {
 func (s *Stakeholder) CanPerformAction(action string) bool {
 	switch action {
 	case "evaluate":
-		return s.CanEvaluate && s.Status == StakeholderStatusActive
+		return s.CanEvaluate && s.Status == StakeholderStatusActivo
 	case "review":
-		return s.CanReview && s.Status == StakeholderStatusActive
+		return s.CanReview && s.Status == StakeholderStatusActivo
 	case "approve":
-		return s.CanApprove && s.Status == StakeholderStatusActive
+		return s.CanApprove && s.Status == StakeholderStatusActivo
 	default:
 		return false
 	}
@@ -165,21 +165,21 @@ func (s *Stakeholder) UpdateLastActive() {
 }
 
 func (s *Stakeholder) Activate() error {
-	if s.Status == StakeholderStatusBlocked {
+	if s.Status == StakeholderStatusBloqueado {
 		return errors.New("cannot activate blocked stakeholder")
 	}
-	s.Status = StakeholderStatusActive
+	s.Status = StakeholderStatusActivo
 	s.UpdatedAt = time.Now()
 	return nil
 }
 
 func (s *Stakeholder) Deactivate() {
-	s.Status = StakeholderStatusInactive
+	s.Status = StakeholderStatusInactivo
 	s.UpdatedAt = time.Now()
 }
 
 func (s *Stakeholder) Block(reason string) {
-	s.Status = StakeholderStatusBlocked
+	s.Status = StakeholderStatusBloqueado
 	if reason != "" {
 		s.Notes = reason
 	}
@@ -191,13 +191,13 @@ func (s *Stakeholder) HasHighAccessLevel() bool {
 }
 
 func (s *Stakeholder) IsCoordinator() bool {
-	return s.Role == StakeholderRoleCoordinator
+	return s.Role == StakeholderRoleCoordinador
 }
 
 func (s *Stakeholder) IsJuror() bool {
-	return s.Role == StakeholderRoleJuror
+	return s.Role == StakeholderRoleJurado
 }
 
 func (s *Stakeholder) IsExternal() bool {
-	return s.Type == StakeholderTypeExternal || s.Type == StakeholderTypeIndustry
+	return s.Type == StakeholderTypeExterno || s.Type == StakeholderTypeIndustria
 }

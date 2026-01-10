@@ -139,8 +139,8 @@ func (r *submissionRepository) GetSubmissionsByStatus(ctx context.Context, statu
 func (r *submissionRepository) GetPendingEvaluations(ctx context.Context) ([]*entities.Submission, error) {
 	var models []models.Submission
 	result := r.db.WithContext(ctx).Preload("Project").Where("status IN ?", []string{
-		string(entities.SubmissionStatusSubmitted),
-		string(entities.SubmissionStatusEvaluating),
+		string(entities.SubmissionStatusEnviada),
+		string(entities.SubmissionStatusEnEvaluacion),
 	}).Find(&models)
 	if result.Error != nil {
 		return nil, result.Error

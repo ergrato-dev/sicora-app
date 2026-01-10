@@ -41,28 +41,28 @@ type GroupMember struct {
 type WorkGroupStatus string
 
 const (
-	WorkGroupStatusActive    WorkGroupStatus = "active"
-	WorkGroupStatusInactive  WorkGroupStatus = "inactive"
-	WorkGroupStatusComplete  WorkGroupStatus = "complete"
-	WorkGroupStatusDisbanded WorkGroupStatus = "disbanded"
+	WorkGroupStatusActivo   WorkGroupStatus = "ACTIVO"
+	WorkGroupStatusInactivo WorkGroupStatus = "INACTIVO"
+	WorkGroupStatusCompleto WorkGroupStatus = "COMPLETO"
+	WorkGroupStatusDisuelto WorkGroupStatus = "DISUELTO"
 )
 
 type GroupMemberRole string
 
 const (
-	GroupMemberRoleLeader    GroupMemberRole = "leader"
-	GroupMemberRoleMember    GroupMemberRole = "member"
-	GroupMemberRoleDeveloper GroupMemberRole = "developer"
-	GroupMemberRoleDesigner  GroupMemberRole = "designer"
-	GroupMemberRoleAnalyst   GroupMemberRole = "analyst"
+	GroupMemberRoleLider         GroupMemberRole = "LIDER"
+	GroupMemberRoleMiembro       GroupMemberRole = "MIEMBRO"
+	GroupMemberRoleDesarrollador GroupMemberRole = "DESARROLLADOR"
+	GroupMemberRoleDisenador     GroupMemberRole = "DISENADOR"
+	GroupMemberRoleAnalista      GroupMemberRole = "ANALISTA"
 )
 
 type GroupMemberStatus string
 
 const (
-	GroupMemberStatusActive   GroupMemberStatus = "active"
-	GroupMemberStatusInactive GroupMemberStatus = "inactive"
-	GroupMemberStatusLeft     GroupMemberStatus = "left"
+	GroupMemberStatusActivo   GroupMemberStatus = "ACTIVO"
+	GroupMemberStatusInactivo GroupMemberStatus = "INACTIVO"
+	GroupMemberStatusRetirado GroupMemberStatus = "RETIRADO"
 )
 
 func (wgs WorkGroupStatus) String() string {
@@ -71,7 +71,7 @@ func (wgs WorkGroupStatus) String() string {
 
 func (wgs WorkGroupStatus) IsValid() bool {
 	switch wgs {
-	case WorkGroupStatusActive, WorkGroupStatusInactive, WorkGroupStatusComplete, WorkGroupStatusDisbanded:
+	case WorkGroupStatusActivo, WorkGroupStatusInactivo, WorkGroupStatusCompleto, WorkGroupStatusDisuelto:
 		return true
 	default:
 		return false
@@ -84,7 +84,7 @@ func (gmr GroupMemberRole) String() string {
 
 func (gmr GroupMemberRole) IsValid() bool {
 	switch gmr {
-	case GroupMemberRoleLeader, GroupMemberRoleMember, GroupMemberRoleDeveloper, GroupMemberRoleDesigner, GroupMemberRoleAnalyst:
+	case GroupMemberRoleLider, GroupMemberRoleMiembro, GroupMemberRoleDesarrollador, GroupMemberRoleDisenador, GroupMemberRoleAnalista:
 		return true
 	default:
 		return false
@@ -97,7 +97,7 @@ func (gms GroupMemberStatus) String() string {
 
 func (gms GroupMemberStatus) IsValid() bool {
 	switch gms {
-	case GroupMemberStatusActive, GroupMemberStatusInactive, GroupMemberStatusLeft:
+	case GroupMemberStatusActivo, GroupMemberStatusInactivo, GroupMemberStatusRetirado:
 		return true
 	default:
 		return false
@@ -105,13 +105,13 @@ func (gms GroupMemberStatus) IsValid() bool {
 }
 
 func (wg *WorkGroup) IsActive() bool {
-	return wg.Status == WorkGroupStatusActive
+	return wg.Status == WorkGroupStatusActivo
 }
 
 func (wg *WorkGroup) GetActiveMembers() []GroupMember {
 	var activeMembers []GroupMember
 	for _, member := range wg.Members {
-		if member.Status == GroupMemberStatusActive {
+		if member.Status == GroupMemberStatusActivo {
 			activeMembers = append(activeMembers, member)
 		}
 	}
@@ -140,7 +140,7 @@ func (wg *WorkGroup) GetLeader() *GroupMember {
 	}
 
 	for _, member := range wg.Members {
-		if member.StudentID == *wg.LeaderID && member.Status == GroupMemberStatusActive {
+		if member.StudentID == *wg.LeaderID && member.Status == GroupMemberStatusActivo {
 			return &member
 		}
 	}
@@ -150,7 +150,7 @@ func (wg *WorkGroup) GetLeader() *GroupMember {
 func (wg *WorkGroup) SetLeader(studentID uuid.UUID) error {
 	// Verify the student is an active member
 	for _, member := range wg.Members {
-		if member.StudentID == studentID && member.Status == GroupMemberStatusActive {
+		if member.StudentID == studentID && member.Status == GroupMemberStatusActivo {
 			wg.LeaderID = &studentID
 			return nil
 		}
@@ -161,7 +161,7 @@ func (wg *WorkGroup) SetLeader(studentID uuid.UUID) error {
 func (wg *WorkGroup) RemoveMember(studentID uuid.UUID) {
 	for i, member := range wg.Members {
 		if member.StudentID == studentID {
-			wg.Members[i].Status = GroupMemberStatusLeft
+			wg.Members[i].Status = GroupMemberStatusRetirado
 			now := time.Now()
 			wg.Members[i].LeftAt = &now
 

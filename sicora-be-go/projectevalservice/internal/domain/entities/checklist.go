@@ -66,27 +66,27 @@ type CriterionLevel struct {
 type ChecklistStatus string
 
 const (
-	ChecklistStatusDraft    ChecklistStatus = "draft"
-	ChecklistStatusReview   ChecklistStatus = "review"
-	ChecklistStatusApproved ChecklistStatus = "approved"
-	ChecklistStatusActive   ChecklistStatus = "active"
-	ChecklistStatusArchived ChecklistStatus = "archived"
+	ChecklistStatusBorrador   ChecklistStatus = "BORRADOR"
+	ChecklistStatusEnRevision ChecklistStatus = "EN_REVISION"
+	ChecklistStatusAprobado   ChecklistStatus = "APROBADO"
+	ChecklistStatusActivo     ChecklistStatus = "ACTIVO"
+	ChecklistStatusArchivado  ChecklistStatus = "ARCHIVADO"
 )
 
 type CriterionCategory string
 
 const (
-	CriterionCategoryTechnical     CriterionCategory = "technical"
-	CriterionCategoryFunctional    CriterionCategory = "functional"
-	CriterionCategoryDocumentation CriterionCategory = "documentation"
-	CriterionCategoryPresentation  CriterionCategory = "presentation"
-	CriterionCategoryTeamwork      CriterionCategory = "teamwork"
-	CriterionCategoryInnovation    CriterionCategory = "innovation"
-	CriterionCategoryQuality       CriterionCategory = "quality"
-	CriterionCategoryDeployment    CriterionCategory = "deployment"
-	CriterionCategorySecurity      CriterionCategory = "security"
-	CriterionCategoryPerformance   CriterionCategory = "performance"
-	CriterionCategoryUsability     CriterionCategory = "usability"
+	CriterionCategoryTecnico       CriterionCategory = "TECNICO"
+	CriterionCategoryFuncional     CriterionCategory = "FUNCIONAL"
+	CriterionCategoryDocumentacion CriterionCategory = "DOCUMENTACION"
+	CriterionCategoryPresentacion  CriterionCategory = "PRESENTACION"
+	CriterionCategoryTrabajoEquipo CriterionCategory = "TRABAJO_EQUIPO"
+	CriterionCategoryInnovacion    CriterionCategory = "INNOVACION"
+	CriterionCategoryCalidad       CriterionCategory = "CALIDAD"
+	CriterionCategoryDespliegue    CriterionCategory = "DESPLIEGUE"
+	CriterionCategorySeguridad     CriterionCategory = "SEGURIDAD"
+	CriterionCategoryRendimiento   CriterionCategory = "RENDIMIENTO"
+	CriterionCategoryUsabilidad    CriterionCategory = "USABILIDAD"
 )
 
 // Methods
@@ -96,7 +96,7 @@ func (cs ChecklistStatus) String() string {
 
 func (cs ChecklistStatus) IsValid() bool {
 	switch cs {
-	case ChecklistStatusDraft, ChecklistStatusReview, ChecklistStatusApproved, ChecklistStatusActive, ChecklistStatusArchived:
+	case ChecklistStatusBorrador, ChecklistStatusEnRevision, ChecklistStatusAprobado, ChecklistStatusActivo, ChecklistStatusArchivado:
 		return true
 	default:
 		return false
@@ -109,7 +109,7 @@ func (cc CriterionCategory) String() string {
 
 func (cc CriterionCategory) IsValid() bool {
 	switch cc {
-	case CriterionCategoryTechnical, CriterionCategoryFunctional, CriterionCategoryDocumentation, CriterionCategoryPresentation, CriterionCategoryTeamwork, CriterionCategoryInnovation, CriterionCategoryQuality, CriterionCategoryDeployment, CriterionCategorySecurity, CriterionCategoryPerformance, CriterionCategoryUsability:
+	case CriterionCategoryTecnico, CriterionCategoryFuncional, CriterionCategoryDocumentacion, CriterionCategoryPresentacion, CriterionCategoryTrabajoEquipo, CriterionCategoryInnovacion, CriterionCategoryCalidad, CriterionCategoryDespliegue, CriterionCategorySeguridad, CriterionCategoryRendimiento, CriterionCategoryUsabilidad:
 		return true
 	default:
 		return false
@@ -117,11 +117,11 @@ func (cc CriterionCategory) IsValid() bool {
 }
 
 func (c *Checklist) CanBeModified() bool {
-	return c.Status == ChecklistStatusDraft || c.Status == ChecklistStatusReview
+	return c.Status == ChecklistStatusBorrador || c.Status == ChecklistStatusEnRevision
 }
 
 func (c *Checklist) IsActive() bool {
-	return c.Status == ChecklistStatusActive
+	return c.Status == ChecklistStatusActivo
 }
 
 func (c *Checklist) GetTotalWeight() float64 {
@@ -147,20 +147,20 @@ func (c *Checklist) GetRequiredCriteria() []ChecklistCriterion {
 }
 
 func (c *Checklist) Approve(approverID uuid.UUID) {
-	c.Status = ChecklistStatusApproved
+	c.Status = ChecklistStatusAprobado
 	c.ApprovedBy = &approverID
 	now := time.Now()
 	c.ApprovedAt = &now
 }
 
 func (c *Checklist) Activate() {
-	if c.Status == ChecklistStatusApproved {
-		c.Status = ChecklistStatusActive
+	if c.Status == ChecklistStatusAprobado {
+		c.Status = ChecklistStatusActivo
 	}
 }
 
 func (c *Checklist) Archive() {
-	c.Status = ChecklistStatusArchived
+	c.Status = ChecklistStatusArchivado
 }
 
 func (cc *ChecklistCriterion) GetLevelByScore(score float64) *CriterionLevel {

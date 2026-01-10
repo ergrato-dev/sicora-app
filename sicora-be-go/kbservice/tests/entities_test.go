@@ -12,31 +12,31 @@ import (
 func TestDocumentEntity(t *testing.T) {
 	t.Run("Create new document", func(t *testing.T) {
 		doc := &entities.Document{
-			ID:          uuid.New(),
-			TenantID:    "test-tenant",
-			Title:       "Test Document",
-			Content:     "This is test content",
-			Category:    entities.CategoryGeneral,
-			Audience:    entities.AudienceAll,
-			Status:      entities.DocumentStatusDraft,
-			AuthorID:    uuid.New(),
-			Slug:        "test-document",
-			MetaTitle:   "Test Document Meta",
-			MetaDesc:    "Test document meta description",
-			Tags:        []string{"test", "document"},
-			Keywords:    []string{"test", "document", "sample"},
+			ID:        uuid.New(),
+			TenantID:  "test-tenant",
+			Title:     "Test Document",
+			Content:   "This is test content",
+			Category:  entities.CategoryGeneral,
+			Audience:  entities.AudienceTodos,
+			Status:    entities.DocumentStatusBorrador,
+			AuthorID:  uuid.New(),
+			Slug:      "test-document",
+			MetaTitle: "Test Document Meta",
+			MetaDesc:  "Test document meta description",
+			Tags:      []string{"test", "document"},
+			Keywords:  []string{"test", "document", "sample"},
 		}
 
 		assert.NotEmpty(t, doc.ID)
 		assert.Equal(t, "test-tenant", doc.TenantID)
 		assert.Equal(t, "Test Document", doc.Title)
 		assert.Equal(t, entities.CategoryGeneral, doc.Category)
-		assert.Equal(t, entities.DocumentStatusDraft, doc.Status)
+		assert.Equal(t, entities.DocumentStatusBorrador, doc.Status)
 	})
 
 	t.Run("Document validation", func(t *testing.T) {
 		doc := &entities.Document{}
-		
+
 		// Test validation would go here
 		// For now, just check that fields can be set
 		doc.Title = "Valid Title"
@@ -47,24 +47,24 @@ func TestDocumentEntity(t *testing.T) {
 func TestFAQEntity(t *testing.T) {
 	t.Run("Create new FAQ", func(t *testing.T) {
 		faq := &entities.FAQ{
-			ID:         uuid.New(),
-			TenantID:   "test-tenant",
-			Question:   "What is this?",
-			Answer:     "This is a test FAQ",
-			Category:   entities.CategoryGeneral,
-			Audience:   entities.AudienceAll,
-			Status:     entities.FAQStatusDraft,
-			Priority:   entities.FAQPriorityMedium,
-			AuthorID:   uuid.New(),
-			Tags:       []string{"test", "faq"},
-			Keywords:   []string{"test", "faq", "sample"},
+			ID:       uuid.New(),
+			TenantID: "test-tenant",
+			Question: "What is this?",
+			Answer:   "This is a test FAQ",
+			Category: entities.CategoryGeneral,
+			Audience: entities.AudienceTodos,
+			Status:   entities.FAQStatusBorrador,
+			Priority: entities.FAQPriorityMedia,
+			AuthorID: uuid.New(),
+			Tags:     []string{"test", "faq"},
+			Keywords: []string{"test", "faq", "sample"},
 		}
 
 		assert.NotEmpty(t, faq.ID)
 		assert.Equal(t, "test-tenant", faq.TenantID)
 		assert.Equal(t, "What is this?", faq.Question)
-		assert.Equal(t, entities.FAQStatusDraft, faq.Status)
-		assert.Equal(t, entities.FAQPriorityMedium, faq.Priority)
+		assert.Equal(t, entities.FAQStatusBorrador, faq.Status)
+		assert.Equal(t, entities.FAQPriorityMedia, faq.Priority)
 	})
 }
 

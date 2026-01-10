@@ -71,7 +71,7 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 		DeliveryDate:    req.DeliveryDate,
 		MaxScore:        req.MaxScore,
 		InstructorID:    req.InstructorID,
-		Status:          entities.ProjectStatusActive,
+		Status:          entities.ProjectStatusActivo,
 	}
 
 	if err := h.projectUseCase.CreateProject(c.Request.Context(), project); err != nil {

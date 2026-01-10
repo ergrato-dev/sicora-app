@@ -39,11 +39,11 @@ type ProjectIdea struct {
 type ProjectIdeaStatus string
 
 const (
-	ProjectIdeaStatusProposed   ProjectIdeaStatus = "proposed"
-	ProjectIdeaStatusEvaluating ProjectIdeaStatus = "evaluating"
-	ProjectIdeaStatusApproved   ProjectIdeaStatus = "approved"
-	ProjectIdeaStatusRejected   ProjectIdeaStatus = "rejected"
-	ProjectIdeaStatusRevision   ProjectIdeaStatus = "revision"
+	ProjectIdeaStatusPropuesta    ProjectIdeaStatus = "PROPUESTA"
+	ProjectIdeaStatusEnEvaluacion ProjectIdeaStatus = "EN_EVALUACION"
+	ProjectIdeaStatusAprobada     ProjectIdeaStatus = "APROBADA"
+	ProjectIdeaStatusRechazada    ProjectIdeaStatus = "RECHAZADA"
+	ProjectIdeaStatusEnRevision   ProjectIdeaStatus = "EN_REVISION"
 )
 
 func (pis ProjectIdeaStatus) String() string {
@@ -52,7 +52,7 @@ func (pis ProjectIdeaStatus) String() string {
 
 func (pis ProjectIdeaStatus) IsValid() bool {
 	switch pis {
-	case ProjectIdeaStatusProposed, ProjectIdeaStatusEvaluating, ProjectIdeaStatusApproved, ProjectIdeaStatusRejected, ProjectIdeaStatusRevision:
+	case ProjectIdeaStatusPropuesta, ProjectIdeaStatusEnEvaluacion, ProjectIdeaStatusAprobada, ProjectIdeaStatusRechazada, ProjectIdeaStatusEnRevision:
 		return true
 	default:
 		return false
@@ -60,19 +60,19 @@ func (pis ProjectIdeaStatus) IsValid() bool {
 }
 
 func (pi *ProjectIdea) CanBeEvaluated() bool {
-	return pi.Status == ProjectIdeaStatusProposed || pi.Status == ProjectIdeaStatusRevision
+	return pi.Status == ProjectIdeaStatusPropuesta || pi.Status == ProjectIdeaStatusEnRevision
 }
 
 func (pi *ProjectIdea) IsApproved() bool {
-	return pi.Status == ProjectIdeaStatusApproved
+	return pi.Status == ProjectIdeaStatusAprobada
 }
 
 func (pi *ProjectIdea) CanBeModified() bool {
-	return pi.Status == ProjectIdeaStatusProposed || pi.Status == ProjectIdeaStatusRevision
+	return pi.Status == ProjectIdeaStatusPropuesta || pi.Status == ProjectIdeaStatusEnRevision
 }
 
 func (pi *ProjectIdea) Approve(evaluatorID uuid.UUID, score float64, feedback string) {
-	pi.Status = ProjectIdeaStatusApproved
+	pi.Status = ProjectIdeaStatusAprobada
 	pi.EvaluatorID = &evaluatorID
 	pi.Score = score
 	pi.Feedback = feedback
@@ -81,7 +81,7 @@ func (pi *ProjectIdea) Approve(evaluatorID uuid.UUID, score float64, feedback st
 }
 
 func (pi *ProjectIdea) Reject(evaluatorID uuid.UUID, reason string, feedback string) {
-	pi.Status = ProjectIdeaStatusRejected
+	pi.Status = ProjectIdeaStatusRechazada
 	pi.EvaluatorID = &evaluatorID
 	pi.RejectionReason = reason
 	pi.Feedback = feedback
@@ -90,7 +90,7 @@ func (pi *ProjectIdea) Reject(evaluatorID uuid.UUID, reason string, feedback str
 }
 
 func (pi *ProjectIdea) RequestRevision(evaluatorID uuid.UUID, feedback string) {
-	pi.Status = ProjectIdeaStatusRevision
+	pi.Status = ProjectIdeaStatusEnRevision
 	pi.EvaluatorID = &evaluatorID
 	pi.Feedback = feedback
 	now := time.Now()

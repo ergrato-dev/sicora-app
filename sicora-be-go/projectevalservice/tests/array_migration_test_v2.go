@@ -18,9 +18,9 @@ func TestStakeholderArrayMigration(t *testing.T) {
 			ID:        uuid.New(),
 			ProjectID: uuid.New(),
 			UserID:    uuid.New(),
-			Role:      entities.StakeholderRoleExternal,
-			Type:      entities.StakeholderTypeExternal,
-			Status:    entities.StakeholderStatusActive,
+			Role:      entities.StakeholderRoleExterno,
+			Type:      entities.StakeholderTypeExterno,
+			Status:    entities.StakeholderStatusActivo,
 			Expertise: []string{"software_engineering", "database_design", "project_management"},
 		}
 
@@ -47,9 +47,9 @@ func TestStakeholderArrayMigration(t *testing.T) {
 			ID:        uuid.New(),
 			ProjectID: uuid.New(),
 			UserID:    uuid.New(),
-			Role:      entities.StakeholderRoleExternal,
-			Type:      entities.StakeholderTypeExternal,
-			Status:    entities.StakeholderStatusActive,
+			Role:      entities.StakeholderRoleExterno,
+			Type:      entities.StakeholderTypeExterno,
+			Status:    entities.StakeholderStatusActivo,
 			Expertise: pq.StringArray{"software_engineering", "database_design"},
 		}
 

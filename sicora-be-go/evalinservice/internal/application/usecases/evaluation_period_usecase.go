@@ -9,6 +9,7 @@ import (
 	"evalinservice/internal/domain/exceptions"
 	"evalinservice/internal/domain/repositories"
 	"evalinservice/internal/domain/valueobjects"
+
 	"github.com/google/uuid"
 )
 
@@ -86,7 +87,7 @@ func (uc *EvaluationPeriodUseCase) DeletePeriod(ctx context.Context, id uuid.UUI
 		return fmt.Errorf("evaluation period not found: %w", err)
 	}
 
-	if period.Status == valueobjects.PeriodStatusActive {
+	if period.Status == valueobjects.PeriodStatusActivo {
 		return exceptions.NewValidationError("status", "cannot delete active period")
 	}
 
@@ -132,7 +133,7 @@ func (uc *EvaluationPeriodUseCase) ClosePeriod(ctx context.Context, id uuid.UUID
 }
 
 func (uc *EvaluationPeriodUseCase) GetActivePeriods(ctx context.Context) ([]*dtos.EvaluationPeriodResponseDTO, error) {
-	periods, err := uc.periodRepo.GetByStatus(ctx, valueobjects.PeriodStatusActive)
+	periods, err := uc.periodRepo.GetByStatus(ctx, valueobjects.PeriodStatusActivo)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get active periods: %w", err)
 	}

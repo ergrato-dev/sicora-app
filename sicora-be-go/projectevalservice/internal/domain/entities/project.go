@@ -26,9 +26,9 @@ type Project struct {
 type ProjectStatus string
 
 const (
-	ProjectStatusActive   ProjectStatus = "active"
-	ProjectStatusInactive ProjectStatus = "inactive"
-	ProjectStatusArchived ProjectStatus = "archived"
+	ProjectStatusActivo    ProjectStatus = "ACTIVO"
+	ProjectStatusInactivo  ProjectStatus = "INACTIVO"
+	ProjectStatusArchivado ProjectStatus = "ARCHIVADO"
 )
 
 func (ps ProjectStatus) String() string {
@@ -37,7 +37,7 @@ func (ps ProjectStatus) String() string {
 
 func (ps ProjectStatus) IsValid() bool {
 	switch ps {
-	case ProjectStatusActive, ProjectStatusInactive, ProjectStatusArchived:
+	case ProjectStatusActivo, ProjectStatusInactivo, ProjectStatusArchivado:
 		return true
 	default:
 		return false
@@ -45,7 +45,7 @@ func (ps ProjectStatus) IsValid() bool {
 }
 
 func (p *Project) IsActive() bool {
-	return p.Status == ProjectStatusActive
+	return p.Status == ProjectStatusActivo
 }
 
 func (p *Project) IsDeliveryDatePassed() bool {

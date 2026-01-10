@@ -9,6 +9,7 @@ import (
 	"evalinservice/internal/domain/exceptions"
 	"evalinservice/internal/domain/repositories"
 	"evalinservice/internal/domain/valueobjects"
+
 	"github.com/google/uuid"
 )
 
@@ -43,7 +44,7 @@ func (uc *EvaluationUseCase) CreateEvaluation(ctx context.Context, req *dtos.Eva
 		return nil, fmt.Errorf(ErrEvaluationNotFound, err)
 	}
 
-	if period.Status != valueobjects.PeriodStatusActive {
+	if period.Status != valueobjects.PeriodStatusActivo {
 		return nil, exceptions.NewValidationError("period", "period is not active")
 	}
 
@@ -85,7 +86,7 @@ func (uc *EvaluationUseCase) UpdateEvaluation(ctx context.Context, id uuid.UUID,
 		return nil, fmt.Errorf(ErrEvaluationNotFound, err)
 	}
 
-	if evaluation.Status == valueobjects.EvaluationStatusSubmitted || evaluation.Status == valueobjects.EvaluationStatusValidated {
+	if evaluation.Status == valueobjects.EvaluationStatusEnviada || evaluation.Status == valueobjects.EvaluationStatusValidada {
 		return nil, exceptions.NewValidationError("status", "cannot update completed evaluation")
 	}
 
@@ -95,11 +96,11 @@ func (uc *EvaluationUseCase) UpdateEvaluation(ctx context.Context, id uuid.UUID,
 			return nil, exceptions.NewValidationError("status", "invalid status")
 		}
 
-		if status == valueobjects.EvaluationStatusSubmitted {
+		if status == valueobjects.EvaluationStatusEnviada {
 			if err := evaluation.Submit(); err != nil {
 				return nil, fmt.Errorf("failed to submit evaluation: %w", err)
 			}
-		} else if status == valueobjects.EvaluationStatusValidated {
+		} else if status == valueobjects.EvaluationStatusValidada {
 			if err := evaluation.Validate(); err != nil {
 				return nil, fmt.Errorf("failed to validate evaluation: %w", err)
 			}
@@ -110,7 +111,7 @@ func (uc *EvaluationUseCase) UpdateEvaluation(ctx context.Context, id uuid.UUID,
 		return nil, fmt.Errorf("failed to update evaluation: %w", err)
 	}
 
-	if evaluation.Status == valueobjects.EvaluationStatusSubmitted {
+	if evaluation.Status == valueobjects.EvaluationStatusEnviada {
 		go uc.notificationUseCase.SendEvaluationNotification(context.Background(), evaluation.ID, "evaluation_completed")
 	}
 
@@ -123,7 +124,7 @@ func (uc *EvaluationUseCase) DeleteEvaluation(ctx context.Context, id uuid.UUID)
 		return fmt.Errorf(ErrEvaluationNotFound, err)
 	}
 
-	if evaluation.Status == valueobjects.EvaluationStatusSubmitted || evaluation.Status == valueobjects.EvaluationStatusValidated {
+	if evaluation.Status == valueobjects.EvaluationStatusEnviada || evaluation.Status == valueobjects.EvaluationStatusValidada {
 		return exceptions.NewValidationError("status", "cannot delete completed evaluation")
 	}
 

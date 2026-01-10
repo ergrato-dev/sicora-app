@@ -50,7 +50,7 @@ func (uc *QRCodeUseCase) GenerateQRCode(ctx context.Context, req *dtos.QRCodeReq
 		StudentID:  req.StudentID,
 		ScheduleID: req.ScheduleID,
 		Code:       uc.generateSecureCode(req.StudentID, req.ScheduleID, now),
-		Status:     entities.QRCodeStatusActive,
+		Status:     entities.QRCodeStatusActivo,
 		ExpiresAt:  now.Add(15 * time.Second), // Expira en 15 segundos
 		IsActive:   true,
 		CreatedAt:  now,
@@ -99,7 +99,7 @@ func (uc *QRCodeUseCase) ScanQRCode(ctx context.Context, req *dtos.QRScanRequest
 	if req.ScanTime != nil {
 		scanTime = *req.ScanTime
 	}
-	
+
 	qrCode.MarkAsUsed(req.InstructorID, req.Location)
 	if err := uc.qrRepo.Update(ctx, qrCode); err != nil {
 		return nil, fmt.Errorf("failed to update QR code: %w", err)
@@ -177,7 +177,7 @@ func (uc *QRCodeUseCase) GetStudentQRStatus(ctx context.Context, req *dtos.Stude
 
 	// Calcular próxima renovación
 	nextRefresh := activeQR.ExpiresAt
-	
+
 	return &dtos.StudentQRStatusResponse{
 		HasActiveQR:      true,
 		CurrentQR:        uc.mapQRCodeToResponse(activeQR),
@@ -218,7 +218,7 @@ func (uc *QRCodeUseCase) BulkGenerateQRCodes(ctx context.Context, req *dtos.Bulk
 		}
 	}
 
-	response.Message = fmt.Sprintf("Generados %d/%d códigos QR exitosamente", 
+	response.Message = fmt.Sprintf("Generados %d/%d códigos QR exitosamente",
 		response.TotalGenerated, response.TotalRequested)
 
 	return response, nil
@@ -230,10 +230,10 @@ func (uc *QRCodeUseCase) generateSecureCode(studentID, scheduleID uuid.UUID, tim
 	// Generar un código seguro usando random bytes
 	randomBytes := make([]byte, 16)
 	rand.Read(randomBytes)
-	
-	return fmt.Sprintf("SICORA_%s_%s_%d_%x", 
-		studentID.String()[:8], 
-		scheduleID.String()[:8], 
+
+	return fmt.Sprintf("SICORA_%s_%s_%d_%x",
+		studentID.String()[:8],
+		scheduleID.String()[:8],
 		timestamp.Unix(),
 		randomBytes[:8])
 }
@@ -245,24 +245,24 @@ func (uc *QRCodeUseCase) mapQRCodeToResponse(qr *entities.AttendanceQRCode) *dto
 	}
 
 	return &dtos.QRCodeResponse{
-		ID:          qr.ID,
-		StudentID:   qr.StudentID,
-		ScheduleID:  qr.ScheduleID,
-		Code:        qr.Code,
-		Status:      string(qr.Status),
-		ExpiresAt:   qr.ExpiresAt,
-		ExpiresIn:   expiresIn,
-		IsActive:    qr.IsActive,
-		CreatedAt:   qr.CreatedAt,
-		UpdatedAt:   qr.UpdatedAt,
+		ID:         qr.ID,
+		StudentID:  qr.StudentID,
+		ScheduleID: qr.ScheduleID,
+		Code:       qr.Code,
+		Status:     string(qr.Status),
+		ExpiresAt:  qr.ExpiresAt,
+		ExpiresIn:  expiresIn,
+		IsActive:   qr.IsActive,
+		CreatedAt:  qr.CreatedAt,
+		UpdatedAt:  qr.UpdatedAt,
 	}
 }
 
 func (uc *QRCodeUseCase) getQRErrorMessage(qr *entities.AttendanceQRCode) string {
 	switch qr.Status {
-	case entities.QRCodeStatusExpired:
+	case entities.QRCodeStatusExpirado:
 		return "El código QR ha expirado. Genere uno nuevo."
-	case entities.QRCodeStatusUsed:
+	case entities.QRCodeStatusUsado:
 		return "Este código QR ya fue utilizado."
 	default:
 		if qr.IsExpired() {
@@ -276,7 +276,7 @@ func (uc *QRCodeUseCase) determineAttendanceStatus(scanTime time.Time, scheduleI
 	// Esta lógica se basaría en el horario programado
 	// Por simplicidad, asumimos que si es dentro de los primeros 15 minutos es "PRESENT"
 	// y después es "LATE"
-	
+
 	// En una implementación real, consultar el horario desde scheduleID
 	// Por ahora usar lógica simple basada en la hora
 	hour := scanTime.Hour()
@@ -285,7 +285,7 @@ func (uc *QRCodeUseCase) determineAttendanceStatus(scanTime time.Time, scheduleI
 	} else if hour >= 14 && hour < 18 { // Horario vespertino
 		return "PRESENT"
 	}
-	
+
 	return "LATE" // Fuera de horario normal
 }
 

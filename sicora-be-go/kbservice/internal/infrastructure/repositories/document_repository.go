@@ -171,7 +171,7 @@ func (r *DocumentRepositoryImpl) SemanticSearch(ctx context.Context, request rep
 	}(), ","))
 
 	query := r.db.WithContext(ctx).
-		Where("deleted_at IS NULL AND status = ?", entities.DocumentStatusPublished)
+		Where("deleted_at IS NULL AND status = ?", entities.DocumentStatusPublicado)
 
 	// Apply filters
 	if len(request.Categories) > 0 {
@@ -201,7 +201,7 @@ func (r *DocumentRepositoryImpl) SemanticSearch(ctx context.Context, request rep
 func (r *DocumentRepositoryImpl) GetByCategory(ctx context.Context, category entities.DocumentCategory, limit, offset int) ([]entities.Document, error) {
 	var documents []entities.Document
 	query := r.db.WithContext(ctx).
-		Where("category = ? AND deleted_at IS NULL AND status = ?", category, entities.DocumentStatusPublished).
+		Where("category = ? AND deleted_at IS NULL AND status = ?", category, entities.DocumentStatusPublicado).
 		Preload("Author").
 		Order("created_at DESC")
 
@@ -258,7 +258,7 @@ func (r *DocumentRepositoryImpl) GetByStatus(ctx context.Context, status entitie
 func (r *DocumentRepositoryImpl) GetByAudience(ctx context.Context, audience entities.AudienceType, limit, offset int) ([]entities.Document, error) {
 	var documents []entities.Document
 	query := r.db.WithContext(ctx).
-		Where("audience = ? AND deleted_at IS NULL AND status = ?", audience, entities.DocumentStatusPublished).
+		Where("audience = ? AND deleted_at IS NULL AND status = ?", audience, entities.DocumentStatusPublicado).
 		Preload("Author").
 		Order("created_at DESC")
 
@@ -407,7 +407,7 @@ func (r *DocumentRepositoryImpl) IncrementShareCount(ctx context.Context, docume
 func (r *DocumentRepositoryImpl) GetPopularDocuments(ctx context.Context, category *entities.DocumentCategory, limit int) ([]entities.Document, error) {
 	var documents []entities.Document
 	query := r.db.WithContext(ctx).
-		Where("deleted_at IS NULL AND status = ?", entities.DocumentStatusPublished)
+		Where("deleted_at IS NULL AND status = ?", entities.DocumentStatusPublicado)
 
 	if category != nil {
 		query = query.Where("category = ?", *category)
@@ -426,7 +426,7 @@ func (r *DocumentRepositoryImpl) GetPopularDocuments(ctx context.Context, catego
 func (r *DocumentRepositoryImpl) GetRecentDocuments(ctx context.Context, category *entities.DocumentCategory, limit int) ([]entities.Document, error) {
 	var documents []entities.Document
 	query := r.db.WithContext(ctx).
-		Where("deleted_at IS NULL AND status = ?", entities.DocumentStatusPublished)
+		Where("deleted_at IS NULL AND status = ?", entities.DocumentStatusPublicado)
 
 	if category != nil {
 		query = query.Where("category = ?", *category)
@@ -558,7 +558,7 @@ func (r *DocumentRepositoryImpl) SubmitForReview(ctx context.Context, documentID
 	return r.db.WithContext(ctx).Model(&entities.Document{}).
 		Where("id = ?", documentID).
 		Updates(map[string]interface{}{
-			"status":                  entities.DocumentStatusReview,
+			"status":                  entities.DocumentStatusEnRevision,
 			"reviewer_id":             reviewerID,
 			"submitted_for_review_at": now,
 			"updated_at":              now,
@@ -571,7 +571,7 @@ func (r *DocumentRepositoryImpl) ApproveDocument(ctx context.Context, documentID
 	return r.db.WithContext(ctx).Model(&entities.Document{}).
 		Where("id = ? AND reviewer_id = ?", documentID, reviewerID).
 		Updates(map[string]interface{}{
-			"status":      entities.DocumentStatusApproved,
+			"status":      entities.DocumentStatusAprobado,
 			"reviewed_at": now,
 			"updated_at":  now,
 		}).Error
@@ -583,7 +583,7 @@ func (r *DocumentRepositoryImpl) RejectDocument(ctx context.Context, documentID,
 	return r.db.WithContext(ctx).Model(&entities.Document{}).
 		Where("id = ? AND reviewer_id = ?", documentID, reviewerID).
 		Updates(map[string]interface{}{
-			"status":        entities.DocumentStatusDraft,
+			"status":        entities.DocumentStatusBorrador,
 			"version_notes": reason,
 			"reviewed_at":   now,
 			"updated_at":    now,
@@ -596,7 +596,7 @@ func (r *DocumentRepositoryImpl) PublishDocument(ctx context.Context, documentID
 	return r.db.WithContext(ctx).Model(&entities.Document{}).
 		Where("id = ?", documentID).
 		Updates(map[string]interface{}{
-			"status":       entities.DocumentStatusPublished,
+			"status":       entities.DocumentStatusPublicado,
 			"published_at": now,
 			"updated_at":   now,
 		}).Error
@@ -607,7 +607,7 @@ func (r *DocumentRepositoryImpl) ArchiveDocument(ctx context.Context, documentID
 	return r.db.WithContext(ctx).Model(&entities.Document{}).
 		Where("id = ?", documentID).
 		Updates(map[string]interface{}{
-			"status":     entities.DocumentStatusArchived,
+			"status":     entities.DocumentStatusArchivado,
 			"updated_at": time.Now(),
 		}).Error
 }
@@ -629,7 +629,7 @@ func (r *DocumentRepositoryImpl) BulkDelete(ctx context.Context, documentIDs []u
 
 // BulkArchive archives multiple documents
 func (r *DocumentRepositoryImpl) BulkArchive(ctx context.Context, documentIDs []uuid.UUID) error {
-	return r.BulkUpdateStatus(ctx, documentIDs, entities.DocumentStatusArchived)
+	return r.BulkUpdateStatus(ctx, documentIDs, entities.DocumentStatusArchivado)
 }
 
 // RecordAnalytic records an analytic event
@@ -706,7 +706,7 @@ func (r *DocumentRepositoryImpl) GetRelatedDocuments(ctx context.Context, docume
 
 	// Find documents with similar tags or in the same category
 	query := r.db.WithContext(ctx).
-		Where("id != ? AND deleted_at IS NULL AND status = ?", documentID, entities.DocumentStatusPublished).
+		Where("id != ? AND deleted_at IS NULL AND status = ?", documentID, entities.DocumentStatusPublicado).
 		Where("category = ? OR tags && ?", sourceDoc.Category, sourceDoc.Tags).
 		Preload("Author").
 		Order("view_count DESC").
@@ -730,7 +730,7 @@ func (r *DocumentRepositoryImpl) GetSimilarDocuments(ctx context.Context, embedd
 	var documents []entities.Document
 
 	query := r.db.WithContext(ctx).
-		Where("id != ? AND deleted_at IS NULL AND status = ?", excludeID, entities.DocumentStatusPublished).
+		Where("id != ? AND deleted_at IS NULL AND status = ?", excludeID, entities.DocumentStatusPublicado).
 		Select("*, (1 - (embedding <=> ?::vector)) as similarity", embeddingStr).
 		Where("(1 - (embedding <=> ?::vector)) > 0.7", embeddingStr). // Similarity threshold
 		Order("similarity DESC").

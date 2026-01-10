@@ -215,7 +215,7 @@ func (uc *StakeholderUseCase) DeleteStakeholder(ctx context.Context, id uuid.UUI
 
 	// Business rule: Cannot delete coordinators if they are the only ones
 	if stakeholder.IsCoordinator() {
-		coordinators, err := uc.stakeholderRepo.GetByRole(ctx, stakeholder.ProjectID, entities.StakeholderRoleCoordinator)
+		coordinators, err := uc.stakeholderRepo.GetByRole(ctx, stakeholder.ProjectID, entities.StakeholderRoleCoordinador)
 		if err != nil {
 			return err
 		}

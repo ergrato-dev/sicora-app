@@ -217,7 +217,7 @@ func (r *reportRepositoryImpl) GetByStatus(ctx context.Context, status valueobje
 func (r *reportRepositoryImpl) GetCompletedReportsByPeriod(ctx context.Context, periodID uuid.UUID) ([]*entities.Report, error) {
 	var reports []models.Report
 	if err := r.db.WithContext(ctx).
-		Where("period_id = ? AND status = ?", periodID, string(valueobjects.ReportStatusCompleted)).
+		Where("period_id = ? AND status = ?", periodID, string(valueobjects.ReportStatusCompletado)).
 		Order("created_at DESC").Find(&reports).Error; err != nil {
 		return nil, fmt.Errorf("failed to get completed reports by period: %w", err)
 	}

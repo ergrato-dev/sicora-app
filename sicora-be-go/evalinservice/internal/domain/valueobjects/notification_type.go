@@ -1,40 +1,44 @@
 package valueobjects
 
+// NotificationType representa los tipos de notificaciones del sistema
 type NotificationType string
 
 const (
-	NotificationTypeEvaluationCreated   NotificationType = "evaluation_created"
-	NotificationTypeEvaluationUpdated   NotificationType = "evaluation_updated"
-	NotificationTypeEvaluationCompleted NotificationType = "evaluation_completed"
-	NotificationTypePeriodStarted       NotificationType = "period_started"
-	NotificationTypePeriodEnded         NotificationType = "period_ended"
-	NotificationTypeReportGenerated     NotificationType = "report_generated"
-	NotificationTypeCommentAdded        NotificationType = "comment_added"
+	NotificationTypeEvaluacionCreada      NotificationType = "EVALUACION_CREADA"
+	NotificationTypeEvaluacionActualizada NotificationType = "EVALUACION_ACTUALIZADA"
+	NotificationTypeEvaluacionCompletada  NotificationType = "EVALUACION_COMPLETADA"
+	NotificationTypePeriodoIniciado       NotificationType = "PERIODO_INICIADO"
+	NotificationTypePeriodoFinalizado     NotificationType = "PERIODO_FINALIZADO"
+	NotificationTypeReporteGenerado       NotificationType = "REPORTE_GENERADO"
+	NotificationTypeComentarioAgregado    NotificationType = "COMENTARIO_AGREGADO"
 )
 
+// IsValid verifica si el tipo de notificación es válido
 func (nt NotificationType) IsValid() bool {
 	switch nt {
-	case NotificationTypeEvaluationCreated, NotificationTypeEvaluationUpdated, NotificationTypeEvaluationCompleted,
-		NotificationTypePeriodStarted, NotificationTypePeriodEnded, NotificationTypeReportGenerated,
-		NotificationTypeCommentAdded:
+	case NotificationTypeEvaluacionCreada, NotificationTypeEvaluacionActualizada, NotificationTypeEvaluacionCompletada,
+		NotificationTypePeriodoIniciado, NotificationTypePeriodoFinalizado, NotificationTypeReporteGenerado,
+		NotificationTypeComentarioAgregado:
 		return true
 	default:
 		return false
 	}
 }
 
+// String retorna la representación en string del tipo de notificación
 func (nt NotificationType) String() string {
 	return string(nt)
 }
 
+// GetAllNotificationTypes retorna todos los tipos de notificación válidos
 func GetAllNotificationTypes() []NotificationType {
 	return []NotificationType{
-		NotificationTypeEvaluationCreated,
-		NotificationTypeEvaluationUpdated,
-		NotificationTypeEvaluationCompleted,
-		NotificationTypePeriodStarted,
-		NotificationTypePeriodEnded,
-		NotificationTypeReportGenerated,
-		NotificationTypeCommentAdded,
+		NotificationTypeEvaluacionCreada,
+		NotificationTypeEvaluacionActualizada,
+		NotificationTypeEvaluacionCompletada,
+		NotificationTypePeriodoIniciado,
+		NotificationTypePeriodoFinalizado,
+		NotificationTypeReporteGenerado,
+		NotificationTypeComentarioAgregado,
 	}
 }
