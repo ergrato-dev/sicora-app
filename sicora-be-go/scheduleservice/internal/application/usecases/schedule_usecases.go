@@ -178,7 +178,7 @@ func (uc *CreateScheduleUseCase) mapToDTO(schedule *entities.Schedule, group *en
 		BlockIdentifier: schedule.BlockIdentifier,
 		StartDate:       schedule.StartDate.Format("2006-01-02"),
 		EndDate:         schedule.EndDate.Format("2006-01-02"),
-		Status:          schedule.Status,
+		Status:          string(schedule.Status),
 		IsActive:        schedule.IsActive,
 		CreatedAt:       schedule.CreatedAt,
 		UpdatedAt:       schedule.UpdatedAt,
@@ -187,14 +187,14 @@ func (uc *CreateScheduleUseCase) mapToDTO(schedule *entities.Schedule, group *en
 			Number:   group.Number,
 			Quarter:  group.Quarter,
 			Year:     group.Year,
-			Shift:    group.Shift,
+			Shift:    string(group.Shift),
 			IsActive: group.IsActive,
 		},
 		Venue: &dtos.VenueResponse{
 			ID:       venue.ID,
 			Name:     venue.Name,
 			Code:     venue.Code,
-			Type:     venue.Type,
+			Type:     string(venue.Type),
 			Capacity: venue.Capacity,
 			Floor:    venue.Floor,
 			IsActive: venue.IsActive,
@@ -242,7 +242,7 @@ func (uc *GetScheduleUseCase) Execute(ctx context.Context, id uuid.UUID) (*dtos.
 		BlockIdentifier: schedule.BlockIdentifier,
 		StartDate:       schedule.StartDate.Format("2006-01-02"),
 		EndDate:         schedule.EndDate.Format("2006-01-02"),
-		Status:          schedule.Status,
+		Status:          string(schedule.Status),
 		IsActive:        schedule.IsActive,
 		CreatedAt:       schedule.CreatedAt,
 		UpdatedAt:       schedule.UpdatedAt,
@@ -255,7 +255,7 @@ func (uc *GetScheduleUseCase) Execute(ctx context.Context, id uuid.UUID) (*dtos.
 			Number:   schedule.AcademicGroup.Number,
 			Quarter:  schedule.AcademicGroup.Quarter,
 			Year:     schedule.AcademicGroup.Year,
-			Shift:    schedule.AcademicGroup.Shift,
+			Shift:    string(schedule.AcademicGroup.Shift),
 			IsActive: schedule.AcademicGroup.IsActive,
 		}
 	}
@@ -265,7 +265,7 @@ func (uc *GetScheduleUseCase) Execute(ctx context.Context, id uuid.UUID) (*dtos.
 			ID:       schedule.Venue.ID,
 			Name:     schedule.Venue.Name,
 			Code:     schedule.Venue.Code,
-			Type:     schedule.Venue.Type,
+			Type:     string(schedule.Venue.Type),
 			Capacity: schedule.Venue.Capacity,
 			Floor:    schedule.Venue.Floor,
 			IsActive: schedule.Venue.IsActive,
@@ -317,7 +317,7 @@ func (uc *ListSchedulesUseCase) Execute(ctx context.Context, filter repositories
 			BlockIdentifier: schedule.BlockIdentifier,
 			StartDate:       schedule.StartDate.Format("2006-01-02"),
 			EndDate:         schedule.EndDate.Format("2006-01-02"),
-			Status:          schedule.Status,
+			Status:          string(schedule.Status),
 			IsActive:        schedule.IsActive,
 			CreatedAt:       schedule.CreatedAt,
 			UpdatedAt:       schedule.UpdatedAt,
@@ -330,7 +330,7 @@ func (uc *ListSchedulesUseCase) Execute(ctx context.Context, filter repositories
 				Number:   schedule.AcademicGroup.Number,
 				Quarter:  schedule.AcademicGroup.Quarter,
 				Year:     schedule.AcademicGroup.Year,
-				Shift:    schedule.AcademicGroup.Shift,
+				Shift:    string(schedule.AcademicGroup.Shift),
 				IsActive: schedule.AcademicGroup.IsActive,
 			}
 		}
@@ -340,7 +340,7 @@ func (uc *ListSchedulesUseCase) Execute(ctx context.Context, filter repositories
 				ID:       schedule.Venue.ID,
 				Name:     schedule.Venue.Name,
 				Code:     schedule.Venue.Code,
-				Type:     schedule.Venue.Type,
+				Type:     string(schedule.Venue.Type),
 				Capacity: schedule.Venue.Capacity,
 				Floor:    schedule.Venue.Floor,
 				IsActive: schedule.Venue.IsActive,
@@ -448,7 +448,7 @@ func (uc *UpdateScheduleUseCase) Execute(ctx context.Context, id uuid.UUID, req 
 		schedule.EndDate = endDate
 	}
 	if req.Status != nil {
-		schedule.Status = *req.Status
+		schedule.Status = entities.EstadoHorario(*req.Status)
 	}
 
 	// Validaciones de negocio
@@ -503,7 +503,7 @@ func (uc *UpdateScheduleUseCase) Execute(ctx context.Context, id uuid.UUID, req 
 		BlockIdentifier: updatedSchedule.BlockIdentifier,
 		StartDate:       updatedSchedule.StartDate.Format("2006-01-02"),
 		EndDate:         updatedSchedule.EndDate.Format("2006-01-02"),
-		Status:          updatedSchedule.Status,
+		Status:          string(updatedSchedule.Status),
 		IsActive:        updatedSchedule.IsActive,
 		CreatedAt:       updatedSchedule.CreatedAt,
 		UpdatedAt:       updatedSchedule.UpdatedAt,

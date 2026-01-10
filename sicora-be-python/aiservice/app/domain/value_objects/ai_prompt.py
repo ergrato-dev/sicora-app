@@ -7,22 +7,22 @@ from enum import Enum
 class PromptType(str, Enum):
     """Types of AI prompts."""
 
-    CHAT = "chat"
-    COMPLETION = "completion"
-    SYSTEM = "system"
-    INSTRUCTION = "instruction"
-    CREATIVE = "creative"
-    ANALYTICAL = "analytical"
+    CHAT = "CHAT"
+    COMPLETADO = "COMPLETADO"
+    SISTEMA = "SISTEMA"
+    INSTRUCCION = "INSTRUCCION"
+    CREATIVO = "CREATIVO"
+    ANALITICO = "ANALITICO"
 
 
 class PromptTemplate(str, Enum):
     """Pre-defined prompt templates."""
 
-    GENERAL_ASSISTANT = "general_assistant"
-    ACADEMIC_TUTOR = "academic_tutor"
-    CODE_ASSISTANT = "code_assistant"
-    ONEVISION_COORDINATOR = "onevision_coordinator"
-    STUDENT_SUPPORT = "student_support"
+    ASISTENTE_GENERAL = "ASISTENTE_GENERAL"
+    TUTOR_ACADEMICO = "TUTOR_ACADEMICO"
+    ASISTENTE_CODIGO = "ASISTENTE_CODIGO"
+    COORDINADOR_ONEVISION = "COORDINADOR_ONEVISION"
+    SOPORTE_APRENDIZ = "SOPORTE_APRENDIZ"
 
 
 class AIPrompt:
@@ -114,7 +114,9 @@ class AIPrompt:
         }
 
     @classmethod
-    def from_template(cls, template: PromptTemplate, variables: Optional[Dict[str, Any]] = None) -> "AIPrompt":
+    def from_template(
+        cls, template: PromptTemplate, variables: Optional[Dict[str, Any]] = None
+    ) -> "AIPrompt":
         """Create prompt from template."""
         templates = {
             PromptTemplate.GENERAL_ASSISTANT: {
@@ -145,7 +147,9 @@ class AIPrompt:
             },
         }
 
-        template_config = templates.get(template, templates[PromptTemplate.GENERAL_ASSISTANT])
+        template_config = templates.get(
+            template, templates[PromptTemplate.GENERAL_ASSISTANT]
+        )
 
         return cls(
             content=template_config["content"],

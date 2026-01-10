@@ -88,9 +88,10 @@ func TestScheduleServiceCache_Program(t *testing.T) {
 	programID := uuid.New()
 	program := &entities.AcademicProgram{
 		ID:       programID,
-		Code:     "ADSO",
+		Code:     "228118",
 		Name:     "Análisis y Desarrollo de Software",
-		Duration: 24,
+		Type:     entities.TipoProgramaTecnologo,
+		Duration: 27,
 		IsActive: true,
 	}
 
@@ -103,6 +104,7 @@ func TestScheduleServiceCache_Program(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, program.Code, retrieved.Code)
 	assert.Equal(t, program.Name, retrieved.Name)
+	assert.Equal(t, entities.TipoProgramaTecnologo, retrieved.Type)
 }
 
 func TestScheduleServiceCache_Group(t *testing.T) {
@@ -199,7 +201,7 @@ func TestScheduleServiceCache_Schedule(t *testing.T) {
 		InstructorID:    instructorID,
 		Subject:         "Programación",
 		DayOfWeek:       1,
-		Status:          "ACTIVO",
+		Status:          entities.EstadoHorarioActivo,
 	}
 
 	// Set
@@ -211,6 +213,7 @@ func TestScheduleServiceCache_Schedule(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, schedule.Subject, retrieved.Subject)
 	assert.Equal(t, schedule.DayOfWeek, retrieved.DayOfWeek)
+	assert.Equal(t, entities.EstadoHorarioActivo, retrieved.Status)
 }
 
 func TestScheduleServiceCache_Ping(t *testing.T) {

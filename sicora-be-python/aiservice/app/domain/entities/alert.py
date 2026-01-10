@@ -10,29 +10,29 @@ from enum import Enum
 class AlertType(str, Enum):
     """Types of alerts."""
 
-    ATTENDANCE_RISK = "attendance_risk"
-    DROPOUT_WARNING = "dropout_warning"
-    PERFORMANCE_ISSUE = "performance_issue"
-    ACADEMIC_RISK = "academic_risk"
-    SYSTEM_ALERT = "system_alert"
+    RIESGO_ASISTENCIA = "RIESGO_ASISTENCIA"
+    ALERTA_DESERCION = "ALERTA_DESERCION"
+    PROBLEMA_RENDIMIENTO = "PROBLEMA_RENDIMIENTO"
+    RIESGO_ACADEMICO = "RIESGO_ACADEMICO"
+    ALERTA_SISTEMA = "ALERTA_SISTEMA"
 
 
 class AlertSeverity(str, Enum):
     """Alert severity levels."""
 
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    CRITICAL = "critical"
+    BAJO = "BAJO"
+    MEDIO = "MEDIO"
+    ALTO = "ALTO"
+    CRITICO = "CRITICO"
 
 
 class AlertStatus(str, Enum):
     """Alert status."""
 
-    ACTIVE = "active"
-    ACKNOWLEDGED = "acknowledged"
-    RESOLVED = "resolved"
-    DISMISSED = "dismissed"
+    ACTIVO = "ACTIVO"
+    RECONOCIDO = "RECONOCIDO"
+    RESUELTO = "RESUELTO"
+    DESCARTADO = "DESCARTADO"
 
 
 class Alert:
@@ -41,14 +41,14 @@ class Alert:
     def __init__(
         self,
         alert_id: Optional[UUID] = None,
-        alert_type: AlertType = AlertType.SYSTEM_ALERT,
-        severity: AlertSeverity = AlertSeverity.MEDIUM,
+        alert_type: AlertType = AlertType.ALERTA_SISTEMA,
+        severity: AlertSeverity = AlertSeverity.MEDIO,
         title: str = "",
         description: str = "",
         subject_id: Optional[UUID] = None,  # Related user, ficha, etc.
         subject_type: str = "user",
         prediction_id: Optional[UUID] = None,  # Related prediction if any
-        status: AlertStatus = AlertStatus.ACTIVE,
+        status: AlertStatus = AlertStatus.ACTIVO,
         created_by: Optional[UUID] = None,  # System or user who created
         assigned_to: Optional[UUID] = None,  # Who should handle this
         data: Optional[Dict[str, Any]] = None,
@@ -125,11 +125,11 @@ class Alert:
 
     def is_critical(self) -> bool:
         """Check if alert is critical."""
-        return self.severity == AlertSeverity.CRITICAL
+        return self.severity == AlertSeverity.CRITICO
 
     def is_active(self) -> bool:
         """Check if alert is still active."""
-        return self.status == AlertStatus.ACTIVE and not self.is_expired()
+        return self.status == AlertStatus.ACTIVO and not self.is_expired()
 
     def get_age_in_hours(self) -> float:
         """Get alert age in hours."""

@@ -34,7 +34,7 @@ type UpdateScheduleRequest struct {
 	BlockIdentifier *string    `json:"block_identifier,omitempty" validate:"omitempty,min=4,max=10"`
 	StartDate       *string    `json:"start_date,omitempty"`
 	EndDate         *string    `json:"end_date,omitempty"`
-	Status          *string    `json:"status,omitempty" validate:"omitempty,oneof=ACTIVE CANCELLED SUSPENDED"`
+	Status          *string    `json:"status,omitempty" validate:"omitempty,oneof=ACTIVO CANCELADO SUSPENDIDO"`
 }
 
 // ScheduleResponse DTO de respuesta para horario
@@ -65,7 +65,7 @@ type ScheduleResponse struct {
 type CreateAcademicProgramRequest struct {
 	Name        string `json:"name" validate:"required,min=5,max=200" example:"Análisis y Desarrollo de Software"`
 	Code        string `json:"code" validate:"required,min=2,max=20" example:"ADSO"`
-	Type        string `json:"type" validate:"required,oneof=TECNICO TECNOLOGO ESPECIALIZACION CURSO_CORTO" example:"TECNOLOGO"`
+	Type        string `json:"type" validate:"required,oneof=TECNICO TECNOLOGO ESPECIALIZACION CURSO_CORTO COMPLEMENTARIA" example:"TECNOLOGO"`
 	Duration    int    `json:"duration" validate:"required,min=1,max=60" example:"24"`
 	Description string `json:"description,omitempty" example:"Programa de formación en desarrollo de software"`
 }
@@ -74,7 +74,7 @@ type CreateAcademicProgramRequest struct {
 type UpdateAcademicProgramRequest struct {
 	Name        *string `json:"name,omitempty" validate:"omitempty,min=5,max=200"`
 	Code        *string `json:"code,omitempty" validate:"omitempty,min=2,max=20"`
-	Type        *string `json:"type,omitempty" validate:"omitempty,oneof=TECNICO TECNOLOGO ESPECIALIZACION CURSO_CORTO"`
+	Type        *string `json:"type,omitempty" validate:"omitempty,oneof=TECNICO TECNOLOGO ESPECIALIZACION CURSO_CORTO COMPLEMENTARIA"`
 	Duration    *int    `json:"duration,omitempty" validate:"omitempty,min=1,max=60"`
 	Description *string `json:"description,omitempty"`
 	IsActive    *bool   `json:"is_active,omitempty"`
@@ -101,7 +101,7 @@ type CreateAcademicGroupRequest struct {
 	AcademicProgramID uuid.UUID `json:"academic_program_id" validate:"required" example:"550e8400-e29b-41d4-a716-446655440000"`
 	Quarter           int       `json:"quarter" validate:"required,min=1,max=10" example:"3"`
 	Year              int       `json:"year" validate:"required,min=2020,max=2030" example:"2024"`
-	Shift             string    `json:"shift" validate:"required,oneof=MANANA TARDE NOCHE" example:"MANANA"`
+	Shift             string    `json:"shift" validate:"required,oneof=DIURNA NOCTURNA MADRUGADA MIXTA" example:"DIURNA"`
 }
 
 // UpdateAcademicGroupRequest DTO para actualizar ficha/grupo
@@ -110,7 +110,7 @@ type UpdateAcademicGroupRequest struct {
 	AcademicProgramID *uuid.UUID `json:"academic_program_id,omitempty"`
 	Quarter           *int       `json:"quarter,omitempty" validate:"omitempty,min=1,max=10"`
 	Year              *int       `json:"year,omitempty" validate:"omitempty,min=2020,max=2030"`
-	Shift             *string    `json:"shift,omitempty" validate:"omitempty,oneof=MANANA TARDE NOCHE"`
+	Shift             *string    `json:"shift,omitempty" validate:"omitempty,oneof=DIURNA NOCTURNA MADRUGADA MIXTA"`
 	IsActive          *bool      `json:"is_active,omitempty"`
 }
 
@@ -122,7 +122,7 @@ type AcademicGroupResponse struct {
 	AcademicProgram   *AcademicProgramResponse `json:"academic_program,omitempty"`
 	Quarter           int                      `json:"quarter" example:"3"`
 	Year              int                      `json:"year" example:"2024"`
-	Shift             string                   `json:"shift" example:"MANANA"`
+	Shift             string                   `json:"shift" example:"DIURNA"`
 	IsActive          bool                     `json:"is_active" example:"true"`
 	CreatedAt         time.Time                `json:"created_at"`
 	UpdatedAt         time.Time                `json:"updated_at"`
@@ -134,8 +134,8 @@ type AcademicGroupResponse struct {
 type CreateVenueRequest struct {
 	Name     string    `json:"name" validate:"required,min=2,max=100" example:"Laboratorio de Software"`
 	Code     string    `json:"code" validate:"required,min=2,max=20" example:"LAB-SW-01"`
-	Type     string    `json:"type" validate:"required,oneof=AULA LABORATORIO TALLER AUDITORIO BIBLIOTECA" example:"LABORATORIO"`
-	Capacity int       `json:"capacity" validate:"required,min=1,max=100" example:"30"`
+	Type     string    `json:"type" validate:"required,oneof=AULA LABORATORIO TALLER AUDITORIO BIBLIOTECA VIRTUAL" example:"LABORATORIO"`
+	Capacity int       `json:"capacity" validate:"required,min=1,max=500" example:"30"`
 	CampusID uuid.UUID `json:"campus_id" validate:"required" example:"550e8400-e29b-41d4-a716-446655440000"`
 	Floor    string    `json:"floor,omitempty" validate:"max=10" example:"2"`
 }
@@ -144,8 +144,8 @@ type CreateVenueRequest struct {
 type UpdateVenueRequest struct {
 	Name     *string    `json:"name,omitempty" validate:"omitempty,min=2,max=100"`
 	Code     *string    `json:"code,omitempty" validate:"omitempty,min=2,max=20"`
-	Type     *string    `json:"type,omitempty" validate:"omitempty,oneof=AULA LABORATORIO TALLER AUDITORIO BIBLIOTECA"`
-	Capacity *int       `json:"capacity,omitempty" validate:"omitempty,min=1,max=100"`
+	Type     *string    `json:"type,omitempty" validate:"omitempty,oneof=AULA LABORATORIO TALLER AUDITORIO BIBLIOTECA VIRTUAL"`
+	Capacity *int       `json:"capacity,omitempty" validate:"omitempty,min=1,max=500"`
 	CampusID *uuid.UUID `json:"campus_id,omitempty"`
 	Floor    *string    `json:"floor,omitempty" validate:"omitempty,max=10"`
 	IsActive *bool      `json:"is_active,omitempty"`

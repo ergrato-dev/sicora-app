@@ -242,7 +242,7 @@ func (uc *BulkScheduleUseCases) processScheduleCreation(ctx context.Context, req
 		BlockIdentifier: savedSchedule.BlockIdentifier,
 		StartDate:       savedSchedule.StartDate.Format("2006-01-02"),
 		EndDate:         savedSchedule.EndDate.Format("2006-01-02"),
-		Status:          savedSchedule.Status,
+		Status:          string(savedSchedule.Status),
 		CreatedAt:       savedSchedule.CreatedAt,
 		UpdatedAt:       savedSchedule.UpdatedAt,
 	}

@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" fill="none">
+  <style>
+    .title { font: bold 24px sans-serif; fill: #e0e0e0; }
+    .subtitle { font: bold 16px sans-serif; fill: #90caf9; }
+    .label { font: bold 12px sans-serif; fill: #ffffff; }
+    .small-text { font: 11px sans-serif; fill: #b0bec5; }
+    .code { font: bold 11px monospace; fill: #81c784; }
+    .hours { font: bold 11px sans-serif; fill: #ffb74d; }
+    .raps { font: 10px sans-serif; fill: #ce93d8; }
+  </style>
+  
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#1e1e1e"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" class="title">Programa ADSO 228118 - Análisis y Desarrollo de Software</text>
+  <text x="600" y="65" text-anchor="middle" class="small-text">Tecnólogo | 27 meses | 3,984 horas | 83 créditos | Versión: 10/sep/2021</text>
+  
+  <!-- Main Program Box -->
+  <rect x="460" y="85" width="280" height="50" rx="8" fill="#2962ff" stroke="#448aff" stroke-width="2"/>
+  <text x="600" y="105" text-anchor="middle" class="label">PROGRAMA ACADÉMICO</text>
+  <text x="600" y="122" text-anchor="middle" class="code">228118 - TECNOLOGO</text>
+  
+  <!-- Divider lines -->
+  <line x1="600" y1="135" x2="600" y2="160" stroke="#546e7a" stroke-width="2"/>
+  <line x1="300" y1="160" x2="900" y2="160" stroke="#546e7a" stroke-width="2"/>
+  
+  <!-- Two main branches -->
+  <line x1="300" y1="160" x2="300" y2="180" stroke="#546e7a" stroke-width="2"/>
+  <line x1="900" y1="160" x2="900" y2="180" stroke="#546e7a" stroke-width="2"/>
+  
+  <!-- COMPETENCIAS TÉCNICAS Section -->
+  <rect x="80" y="180" width="440" height="40" rx="6" fill="#00695c" stroke="#26a69a" stroke-width="2"/>
+  <text x="300" y="205" text-anchor="middle" class="label">COMPETENCIAS TÉCNICAS (7)</text>
+  <text x="300" y="215" text-anchor="middle" class="hours">3,120 horas - 33 RAPs</text>
+  
+  <!-- Technical Competencies -->
+  <!-- Competencia 1 -->
+  <rect x="30" y="235" width="200" height="80" rx="5" fill="#263238" stroke="#00897b" stroke-width="1"/>
+  <text x="130" y="252" text-anchor="middle" class="code">220501092</text>
+  <text x="130" y="268" text-anchor="middle" class="small-text">Establecer requisitos de</text>
+  <text x="130" y="281" text-anchor="middle" class="small-text">la solución de software</text>
+  <text x="130" y="298" text-anchor="middle" class="hours">144 h</text>
+  <text x="130" y="310" text-anchor="middle" class="raps">4 RAPs</text>
+  
+  <!-- Competencia 2 -->
+  <rect x="240" y="235" width="200" height="80" rx="5" fill="#263238" stroke="#00897b" stroke-width="1"/>
+  <text x="340" y="252" text-anchor="middle" class="code">220501093</text>
+  <text x="340" y="268" text-anchor="middle" class="small-text">Evaluar requisitos de</text>
+  <text x="340" y="281" text-anchor="middle" class="small-text">la solución de software</text>
+  <text x="340" y="298" text-anchor="middle" class="hours">240 h</text>
+  <text x="340" y="310" text-anchor="middle" class="raps">3 RAPs</text>
+  
+  <!-- Competencia 3 -->
+  <rect x="450" y="235" width="200" height="80" rx="5" fill="#263238" stroke="#00897b" stroke-width="1"/>
+  <text x="550" y="252" text-anchor="middle" class="code">220501094</text>
+  <text x="550" y="268" text-anchor="middle" class="small-text">Estructurar propuesta</text>
+  <text x="550" y="281" text-anchor="middle" class="small-text">técnica de servicio TI</text>
+  <text x="550" y="298" text-anchor="middle" class="hours">264 h</text>
+  <text x="550" y="310" text-anchor="middle" class="raps">3 RAPs</text>
+  
+  <!-- Competencia 4 -->
+  <rect x="30" y="325" width="200" height="80" rx="5" fill="#263238" stroke="#00897b" stroke-width="1"/>
+  <text x="130" y="342" text-anchor="middle" class="code">220501095</text>
+  <text x="130" y="358" text-anchor="middle" class="small-text">Diseñar la solución</text>
+  <text x="130" y="371" text-anchor="middle" class="small-text">de software</text>
+  <text x="130" y="388" text-anchor="middle" class="hours">480 h</text>
+  <text x="130" y="400" text-anchor="middle" class="raps">8 RAPs</text>
+  
+  <!-- Competencia 5 (Principal - Mayor horas) -->
+  <rect x="240" y="325" width="200" height="80" rx="5" fill="#1b5e20" stroke="#4caf50" stroke-width="2"/>
+  <text x="340" y="342" text-anchor="middle" class="code">220501096</text>
+  <text x="340" y="358" text-anchor="middle" class="small-text">Desarrollar la solución</text>
+  <text x="340" y="371" text-anchor="middle" class="small-text">de software</text>
+  <text x="340" y="388" text-anchor="middle" class="hours">1,008 h ⭐</text>
+  <text x="340" y="400" text-anchor="middle" class="raps">5 RAPs</text>
+  
+  <!-- Competencia 6 -->
+  <rect x="450" y="325" width="200" height="80" rx="5" fill="#263238" stroke="#00897b" stroke-width="1"/>
+  <text x="550" y="342" text-anchor="middle" class="code">220501097</text>
+  <text x="550" y="358" text-anchor="middle" class="small-text">Implementar la solución</text>
+  <text x="550" y="371" text-anchor="middle" class="small-text">de software</text>
+  <text x="550" y="388" text-anchor="middle" class="hours">840 h</text>
+  <text x="550" y="400" text-anchor="middle" class="raps">7 RAPs</text>
+  
+  <!-- Competencia 7 -->
+  <rect x="240" y="415" width="200" height="80" rx="5" fill="#263238" stroke="#00897b" stroke-width="1"/>
+  <text x="340" y="432" text-anchor="middle" class="code">220501098</text>
+  <text x="340" y="448" text-anchor="middle" class="small-text">Controlar la calidad del</text>
+  <text x="340" y="461" text-anchor="middle" class="small-text">servicio de software</text>
+  <text x="340" y="478" text-anchor="middle" class="hours">144 h</text>
+  <text x="340" y="490" text-anchor="middle" class="raps">3 RAPs</text>
+  
+  <!-- COMPETENCIAS TRANSVERSALES Section -->
+  <rect x="680" y="180" width="440" height="40" rx="6" fill="#4a148c" stroke="#ab47bc" stroke-width="2"/>
+  <text x="900" y="205" text-anchor="middle" class="label">COMPETENCIAS TRANSVERSALES (12)</text>
+  <text x="900" y="215" text-anchor="middle" class="hours">864 horas</text>
+  
+  <!-- Row 1 - Transversales -->
+  <rect x="685" y="235" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="750" y="255" text-anchor="middle" class="code">240201526</text>
+  <text x="750" y="270" text-anchor="middle" class="small-text">Ética y</text>
+  <text x="750" y="283" text-anchor="middle" class="small-text">cultura de paz</text>
+  
+  <rect x="825" y="235" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="890" y="255" text-anchor="middle" class="code">210201501</text>
+  <text x="890" y="270" text-anchor="middle" class="small-text">Derechos</text>
+  <text x="890" y="283" text-anchor="middle" class="small-text">laborales</text>
+  
+  <rect x="965" y="235" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="1030" y="255" text-anchor="middle" class="code">230101507</text>
+  <text x="1030" y="270" text-anchor="middle" class="small-text">Cultura</text>
+  <text x="1030" y="283" text-anchor="middle" class="small-text">física</text>
+  
+  <!-- Row 2 - Transversales -->
+  <rect x="685" y="305" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="750" y="325" text-anchor="middle" class="code">240201524</text>
+  <text x="750" y="340" text-anchor="middle" class="small-text">Comunicación</text>
+  <text x="750" y="353" text-anchor="middle" class="small-text">efectiva</text>
+  
+  <rect x="825" y="305" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="890" y="325" text-anchor="middle" class="code">220201501</text>
+  <text x="890" y="340" text-anchor="middle" class="small-text">Ciencias</text>
+  <text x="890" y="353" text-anchor="middle" class="small-text">naturales</text>
+  
+  <rect x="965" y="305" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="1030" y="325" text-anchor="middle" class="code">220601501</text>
+  <text x="1030" y="340" text-anchor="middle" class="small-text">Seguridad</text>
+  <text x="1030" y="353" text-anchor="middle" class="small-text">y SST</text>
+  
+  <!-- Row 3 - Transversales -->
+  <rect x="685" y="375" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="750" y="395" text-anchor="middle" class="code">240201525</text>
+  <text x="750" y="410" text-anchor="middle" class="small-text">Emprendimiento</text>
+  
+  <rect x="825" y="375" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="890" y="395" text-anchor="middle" class="code">240201064</text>
+  <text x="890" y="410" text-anchor="middle" class="small-text">Investigación</text>
+  <text x="890" y="423" text-anchor="middle" class="small-text">formativa</text>
+  
+  <rect x="965" y="375" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="1030" y="395" text-anchor="middle" class="code">240201517</text>
+  <text x="1030" y="410" text-anchor="middle" class="small-text">Razonamiento</text>
+  <text x="1030" y="423" text-anchor="middle" class="small-text">cuantitativo</text>
+  
+  <!-- Row 4 - Transversales -->
+  <rect x="685" y="445" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="750" y="465" text-anchor="middle" class="code">220501046</text>
+  <text x="750" y="480" text-anchor="middle" class="small-text">Herramientas</text>
+  <text x="750" y="493" text-anchor="middle" class="small-text">informáticas</text>
+  
+  <!-- Inglés (Principal transversal) -->
+  <rect x="825" y="445" width="130" height="60" rx="4" fill="#1a237e" stroke="#536dfe" stroke-width="2"/>
+  <text x="890" y="465" text-anchor="middle" class="code">240202501</text>
+  <text x="890" y="480" text-anchor="middle" class="small-text">Inglés B1-B2</text>
+  <text x="890" y="493" text-anchor="middle" class="hours">360 h ⭐</text>
+  
+  <rect x="965" y="445" width="130" height="60" rx="4" fill="#311b92" stroke="#7c4dff" stroke-width="1"/>
+  <text x="1030" y="465" text-anchor="middle" class="code">240201530</text>
+  <text x="1030" y="480" text-anchor="middle" class="small-text">Inducción</text>
+  
+  <!-- Etapas Section -->
+  <rect x="80" y="530" width="1040" height="40" rx="6" fill="#37474f" stroke="#78909c" stroke-width="2"/>
+  <text x="600" y="555" text-anchor="middle" class="label">ESTRUCTURA DEL PROGRAMA</text>
+  
+  <!-- Etapa Lectiva -->
+  <rect x="80" y="585" width="500" height="90" rx="6" fill="#1565c0" stroke="#42a5f5" stroke-width="2"/>
+  <text x="330" y="610" text-anchor="middle" class="label">ETAPA LECTIVA</text>
+  <text x="330" y="630" text-anchor="middle" class="hours">3,120 horas (21 meses)</text>
+  <text x="330" y="650" text-anchor="middle" class="small-text">Formación teórico-práctica en Centro/Virtual</text>
+  <text x="330" y="665" text-anchor="middle" class="small-text">78% del programa</text>
+  
+  <!-- Etapa Productiva -->
+  <rect x="620" y="585" width="500" height="90" rx="6" fill="#c62828" stroke="#ef5350" stroke-width="2"/>
+  <text x="870" y="610" text-anchor="middle" class="label">ETAPA PRODUCTIVA</text>
+  <text x="870" y="630" text-anchor="middle" class="hours">864 horas (6 meses)</text>
+  <text x="870" y="650" text-anchor="middle" class="small-text">Práctica en empresa/proyecto productivo</text>
+  <text x="870" y="665" text-anchor="middle" class="small-text">22% del programa</text>
+  
+  <!-- Modalidades -->
+  <rect x="80" y="690" width="500" height="70" rx="6" fill="#263238" stroke="#546e7a" stroke-width="1"/>
+  <text x="330" y="715" text-anchor="middle" class="subtitle">MODALIDAD VIRTUAL</text>
+  <text x="330" y="735" text-anchor="middle" class="small-text">100% virtual - Plataforma LMS Zajuna</text>
+  <text x="330" y="750" text-anchor="middle" class="small-text">Horarios flexibles - 3h diarias mínimo</text>
+  
+  <rect x="620" y="690" width="500" height="70" rx="6" fill="#263238" stroke="#546e7a" stroke-width="1"/>
+  <text x="870" y="715" text-anchor="middle" class="subtitle">MODALIDAD PRESENCIAL</text>
+  <text x="870" y="735" text-anchor="middle" class="small-text">Centros de Formación SENA</text>
+  <text x="870" y="750" text-anchor="middle" class="small-text">Jornadas: Diurna | Nocturna | Madrugada | Mixta</text>
+  
+  <!-- Ciclo de Vida del Software -->
+  <rect x="80" y="775" width="1040" height="35" rx="6" fill="#004d40" stroke="#00897b" stroke-width="2"/>
+  <text x="600" y="798" text-anchor="middle" class="label">CICLO DE VIDA: Análisis → Diseño → Desarrollo → Implementación → Calidad</text>
+  
+  <!-- Footer -->
+  <text x="600" y="835" text-anchor="middle" class="small-text">CNO: 2281 - Técnico en Tecnologías de la Información | Registro SNIES: 10635 (Virtual)</text>
+  <text x="600" y="855" text-anchor="middle" class="small-text">Título: Tecnólogo en Análisis y Desarrollo de Software | Red: Informática, Diseño y Desarrollo de Software</text>
+  
+  <!-- Watermark -->
+  <text x="600" y="885" text-anchor="middle" class="code">SICORA - Sistema de Control de Horarios Académicos | Datos ADSO 228118</text>
+</svg>

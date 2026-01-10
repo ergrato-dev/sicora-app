@@ -80,7 +80,7 @@ func (uc *CreateAcademicProgramUseCase) Execute(ctx context.Context, req *dtos.C
 	program := &entities.AcademicProgram{
 		Name:        req.Name,
 		Code:        req.Code,
-		Type:        req.Type,
+		Type:        entities.TipoPrograma(req.Type),
 		Duration:    req.Duration,
 		Description: req.Description,
 		IsActive:    true,
@@ -100,7 +100,7 @@ func (uc *CreateAcademicProgramUseCase) Execute(ctx context.Context, req *dtos.C
 		ID:          createdProgram.ID,
 		Name:        createdProgram.Name,
 		Code:        createdProgram.Code,
-		Type:        createdProgram.Type,
+		Type:        string(createdProgram.Type),
 		Duration:    createdProgram.Duration,
 		Description: createdProgram.Description,
 		IsActive:    createdProgram.IsActive,
@@ -157,7 +157,7 @@ func (uc *CreateAcademicGroupUseCase) Execute(ctx context.Context, req *dtos.Cre
 		AcademicProgramID: req.AcademicProgramID,
 		Quarter:           req.Quarter,
 		Year:              req.Year,
-		Shift:             req.Shift,
+		Shift:             entities.Jornada(req.Shift),
 		IsActive:          true,
 	}
 
@@ -177,7 +177,7 @@ func (uc *CreateAcademicGroupUseCase) Execute(ctx context.Context, req *dtos.Cre
 		AcademicProgramID: createdGroup.AcademicProgramID,
 		Quarter:           createdGroup.Quarter,
 		Year:              createdGroup.Year,
-		Shift:             createdGroup.Shift,
+		Shift:             string(createdGroup.Shift),
 		IsActive:          createdGroup.IsActive,
 		CreatedAt:         createdGroup.CreatedAt,
 		UpdatedAt:         createdGroup.UpdatedAt,
@@ -185,7 +185,7 @@ func (uc *CreateAcademicGroupUseCase) Execute(ctx context.Context, req *dtos.Cre
 			ID:          program.ID,
 			Name:        program.Name,
 			Code:        program.Code,
-			Type:        program.Type,
+			Type:        string(program.Type),
 			Duration:    program.Duration,
 			Description: program.Description,
 			IsActive:    program.IsActive,
@@ -241,7 +241,7 @@ func (uc *CreateVenueUseCase) Execute(ctx context.Context, req *dtos.CreateVenue
 	venue := &entities.Venue{
 		Name:     req.Name,
 		Code:     req.Code,
-		Type:     req.Type,
+		Type:     entities.TipoAmbiente(req.Type),
 		Capacity: req.Capacity,
 		CampusID: req.CampusID,
 		Floor:    req.Floor,
@@ -262,7 +262,7 @@ func (uc *CreateVenueUseCase) Execute(ctx context.Context, req *dtos.CreateVenue
 		ID:        createdVenue.ID,
 		Name:      createdVenue.Name,
 		Code:      createdVenue.Code,
-		Type:      createdVenue.Type,
+		Type:      string(createdVenue.Type),
 		Capacity:  createdVenue.Capacity,
 		CampusID:  createdVenue.CampusID,
 		Floor:     createdVenue.Floor,
@@ -372,7 +372,7 @@ func (uc *ListAcademicProgramsUseCase) Execute(ctx context.Context, filter repos
 			ID:          program.ID,
 			Name:        program.Name,
 			Code:        program.Code,
-			Type:        program.Type,
+			Type:        string(program.Type),
 			Duration:    program.Duration,
 			Description: program.Description,
 			IsActive:    program.IsActive,
@@ -433,7 +433,7 @@ func (uc *ListAcademicGroupsUseCase) Execute(ctx context.Context, filter reposit
 			AcademicProgramID: group.AcademicProgramID,
 			Quarter:           group.Quarter,
 			Year:              group.Year,
-			Shift:             group.Shift,
+			Shift:             string(group.Shift),
 			IsActive:          group.IsActive,
 			CreatedAt:         group.CreatedAt,
 			UpdatedAt:         group.UpdatedAt,
@@ -445,7 +445,7 @@ func (uc *ListAcademicGroupsUseCase) Execute(ctx context.Context, filter reposit
 				ID:          group.AcademicProgram.ID,
 				Name:        group.AcademicProgram.Name,
 				Code:        group.AcademicProgram.Code,
-				Type:        group.AcademicProgram.Type,
+				Type:        string(group.AcademicProgram.Type),
 				Duration:    group.AcademicProgram.Duration,
 				Description: group.AcademicProgram.Description,
 				IsActive:    group.AcademicProgram.IsActive,
@@ -505,7 +505,7 @@ func (uc *ListVenuesUseCase) Execute(ctx context.Context, filter repositories.Ve
 			ID:        venue.ID,
 			Name:      venue.Name,
 			Code:      venue.Code,
-			Type:      venue.Type,
+			Type:      string(venue.Type),
 			Capacity:  venue.Capacity,
 			CampusID:  venue.CampusID,
 			Floor:     venue.Floor,
@@ -636,7 +636,7 @@ func (uc *GetAcademicProgramUseCase) Execute(ctx context.Context, id uuid.UUID) 
 		ID:          program.ID,
 		Name:        program.Name,
 		Code:        program.Code,
-		Type:        program.Type,
+		Type:        string(program.Type),
 		Duration:    program.Duration,
 		Description: program.Description,
 		IsActive:    program.IsActive,
@@ -677,7 +677,7 @@ func (uc *GetAcademicGroupUseCase) Execute(ctx context.Context, id uuid.UUID) (*
 		AcademicProgramID: group.AcademicProgramID,
 		Quarter:           group.Quarter,
 		Year:              group.Year,
-		Shift:             group.Shift,
+		Shift:             string(group.Shift),
 		IsActive:          group.IsActive,
 		CreatedAt:         group.CreatedAt,
 		UpdatedAt:         group.UpdatedAt,
@@ -714,7 +714,7 @@ func (uc *GetVenueUseCase) Execute(ctx context.Context, id uuid.UUID) (*dtos.Ven
 		ID:        venue.ID,
 		Name:      venue.Name,
 		Code:      venue.Code,
-		Type:      venue.Type,
+		Type:      string(venue.Type),
 		Capacity:  venue.Capacity,
 		CampusID:  venue.CampusID,
 		Floor:     venue.Floor,
@@ -809,7 +809,7 @@ func (uc *UpdateAcademicProgramUseCase) Execute(ctx context.Context, id uuid.UUI
 		program.Name = *req.Name
 	}
 	if req.Type != nil {
-		program.Type = *req.Type
+		program.Type = entities.TipoPrograma(*req.Type)
 	}
 	if req.Duration != nil {
 		program.Duration = *req.Duration
@@ -832,7 +832,7 @@ func (uc *UpdateAcademicProgramUseCase) Execute(ctx context.Context, id uuid.UUI
 		ID:          updatedProgram.ID,
 		Name:        updatedProgram.Name,
 		Code:        updatedProgram.Code,
-		Type:        updatedProgram.Type,
+		Type:        string(updatedProgram.Type),
 		Duration:    updatedProgram.Duration,
 		Description: updatedProgram.Description,
 		IsActive:    updatedProgram.IsActive,
@@ -882,7 +882,7 @@ func (uc *UpdateAcademicGroupUseCase) Execute(ctx context.Context, id uuid.UUID,
 		group.Year = *req.Year
 	}
 	if req.Shift != nil {
-		group.Shift = *req.Shift
+		group.Shift = entities.Jornada(*req.Shift)
 	}
 	if req.IsActive != nil {
 		group.IsActive = *req.IsActive
@@ -901,7 +901,7 @@ func (uc *UpdateAcademicGroupUseCase) Execute(ctx context.Context, id uuid.UUID,
 		AcademicProgramID: updatedGroup.AcademicProgramID,
 		Quarter:           updatedGroup.Quarter,
 		Year:              updatedGroup.Year,
-		Shift:             updatedGroup.Shift,
+		Shift:             string(updatedGroup.Shift),
 		IsActive:          updatedGroup.IsActive,
 		CreatedAt:         updatedGroup.CreatedAt,
 		UpdatedAt:         updatedGroup.UpdatedAt,
@@ -940,7 +940,7 @@ func (uc *UpdateVenueUseCase) Execute(ctx context.Context, id uuid.UUID, req *dt
 		venue.Name = *req.Name
 	}
 	if req.Type != nil {
-		venue.Type = *req.Type
+		venue.Type = entities.TipoAmbiente(*req.Type)
 	}
 	if req.Capacity != nil {
 		venue.Capacity = *req.Capacity
@@ -966,7 +966,7 @@ func (uc *UpdateVenueUseCase) Execute(ctx context.Context, id uuid.UUID, req *dt
 		ID:        updatedVenue.ID,
 		Name:      updatedVenue.Name,
 		Code:      updatedVenue.Code,
-		Type:      updatedVenue.Type,
+		Type:      string(updatedVenue.Type),
 		Capacity:  updatedVenue.Capacity,
 		CampusID:  updatedVenue.CampusID,
 		Floor:     updatedVenue.Floor,

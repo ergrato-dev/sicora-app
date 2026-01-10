@@ -13,7 +13,6 @@ from app.domain.repositories.prediction_repository import (
 from app.domain.exceptions import (
     AlertNotFoundError,
     InvalidAlertDataError,
-    AlertPermissionError,
     AlertStatusError,
 )
 
@@ -122,7 +121,7 @@ class AcknowledgeAlertUseCase:
         if not alert:
             raise AlertNotFoundError(f"Alert with ID {alert_id} not found")
 
-        if alert.status != AlertStatus.ACTIVE:
+        if alert.status != AlertStatus.ACTIVO:
             raise AlertStatusError("Only active alerts can be acknowledged")
 
         return await self.alert_repository.acknowledge_alert(alert_id, acknowledged_by)

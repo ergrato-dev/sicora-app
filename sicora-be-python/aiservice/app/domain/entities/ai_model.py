@@ -9,28 +9,30 @@ from enum import Enum
 
 class ModelType(str, Enum):
     """AI Model types."""
-    OPENAI_GPT = "openai_gpt"
-    ANTHROPIC_CLAUDE = "anthropic_claude"
-    HUGGINGFACE = "huggingface"
-    LOCAL = "local"
+
+    GPT_OPENAI = "GPT_OPENAI"
+    CLAUDE_ANTHROPIC = "CLAUDE_ANTHROPIC"
+    HUGGINGFACE = "HUGGINGFACE"
+    LOCAL = "LOCAL"
 
 
 class ModelStatus(str, Enum):
     """AI Model status."""
-    ACTIVE = "active"
-    INACTIVE = "inactive"
-    MAINTENANCE = "maintenance"
-    ERROR = "error"
+
+    ACTIVO = "ACTIVO"
+    INACTIVO = "INACTIVO"
+    MANTENIMIENTO = "MANTENIMIENTO"
+    ERROR = "ERROR"
 
 
 class AIModel:
     """AI Model configuration domain entity."""
-    
+
     def __init__(
         self,
         model_id: Optional[UUID] = None,
         name: str = "",
-        model_type: ModelType = ModelType.OPENAI_GPT,
+        model_type: ModelType = ModelType.GPT_OPENAI,
         model_name: str = "",
         api_endpoint: Optional[str] = None,
         api_key_name: Optional[str] = None,
@@ -41,11 +43,11 @@ class AIModel:
         presence_penalty: float = 0.0,
         context_window: int = 4096,
         cost_per_token: float = 0.0,
-        status: ModelStatus = ModelStatus.ACTIVE,
+        status: ModelStatus = ModelStatus.ACTIVO,
         metadata: Optional[Dict[str, Any]] = None,
         supported_features: Optional[List[str]] = None,
         created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None
+        updated_at: Optional[datetime] = None,
     ):
         self.model_id = model_id or uuid.uuid4()
         self.name = name
@@ -65,19 +67,19 @@ class AIModel:
         self.supported_features = supported_features or []
         self.created_at = created_at or datetime.utcnow()
         self.updated_at = updated_at or datetime.utcnow()
-    
+
     def update_status(self, new_status: ModelStatus) -> None:
         """Update model status."""
         self.status = new_status
         self.updated_at = datetime.utcnow()
-    
+
     def update_parameters(
         self,
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
         max_tokens: Optional[int] = None,
         frequency_penalty: Optional[float] = None,
-        presence_penalty: Optional[float] = None
+        presence_penalty: Optional[float] = None,
     ) -> None:
         """Update model parameters."""
         if temperature is not None:
@@ -90,33 +92,33 @@ class AIModel:
             self.frequency_penalty = frequency_penalty
         if presence_penalty is not None:
             self.presence_penalty = presence_penalty
-        
+
         self.updated_at = datetime.utcnow()
-    
+
     def add_feature(self, feature: str) -> None:
         """Add a supported feature."""
         if feature not in self.supported_features:
             self.supported_features.append(feature)
             self.updated_at = datetime.utcnow()
-    
+
     def remove_feature(self, feature: str) -> None:
         """Remove a supported feature."""
         if feature in self.supported_features:
             self.supported_features.remove(feature)
             self.updated_at = datetime.utcnow()
-    
+
     def is_available(self) -> bool:
         """Check if model is available for use."""
-        return self.status == ModelStatus.ACTIVE
-    
+        return self.status == ModelStatus.ACTIVO
+
     def supports_feature(self, feature: str) -> bool:
         """Check if model supports a specific feature."""
         return feature in self.supported_features
-    
+
     def calculate_cost(self, token_count: int) -> float:
         """Calculate cost for given token count."""
         return self.cost_per_token * token_count
-    
+
     def get_configuration(self) -> Dict[str, Any]:
         """Get model configuration parameters."""
         return {
@@ -124,9 +126,9 @@ class AIModel:
             "top_p": self.top_p,
             "max_tokens": self.max_tokens,
             "frequency_penalty": self.frequency_penalty,
-            "presence_penalty": self.presence_penalty
+            "presence_penalty": self.presence_penalty,
         }
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert AI model to dictionary."""
         return {
@@ -147,11 +149,11 @@ class AIModel:
             "supported_features": self.supported_features,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "is_available": self.is_available()
+            "is_available": self.is_available(),
         }
-    
+
     def __str__(self) -> str:
         return f"AIModel(id={self.model_id}, name='{self.name}', type='{self.model_type.value}', status='{self.status.value}')"
-    
+
     def __repr__(self) -> str:
         return self.__str__()

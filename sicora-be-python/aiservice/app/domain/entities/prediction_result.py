@@ -1,7 +1,7 @@
 """Prediction Result entity for AI Service."""
 
 from datetime import datetime
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 from uuid import UUID
 import uuid
 from enum import Enum
@@ -10,28 +10,28 @@ from enum import Enum
 class PredictionType(str, Enum):
     """Types of predictions available."""
 
-    ATTENDANCE = "attendance"
-    DROPOUT = "dropout"
-    PERFORMANCE = "performance"
-    ACADEMIC_RISK = "academic_risk"
+    ASISTENCIA = "ASISTENCIA"
+    DESERCION = "DESERCION"
+    RENDIMIENTO = "RENDIMIENTO"
+    RIESGO_ACADEMICO = "RIESGO_ACADEMICO"
 
 
 class PredictionStatus(str, Enum):
     """Status of predictions."""
 
-    PENDING = "pending"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
-    FAILED = "failed"
+    PENDIENTE = "PENDIENTE"
+    PROCESANDO = "PROCESANDO"
+    COMPLETADO = "COMPLETADO"
+    FALLIDO = "FALLIDO"
 
 
 class ConfidenceLevel(str, Enum):
     """Confidence levels for predictions."""
 
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    VERY_HIGH = "very_high"
+    BAJO = "BAJO"
+    MEDIO = "MEDIO"
+    ALTO = "ALTO"
+    MUY_ALTO = "MUY_ALTO"
 
 
 class PredictionResult:
@@ -40,7 +40,7 @@ class PredictionResult:
     def __init__(
         self,
         prediction_id: Optional[UUID] = None,
-        prediction_type: PredictionType = PredictionType.ATTENDANCE,
+        prediction_type: PredictionType = PredictionType.ASISTENCIA,
         subject_id: Optional[UUID] = None,  # User ID or entity being predicted
         subject_type: str = "user",  # user, ficha, programa, etc.
         confidence: float = 0.0,
@@ -48,7 +48,7 @@ class PredictionResult:
         prediction_data: Optional[Dict[str, Any]] = None,
         raw_data: Optional[Dict[str, Any]] = None,
         model_used: Optional[str] = None,
-        status: PredictionStatus = PredictionStatus.PENDING,
+        status: PredictionStatus = PredictionStatus.PENDIENTE,
         created_by: Optional[UUID] = None,
         created_at: Optional[datetime] = None,
         expires_at: Optional[datetime] = None,
@@ -74,13 +74,13 @@ class PredictionResult:
     def _calculate_confidence_level(self, confidence: float) -> ConfidenceLevel:
         """Calculate confidence level based on confidence score."""
         if confidence >= 0.9:
-            return ConfidenceLevel.VERY_HIGH
+            return ConfidenceLevel.MUY_ALTO
         elif confidence >= 0.7:
-            return ConfidenceLevel.HIGH
+            return ConfidenceLevel.ALTO
         elif confidence >= 0.5:
-            return ConfidenceLevel.MEDIUM
+            return ConfidenceLevel.MEDIO
         else:
-            return ConfidenceLevel.LOW
+            return ConfidenceLevel.BAJO
 
     def update_status(self, new_status: PredictionStatus) -> None:
         """Update prediction status."""
