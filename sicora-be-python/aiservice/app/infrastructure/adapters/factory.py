@@ -90,22 +90,11 @@ class AIServiceFactory:
             return self._vector_stores[cache_key]
         
         try:
-            # if store_type == VectorStoreType.CHROMADB:
-            #     adapter = ChromaDBAdapter(
-            #         host=config.get("host", "localhost"),
-            #         port=config.get("port", 8000),
-            #         collection_name=config.get("collection_name", "knowledge_base"),
-            #         persist_directory=config.get("persist_directory")
-            #     )
-            # else:
-            if True:  # Temporary: no vector stores available
-                raise ValueError(f"Unsupported vector store type: {store_type}")
-            else:
-                raise AIProviderError(f"Unsupported vector store type: {store_type}")
+            # Vector stores no implementados en esta versión
+            raise AIProviderError(f"Unsupported vector store type: {store_type}")
             
-            self._vector_stores[cache_key] = adapter
-            return adapter
-            
+        except AIProviderError:
+            raise
         except Exception as e:
             raise AIProviderError(f"Failed to create vector store {store_type}: {str(e)}")
     

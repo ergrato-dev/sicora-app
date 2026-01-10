@@ -29,8 +29,9 @@ Incluye verificación de infraestructura, backend, frontend y la integración en
         ▼             ▼           ▼           ▼             ▼             ▼
 ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐
 │userservice│ │schedule   │ │attendance │ │evalin     │ │kbservice  │ │aiservice  │
-│  :8001    │ │service    │ │service    │ │service    │ │  :8005    │ │  :8006    │
-│           │ │  :8002    │ │  :8003    │ │  :8030    │ │           │ │           │
+│  :8001    │ │service    │ │service    │ │service    │ │  :8005    │ │  :8007    │
+│   (Go)    │ │  :8002    │ │  :8003    │ │  :8004    │ │   (Go)    │ │ (Python)  │
+│           │ │   (Go)    │ │   (Go)    │ │   (Go)    │ │           │ │           │
 └─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └─────┬─────┘
       │             │             │             │             │             │
       └─────────────┴─────────────┴──────┬──────┴─────────────┴─────────────┘
@@ -40,7 +41,8 @@ Incluye verificación de infraestructura, backend, frontend y la integración en
              ┌───────────┐        ┌───────────┐        ┌───────────┐
              │ PostgreSQL│        │   Redis   │        │  MongoDB  │
              │   :5433   │        │   :6379   │        │  :27017   │
-             └───────────┘        └───────────┘        └───────────┘
+             │ +pgvector │        └───────────┘        └───────────┘
+             └───────────┘
 ```
 
 ---
@@ -58,7 +60,7 @@ docker compose up -d postgres redis mongodb
 
 # Esperar 10 segundos para inicialización
 sleep 10
-```
+```:
 
 ### 1.2 Verificar PostgreSQL
 
@@ -183,14 +185,14 @@ curl -s http://localhost:8003/docs -o /dev/null -w "%{http_code}"
 - [ ] Health check retorna `{"status": "healthy"}`
 - [ ] Swagger docs accesible (HTTP 200)
 
-### 2.5 Health Check - Evalin Service (Puerto 8030)
+### 2.5 Health Check - Evalin Service (Puerto 8004)
 
 ```bash
 # Health check
-curl -s http://localhost:8030/health | jq .
+curl -s http://localhost:8004/health | jq .
 
 # Documentación OpenAPI
-curl -s http://localhost:8030/docs -o /dev/null -w "%{http_code}"
+curl -s http://localhost:8004/docs -o /dev/null -w "%{http_code}"
 ```
 
 **✅ Criterio de éxito:**
@@ -211,14 +213,14 @@ curl -s http://localhost:8005/docs -o /dev/null -w "%{http_code}"
 - [ ] Health check retorna `{"status": "healthy"}`
 - [ ] Swagger docs accesible (HTTP 200)
 
-### 2.7 Health Check - AI Service (Puerto 8006)
+### 2.7 Health Check - AI Service (Puerto 8007)
 
 ```bash
 # Health check
-curl -s http://localhost:8006/health | jq .
+curl -s http://localhost:8007/health | jq .
 
 # Documentación OpenAPI
-curl -s http://localhost:8006/docs -o /dev/null -w "%{http_code}"
+curl -s http://localhost:8007/docs -o /dev/null -w "%{http_code}"
 ```
 
 **✅ Criterio de éxito:**
@@ -481,23 +483,26 @@ docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
 ## 🚀 FASE 7: Checklist Final Pre-Deploy
 
 ### Infraestructura
-- [ ] PostgreSQL funcionando y con datos iniciales
-- [ ] Redis funcionando
-- [ ] MongoDB funcionando
+- [x] PostgreSQL 18 + pgvector 0.8.1 funcionando
+- [x] Redis funcionando (puerto 6379)
+- [x] MongoDB funcionando (puerto 27017)
 - [ ] Todos los contenedores en estado `healthy`
 
-### Backend Services
-- [ ] User Service (8001) - Health OK
-- [ ] Schedule Service (8002) - Health OK
-- [ ] Attendance Service (8003) - Health OK
-- [ ] Evalin Service (8030) - Health OK
-- [ ] KB Service (8005) - Health OK
-- [ ] AI Service (8006) - Health OK
-- [ ] API Gateway (8000) - Health OK y rutea correctamente
+### Backend Services (Go)
+- [x] User Service (8001) - Health OK ✅ `{"status":"up"}`
+- [x] Schedule Service (8002) - Health OK ✅ `{"status":"up"}`
+- [x] Attendance Service (8003) - Health OK ✅ `{"status":"OK"}`
+- [x] Evalin Service (8004) - Health OK ✅ `{"success":true}`
+- [x] KB Service (8005) - Health OK ✅ `{"status":"up"}` (pgvector enabled)
+- [x] Meval Service (8006) - Health OK ✅ `{"status":"up"}`
+- [x] ProjectEval Service (8008) - Health OK ✅ `{"status":"up"}`
+
+### Backend Services (Python)
+- [x] AI Service (8007) - Health OK ✅ `{"status":"healthy"}`
 
 ### Frontend
+- [x] Tests unitarios pasan (562 tests)
 - [ ] Aplicación carga correctamente
-- [ ] Tests unitarios pasan (562 tests)
 - [ ] Build de producción exitoso: `pnpm build`
 
 ### Integración
@@ -581,9 +586,11 @@ echo -e "${YELLOW}[2/4] Verificando Backend Services...${NC}"
 check_service "User Service" "http://localhost:8001/health"
 check_service "Schedule Service" "http://localhost:8002/health"
 check_service "Attendance Service" "http://localhost:8003/health"
-check_service "Evalin Service" "http://localhost:8030/health"
+check_service "Evalin Service" "http://localhost:8004/health"
 check_service "KB Service" "http://localhost:8005/health"
-check_service "AI Service" "http://localhost:8006/health"
+check_service "Meval Service" "http://localhost:8006/health"
+check_service "AI Service" "http://localhost:8007/health"
+check_service "ProjectEval Service" "http://localhost:8008/health"
 check_service "API Gateway" "http://localhost:8000/health"
 
 echo ""
@@ -657,6 +664,13 @@ docker compose up -d --build  # Reconstruye imágenes
 
 ---
 
-**Última actualización:** $(date +%Y-%m-%d)
+**Última actualización:** 2026-01-09
 **Autor:** GitHub Copilot
-**Versión:** 1.0.0
+**Versión:** 1.2.0
+
+### Historial de Cambios
+| Versión | Fecha | Descripción |
+|---------|-------|-------------|
+| 1.2.0 | 2026-01-09 | ✅ Todos los servicios Go UP: MevalService (8006), ProjectEvalService (8008) completados |
+| 1.1.0 | 2026-01-09 | Actualizado con estado real de servicios Go, corregido puerto KBService (8005), agregado pgvector |
+| 1.0.0 | 2026-01-09 | Versión inicial del plan de pruebas |
