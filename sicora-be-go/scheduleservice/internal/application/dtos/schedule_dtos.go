@@ -53,7 +53,7 @@ type ScheduleResponse struct {
 	BlockIdentifier string                 `json:"block_identifier" example:"MLUN1"`
 	StartDate       string                 `json:"start_date" example:"2024-01-15"`
 	EndDate         string                 `json:"end_date" example:"2024-06-15"`
-	Status          string                 `json:"status" example:"ACTIVE"`
+	Status          string                 `json:"status" example:"ACTIVO"`
 	IsActive        bool                   `json:"is_active" example:"true"`
 	CreatedAt       time.Time              `json:"created_at"`
 	UpdatedAt       time.Time              `json:"updated_at"`

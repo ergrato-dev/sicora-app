@@ -180,7 +180,7 @@ func (uc *BulkScheduleUseCases) processScheduleCreation(ctx context.Context, req
 	filters := repositories.ScheduleFilter{
 		DayOfWeek: &req.DayOfWeek,
 		VenueID:   &req.VenueID,
-		Status:    "ACTIVE",
+		Status:    "ACTIVO",
 	}
 
 	existingSchedules, _, err := uc.scheduleRepo.List(ctx, filters)
@@ -215,7 +215,7 @@ func (uc *BulkScheduleUseCases) processScheduleCreation(ctx context.Context, req
 		BlockIdentifier: req.BlockIdentifier,
 		StartDate:       startDate,
 		EndDate:         endDate,
-		Status:          "ACTIVE",
+		Status:          "ACTIVO",
 		IsActive:        true,
 	}
 

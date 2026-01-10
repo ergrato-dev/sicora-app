@@ -303,8 +303,8 @@ func (h *ScheduleHandler) ListSchedules(c *gin.Context) {
 	}
 
 	status := c.Query("status")
-	if status != "" && status != "ACTIVE" && status != "CANCELLED" && status != "SUSPENDED" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid status, must be ACTIVE, CANCELLED, or SUSPENDED"})
+	if status != "" && status != "ACTIVO" && status != "CANCELADO" && status != "SUSPENDIDO" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid status, must be ACTIVO, CANCELADO, or SUSPENDIDO"})
 		return
 	}
 

@@ -199,7 +199,7 @@ func TestScheduleServiceCache_Schedule(t *testing.T) {
 		InstructorID:    instructorID,
 		Subject:         "Programación",
 		DayOfWeek:       1,
-		Status:          "ACTIVE",
+		Status:          "ACTIVO",
 	}
 
 	// Set

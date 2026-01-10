@@ -75,7 +75,7 @@ type Schedule struct {
 	BlockIdentifier string         `json:"block_identifier" gorm:"column:block_identifier;type:varchar(10);not null" validate:"required,min=4,max=10"` // MLUN1, TMAR2, etc.
 	StartDate       time.Time      `json:"start_date" gorm:"column:start_date;type:date;not null" validate:"required"`
 	EndDate         time.Time      `json:"end_date" gorm:"column:end_date;type:date;not null" validate:"required"`
-	Status          string         `json:"status" gorm:"column:status;type:varchar(20);default:ACTIVE" validate:"oneof=ACTIVE CANCELLED SUSPENDED"`
+	Status          string         `json:"status" gorm:"column:status;type:varchar(20);default:ACTIVO" validate:"oneof=ACTIVO CANCELADO SUSPENDIDO"`
 	IsActive        bool           `json:"is_active" gorm:"column:is_active;default:true"`
 	CreatedAt       time.Time      `json:"created_at" gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt       time.Time      `json:"updated_at" gorm:"column:updated_at;autoUpdateTime"`

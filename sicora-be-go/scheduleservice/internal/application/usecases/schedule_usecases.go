@@ -105,7 +105,7 @@ func (uc *CreateScheduleUseCase) Execute(ctx context.Context, req *dtos.CreateSc
 		BlockIdentifier: req.BlockIdentifier,
 		StartDate:       startDate,
 		EndDate:         endDate,
-		Status:          "ACTIVE",
+		Status:          "ACTIVO",
 		IsActive:        true,
 	}
 
