@@ -17,8 +17,8 @@ GRANT ALL ON SCHEMA userservice_schema TO userservice_user;
 -- Esto significa que cuando userservice_user se conecte, buscará tablas primero en su esquema, luego en public.
 ALTER ROLE userservice_user SET search_path = userservice_schema, public;
 
--- Otorgar permisos necesarios sobre la base de datos principal (sicora_db se crea vía env var)
-GRANT CONNECT ON DATABASE sicora_db TO userservice_user;
+-- Otorgar permisos necesarios sobre la base de datos principal (sicora_dev se crea vía env var)
+GRANT CONNECT ON DATABASE sicora_dev TO userservice_user;
 GRANT USAGE ON SCHEMA public TO userservice_user; -- Por si se necesita algo de public temporalmente
 
 -- ###############################################
@@ -29,7 +29,7 @@ CREATE USER scheduleservice_user WITH PASSWORD 'scheduleservice_password_placeho
 ALTER SCHEMA scheduleservice_schema OWNER TO scheduleservice_user;
 GRANT ALL ON SCHEMA scheduleservice_schema TO scheduleservice_user;
 ALTER ROLE scheduleservice_user SET search_path = scheduleservice_schema, public;
-GRANT CONNECT ON DATABASE sicora_db TO scheduleservice_user;
+GRANT CONNECT ON DATABASE sicora_dev TO scheduleservice_user;
 GRANT USAGE ON SCHEMA public TO scheduleservice_user;
 
 -- ###############################################
@@ -40,7 +40,7 @@ CREATE USER attendanceservice_user WITH PASSWORD 'attendanceservice_password_pla
 ALTER SCHEMA attendanceservice_schema OWNER TO attendanceservice_user;
 GRANT ALL ON SCHEMA attendanceservice_schema TO attendanceservice_user;
 ALTER ROLE attendanceservice_user SET search_path = attendanceservice_schema, public;
-GRANT CONNECT ON DATABASE sicora_db TO attendanceservice_user;
+GRANT CONNECT ON DATABASE sicora_dev TO attendanceservice_user;
 GRANT USAGE ON SCHEMA public TO attendanceservice_user;
 
 -- ###############################################
@@ -51,7 +51,7 @@ CREATE USER evalinservice_user WITH PASSWORD 'evalinservice_password_placeholder
 ALTER SCHEMA evalinservice_schema OWNER TO evalinservice_user;
 GRANT ALL ON SCHEMA evalinservice_schema TO evalinservice_user;
 ALTER ROLE evalinservice_user SET search_path = evalinservice_schema, public;
-GRANT CONNECT ON DATABASE sicora_db TO evalinservice_user;
+GRANT CONNECT ON DATABASE sicora_dev TO evalinservice_user;
 GRANT USAGE ON SCHEMA public TO evalinservice_user;
 
 -- ###############################################
@@ -62,7 +62,7 @@ CREATE USER kbservice_user WITH PASSWORD 'kbservice_password_placeholder'; -- CO
 ALTER SCHEMA kbservice_schema OWNER TO kbservice_user;
 GRANT ALL ON SCHEMA kbservice_schema TO kbservice_user;
 ALTER ROLE kbservice_user SET search_path = kbservice_schema, public;
-GRANT CONNECT ON DATABASE sicora_db TO kbservice_user;
+GRANT CONNECT ON DATABASE sicora_dev TO kbservice_user;
 GRANT USAGE ON SCHEMA public TO kbservice_user;
 
 -- ###############################################
@@ -73,7 +73,7 @@ CREATE USER aiservice_user WITH PASSWORD 'aiservice_password_placeholder'; -- CO
 ALTER SCHEMA aiservice_schema OWNER TO aiservice_user;
 GRANT ALL ON SCHEMA aiservice_schema TO aiservice_user;
 ALTER ROLE aiservice_user SET search_path = aiservice_schema, public;
-GRANT CONNECT ON DATABASE sicora_db TO aiservice_user;
+GRANT CONNECT ON DATABASE sicora_dev TO aiservice_user;
 GRANT USAGE ON SCHEMA public TO aiservice_user;
 
 -- ###############################################
@@ -84,7 +84,7 @@ CREATE USER softwarefactoryservice_user WITH PASSWORD 'softwarefactoryservice_pa
 ALTER SCHEMA softwarefactoryservice_schema OWNER TO softwarefactoryservice_user;
 GRANT ALL ON SCHEMA softwarefactoryservice_schema TO softwarefactoryservice_user;
 ALTER ROLE softwarefactoryservice_user SET search_path = softwarefactoryservice_schema, public;
-GRANT CONNECT ON DATABASE sicora_db TO softwarefactoryservice_user;
+GRANT CONNECT ON DATABASE sicora_dev TO softwarefactoryservice_user;
 GRANT USAGE ON SCHEMA public TO softwarefactoryservice_user;
 
 -- ###############################################
@@ -95,7 +95,7 @@ CREATE USER mevalservice_user WITH PASSWORD 'mevalservice_password_placeholder';
 ALTER SCHEMA mevalservice_schema OWNER TO mevalservice_user;
 GRANT ALL ON SCHEMA mevalservice_schema TO mevalservice_user;
 ALTER ROLE mevalservice_user SET search_path = mevalservice_schema, public;
-GRANT CONNECT ON DATABASE sicora_db TO mevalservice_user;
+GRANT CONNECT ON DATABASE sicora_dev TO mevalservice_user;
 GRANT USAGE ON SCHEMA public TO mevalservice_user;
 
 -- ###############################################
@@ -106,11 +106,11 @@ CREATE USER projectevalservice_user WITH PASSWORD 'projectevalservice_password_p
 ALTER SCHEMA projectevalservice_schema OWNER TO projectevalservice_user;
 GRANT ALL ON SCHEMA projectevalservice_schema TO projectevalservice_user;
 ALTER ROLE projectevalservice_user SET search_path = projectevalservice_schema, public;
-GRANT CONNECT ON DATABASE sicora_db TO projectevalservice_user;
+GRANT CONNECT ON DATABASE sicora_dev TO projectevalservice_user;
 GRANT USAGE ON SCHEMA public TO projectevalservice_user;
 
 -- NOTA: El usuario 'postgres' (o el definido por POSTGRES_USER en docker-compose)
--- sigue siendo el superusuario y propietario de la base de datos 'sicora_db'.
+-- sigue siendo el superusuario y propietario de la base de datos 'sicora_dev'.
 -- Estos usuarios de servicio tienen permisos granulares sobre sus respectivos esquemas.
 
 -- ###############################################

@@ -157,7 +157,49 @@ python3 scripts/validate-programs-csv.py sicora-shared/sample-data/templates/pro
 - Preserva estructura y metadatos
 - Valida integridad después de la migración
 
-### 🔒 Scripts de Respaldo y VCS
+### � Scripts de Análisis de Código
+
+#### `run-sonar-analysis.sh` ⚠️ **DESACTIVADO TEMPORALMENTE**
+
+**Estado**: Desactivado temporalmente (Enero 2026) - Consumo excesivo de recursos durante desarrollo
+
+**Propósito**: Ejecutar análisis SonarQube en todo el proyecto SICORA
+
+**Uso** (cuando esté activo):
+
+```bash
+# Análisis global completo
+./scripts/run-sonar-analysis.sh
+
+# Análisis de servicio específico Go
+./scripts/run-sonar-analysis.sh go userservice
+
+# Análisis de servicio específico Python
+./scripts/run-sonar-analysis.sh python apigateway
+
+# Solo frontend
+./scripts/run-sonar-analysis.sh frontend
+```
+
+**Para reactivar SonarQube**:
+
+```bash
+# Reactivar configuración
+mv sonar-project.properties.disabled sonar-project.properties
+
+# Levantar servidor SonarQube
+cd sicora-infra/docker && docker compose -f docker-compose.sonarqube.yml up -d
+```
+
+**Nota**: SonarQube será reactivado al final del proyecto para análisis completo de calidad de código.
+
+#### `configure-sonarqube.sh`
+
+**Propósito**: Configurar SonarQube para el proyecto (también desactivado temporalmente)
+
+---
+
+### �🔒 Scripts de Respaldo y VCS
 
 #### `setup-vcs-backup-strategy.sh` ⭐ **NUEVO**
 

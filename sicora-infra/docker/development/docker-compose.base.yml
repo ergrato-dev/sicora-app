@@ -3,7 +3,7 @@ services:
     image: postgres:18-alpine
     container_name: sicora_postgres
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-sicora_db} # Permite override desde .env, con fallback
+      POSTGRES_DB: ${POSTGRES_DB:-sicora_dev} # Permite override desde .env, con fallback
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_local_postgres_password} # Fallback debe ser el mismo que en .env.example
     ports:
@@ -36,7 +36,7 @@ services:
     container_name: sicora_userservice
     environment:
       # DATABASE_URL se construye usando las variables específicas del servicio
-      - DATABASE_URL=postgresql+asyncpg://${USERSERVICE_DB_USER}:${USERSERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_db}
+      - DATABASE_URL=postgresql+asyncpg://${USERSERVICE_DB_USER}:${USERSERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_dev}
       - DB_SCHEMA=${USERSERVICE_DB_SCHEMA}
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=${SECRET_KEY}
@@ -60,7 +60,7 @@ services:
       dockerfile: Dockerfile
     container_name: sicora_scheduleservice
     environment:
-      - DATABASE_URL=postgresql://${SCHEDULESERVICE_DB_USER}:${SCHEDULESERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_db}
+      - DATABASE_URL=postgresql://${SCHEDULESERVICE_DB_USER}:${SCHEDULESERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_dev}
       - DB_SCHEMA=${SCHEDULESERVICE_DB_SCHEMA}
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=${SECRET_KEY}
@@ -84,7 +84,7 @@ services:
       dockerfile: Dockerfile
     container_name: sicora_attendanceservice
     environment:
-      - DATABASE_URL=postgresql://${ATTENDANCESERVICE_DB_USER}:${ATTENDANCESERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_db}
+      - DATABASE_URL=postgresql://${ATTENDANCESERVICE_DB_USER}:${ATTENDANCESERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_dev}
       - DB_SCHEMA=${ATTENDANCESERVICE_DB_SCHEMA}
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=${SECRET_KEY}
@@ -108,7 +108,7 @@ services:
       dockerfile: Dockerfile
     container_name: sicora_evalinservice
     environment:
-      - DATABASE_URL=postgresql://${EVALINSERVICE_DB_USER}:${EVALINSERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_db}
+      - DATABASE_URL=postgresql://${EVALINSERVICE_DB_USER}:${EVALINSERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_dev}
       - DB_SCHEMA=${EVALINSERVICE_DB_SCHEMA}
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=${SECRET_KEY}
@@ -132,7 +132,7 @@ services:
       dockerfile: Dockerfile
     container_name: sicora_kbservice
     environment:
-      - DATABASE_URL=postgresql://${KBSERVICE_DB_USER}:${KBSERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_db}
+      - DATABASE_URL=postgresql://${KBSERVICE_DB_USER}:${KBSERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_dev}
       - DB_SCHEMA=${KBSERVICE_DB_SCHEMA}
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=${SECRET_KEY}
@@ -156,7 +156,7 @@ services:
       dockerfile: Dockerfile
     container_name: sicora_aiservice
     environment:
-      - DATABASE_URL=postgresql+asyncpg://${AISERVICE_DB_USER}:${AISERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_db}
+      - DATABASE_URL=postgresql+asyncpg://${AISERVICE_DB_USER}:${AISERVICE_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-sicora_dev}
       - DB_SCHEMA=${AISERVICE_DB_SCHEMA}
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=${SECRET_KEY}

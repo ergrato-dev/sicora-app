@@ -68,14 +68,14 @@ sleep 10
 # Estado del contenedor
 docker compose ps postgres
 
-# Test de conexión
-docker exec -it sicora_postgres psql -U postgres -d sicora_db -c "SELECT version();"
+# Test de conexión (usando sicora_user en sicora_dev)
+docker exec -it sicora_postgres psql -U sicora_user -d sicora_dev -c "SELECT version();"
 
 # Verificar schemas creados
-docker exec -it sicora_postgres psql -U postgres -d sicora_db -c "\dn"
+docker exec -it sicora_postgres psql -U sicora_user -d sicora_dev -c "\dn"
 
 # Verificar tablas en cada schema
-docker exec -it sicora_postgres psql -U postgres -d sicora_db -c "
+docker exec -it sicora_postgres psql -U sicora_user -d sicora_dev -c "
 SELECT schemaname, tablename 
 FROM pg_tables 
 WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
@@ -84,8 +84,8 @@ ORDER BY schemaname, tablename;"
 
 **✅ Criterio de éxito:**
 - [ ] Contenedor `sicora_postgres` en estado `running`
-- [ ] Conexión exitosa a la base de datos
-- [ ] Schemas `users`, `schedules`, `attendance`, `evalin`, `kb`, `ai` existen
+- [ ] Conexión exitosa a la base de datos `sicora_dev`
+- [ ] Schemas `userservice`, `scheduleservice`, `attendanceservice`, `evalinservice`, `kbservice`, `aiservice` existen
 - [ ] Tablas principales creadas en cada schema
 
 ### 1.3 Verificar Redis

@@ -22,7 +22,7 @@ POSTGRES_PASSWORD=sicora_password
 
 ### Docker Compose en `/sicora-infra/docker/docker-compose.yml`:
 
-- Usa: `${POSTGRES_DB:-sicora_db}` con fallback a `sicora_db`
+- Usa: `${POSTGRES_DB:-sicora_dev}` con fallback a `sicora_dev`
 - Con `.env` actual resuelve a: `sicora_dev`
 - Puerto: `5433:5432` (pero el contenedor corriendo usa puerto 5432)
 

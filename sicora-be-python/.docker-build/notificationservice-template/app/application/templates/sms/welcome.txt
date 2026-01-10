@@ -1,1 +1,0 @@
-¡Bienvenido a SICORA, {{ user_name }}! Tu cuenta ha sido creada exitosamente.

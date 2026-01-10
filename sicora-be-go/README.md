@@ -165,7 +165,7 @@ http://localhost:8002/swagger/index.html
 
 ```bash
 # Conexión local
-DATABASE_URL=postgres://sicora:password@localhost:5432/sicora_db
+DATABASE_URL=postgres://sicora:password@localhost:5432/sicora_dev
 
 # Migraciones automáticas
 AUTO_MIGRATE=true

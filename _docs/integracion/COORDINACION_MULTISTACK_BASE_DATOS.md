@@ -2,14 +2,14 @@
 
 ## 📋 Resumen Ejecutivo
 
-SICORA-APP implementa una **arquitectura multistack híbrida** donde **Python (FastAPI) y Go comparten la misma base de datos PostgreSQL** (`sicora_db`) utilizando **esquemas separados por servicio**. Esta arquitectura permite que ambos stacks coexistan y se complementen mientras mantienen separación de responsabilidades.
+SICORA-APP implementa una **arquitectura multistack híbrida** donde **Python (FastAPI) y Go comparten la misma base de datos PostgreSQL** (`sicora_dev`) utilizando **esquemas separados por servicio**. Esta arquitectura permite que ambos stacks coexistan y se complementen mientras mantienen separación de responsabilidades.
 
 ## 🏗️ Arquitectura de Base de Datos
 
 ### Base de Datos Única Compartida
 
 ```
-sicora_db (PostgreSQL 15)
+sicora_dev (PostgreSQL 15)
 ├── userservice_schema (🔄 COMPARTIDO - Python + Go)
 ├── scheduleservice_schema (🔄 COMPARTIDO - Python + Go)
 ├── attendanceservice_schema (🔄 COMPARTIDO - Python + Go)
@@ -152,21 +152,21 @@ INSERT INTO userservice_schema.users (
 
 ```bash
 # Verificar esquemas existentes
-psql -h localhost -p 5433 -U sicora_user -d sicora_db -c "
+psql -h localhost -p 5433 -U sicora_user -d sicora_dev -c "
 SELECT schema_name
 FROM information_schema.schemata
 WHERE schema_name LIKE '%service%_schema'
 ORDER BY schema_name;"
 
 # Verificar tablas por esquema
-psql -h localhost -p 5433 -U sicora_user -d sicora_db -c "
+psql -h localhost -p 5433 -U sicora_user -d sicora_dev -c "
 SELECT schemaname, tablename, tableowner
 FROM pg_tables
 WHERE schemaname LIKE '%service%_schema'
 ORDER BY schemaname, tablename;"
 
 # Verificar permisos de usuarios
-psql -h localhost -p 5433 -U sicora_user -d sicora_db -c "
+psql -h localhost -p 5433 -U sicora_user -d sicora_dev -c "
 SELECT
     r.rolname AS username,
     n.nspname AS schema_name,
@@ -240,7 +240,7 @@ graph TD
 
 **Respuesta**: **SÍ, ABSOLUTAMENTE**. Los datos de prueba deben ser 100% compatibles con ambos stacks porque:
 
-1. **Comparten la misma base de datos** (`sicora_db`)
+1. **Comparten la misma base de datos** (`sicora_dev`)
 2. **Algunos esquemas son utilizados por ambos** stacks (`userservice_schema`, `scheduleservice_schema`, `attendanceservice_schema`)
 3. **La integridad referencial** debe mantenerse para ambas implementaciones
 4. **Los tipos de datos** deben ser compatibles con SQLAlchemy (Python) y GORM (Go)

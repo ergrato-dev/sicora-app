@@ -78,7 +78,7 @@ check_container() {
 check_postgres() {
     if docker exec sicora_postgres pg_isready -U postgres > /dev/null 2>&1; then
         # Verificar conexión a la base de datos
-        if docker exec sicora_postgres psql -U postgres -d sicora_db -c "SELECT 1" > /dev/null 2>&1; then
+        if docker exec sicora_postgres psql -U postgres -d sicora_dev -c "SELECT 1" > /dev/null 2>&1; then
             echo -e "${GREEN}✓${NC} PostgreSQL - OK (conexión verificada)"
             ((PASSED++))
             return 0

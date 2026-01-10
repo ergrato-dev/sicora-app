@@ -1,6 +1,0 @@
-# Requirements for SoftwareFactoryService migrations
-# Minimal dependencies for Alembic migrations only
-
-alembic==1.12.1
-SQLAlchemy==2.0.23
-psycopg2-binary==2.9.7

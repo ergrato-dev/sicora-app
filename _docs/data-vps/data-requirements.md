@@ -6,7 +6,7 @@ Generar un conjunto completo de datos de prueba para SICORA OneVision que permit
 
 ## 🔄 Coordinación Multi-Stack
 
-**IMPORTANTE**: Este proyecto utiliza una arquitectura multistack donde **Python (FastAPI) y Go comparten la misma base de datos PostgreSQL (`sicora_db`)** pero con **esquemas separados por servicio**.
+**IMPORTANTE**: Este proyecto utiliza una arquitectura multistack donde **Python (FastAPI) y Go comparten la misma base de datos PostgreSQL (`sicora_dev`)** pero con **esquemas separados por servicio**.
 
 ### Esquemas de Base de Datos Compartida
 

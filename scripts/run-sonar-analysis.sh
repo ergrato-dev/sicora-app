@@ -4,8 +4,16 @@
 # Script para ejecutar análisis SonarQube en SICORA
 # Versión: 2.0 - Enero 2026
 # =============================================================================
+# ⚠️  TEMPORALMENTE DESACTIVADO - Enero 2026
+# Motivo: Consumo excesivo de recursos durante desarrollo
+# Para reactivar: mv sonar-project.properties.disabled sonar-project.properties
+# =============================================================================
 
 set -e
+
+# Detectar directorio raíz del proyecto (necesario antes de la verificación)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Colores
 RED='\033[0;31m'
@@ -15,9 +23,18 @@ BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
 
-# Detectar directorio raíz del proyecto
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+# Verificación de desactivación temporal
+if [ ! -f "$PROJECT_ROOT/sonar-project.properties" ] && [ -f "$PROJECT_ROOT/sonar-project.properties.disabled" ]; then
+    echo -e "${YELLOW}╔══════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}║  ⚠️  SonarQube está TEMPORALMENTE DESACTIVADO                    ║${NC}"
+    echo -e "${YELLOW}║                                                                  ║${NC}"
+    echo -e "${YELLOW}║  Motivo: Optimización de recursos durante desarrollo             ║${NC}"
+    echo -e "${YELLOW}║                                                                  ║${NC}"
+    echo -e "${YELLOW}║  Para reactivar:                                                 ║${NC}"
+    echo -e "${YELLOW}║  mv sonar-project.properties.disabled sonar-project.properties   ║${NC}"
+    echo -e "${YELLOW}╚══════════════════════════════════════════════════════════════════╝${NC}"
+    exit 0
+fi
 
 # Configuración
 SONAR_HOST="${SONAR_HOST_URL:-http://localhost:9000}"

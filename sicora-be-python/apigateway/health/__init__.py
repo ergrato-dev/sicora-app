@@ -1,1 +1,0 @@
-"""Health check del ApiGateway."""
