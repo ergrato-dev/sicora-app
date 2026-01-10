@@ -128,7 +128,14 @@ coverage/
 *.coverprofile
 
 # SICORA specific exclusions
-# Nota: sicora-docs ahora es editable para trabajar con RF's e historias
-# sicora-docs/
-# sicora-be-go/ # Reincluido - contiene microservicios core
+# Documentación de desarrollo local (NO subir a GitHub)
+# Solo RFs, RNFs, HUs y restricciones van en sicora-docs/
+_docs/
+
+# Archivos de proceso y reportes locales
+scripts/*.log
+scripts/*.backup
+
+# Postman collections locales (para desarrollo)
+postman-collections/environments/*.local.json
 
