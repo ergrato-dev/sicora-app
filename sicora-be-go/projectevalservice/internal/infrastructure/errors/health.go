@@ -1,5 +1,4 @@
-// Package errors provides health check and shutdown management using the
-// centralized error handling package.
+// Package errors provides health check for projectevalservice.
 package errors
 
 import (
@@ -7,152 +6,98 @@ import (
 	"net/http"
 	"time"
 
-	apperrors "sicora-be-go/pkg/errors"
-
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-// ============================================================================
-// Health Checker Setup
-// ============================================================================
+// HealthResponse represents health check response
+type HealthResponse struct {
+	Status    string    `json:"status"`
+	Service   string    `json:"service"`
+	Version   string    `json:"version"`
+	Timestamp time.Time `json:"timestamp"`
+	Database  string    `json:"database,omitempty"`
+}
 
-// HealthCheckerSetup creates and configures a health checker with standard
-// checks for projectevalservice.
-func HealthCheckerSetup(db *gorm.DB, shutdownMgr *apperrors.ShutdownManager) *apperrors.HealthChecker {
-	config := &apperrors.HealthCheckerConfig{
-		ServiceName:    ServiceName,
-		ServiceVersion: ServiceVersion,
-		CheckTimeout:   5 * time.Second,
+// HealthHandler returns health check endpoint handler
+func HealthHandler(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		response := HealthResponse{
+			Status:    "up",
+			Service:   ServiceName,
+			Version:   ServiceVersion,
+			Timestamp: time.Now(),
+		}
+
+		// Check database
+		if db != nil {
+			sqlDB, err := db.DB()
+			if err != nil {
+				response.Database = "error: " + err.Error()
+				response.Status = "degraded"
+			} else {
+				ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
+				defer cancel()
+				if err := sqlDB.PingContext(ctx); err != nil {
+					response.Database = "error: " + err.Error()
+					response.Status = "degraded"
+				} else {
+					response.Database = "connected"
+				}
+			}
+		}
+
+		statusCode := http.StatusOK
+		if response.Status != "up" {
+			statusCode = http.StatusServiceUnavailable
+		}
+
+		c.JSON(statusCode, response)
 	}
-
-	checker := apperrors.NewHealthChecker(config)
-
-	// Register database health check
-	checker.RegisterCheck("database", func(ctx context.Context) apperrors.HealthCheckResult {
-		sqlDB, err := db.DB()
-		if err != nil {
-			return apperrors.HealthCheckResult{
-				Status: apperrors.HealthStatusDown,
-				Error:  "failed to get database connection: " + err.Error(),
-			}
-		}
-
-		if err := sqlDB.PingContext(ctx); err != nil {
-			return apperrors.HealthCheckResult{
-				Status: apperrors.HealthStatusDown,
-				Error:  "database ping failed: " + err.Error(),
-			}
-		}
-
-		return apperrors.HealthCheckResult{
-			Status: apperrors.HealthStatusUp,
-		}
-	})
-
-	// Register liveness check (basic service alive check)
-	checker.RegisterLivenessCheck("service", func(ctx context.Context) apperrors.HealthCheckResult {
-		return apperrors.HealthCheckResult{
-			Status: apperrors.HealthStatusUp,
-		}
-	})
-
-	// Register readiness check (service ready to accept traffic)
-	checker.RegisterReadinessCheck("database", func(ctx context.Context) apperrors.HealthCheckResult {
-		sqlDB, err := db.DB()
-		if err != nil {
-			return apperrors.HealthCheckResult{
-				Status: apperrors.HealthStatusDown,
-				Error:  "database not available: " + err.Error(),
-			}
-		}
-
-		if err := sqlDB.PingContext(ctx); err != nil {
-			return apperrors.HealthCheckResult{
-				Status: apperrors.HealthStatusDown,
-				Error:  "database not ready: " + err.Error(),
-			}
-		}
-
-		return apperrors.HealthCheckResult{
-			Status: apperrors.HealthStatusUp,
-		}
-	})
-
-	return checker
 }
 
-// ============================================================================
-// Shutdown Manager Setup
-// ============================================================================
-
-// ShutdownManagerSetup creates and configures a shutdown manager for
-// graceful shutdown of projectevalservice.
-func ShutdownManagerSetup() *apperrors.ShutdownManager {
-	config := &apperrors.ShutdownConfig{
-		Timeout:         30 * time.Second,
-		GracePeriod:     5 * time.Second,
-		ShutdownSignals: true,
+// LiveHandler returns liveness check handler
+func LiveHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"alive":     true,
+			"timestamp": time.Now(),
+		})
 	}
-
-	return apperrors.NewShutdownManager(config)
 }
 
-// ============================================================================
-// Health Routes Registration
-// ============================================================================
+// ReadyHandler returns readiness check handler
+func ReadyHandler(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ready := true
+		checks := make(map[string]string)
 
-// RegisterHealthRoutes registers health check endpoints on the router.
-func RegisterHealthRoutes(router *gin.Engine, checker *apperrors.HealthChecker) {
-	// Main health endpoint
-	router.GET("/health", func(c *gin.Context) {
-		result := checker.Check(c.Request.Context())
-		status := http.StatusOK
-		if result.Status != apperrors.HealthStatusUp {
-			status = http.StatusServiceUnavailable
+		if db != nil {
+			sqlDB, err := db.DB()
+			if err != nil {
+				ready = false
+				checks["database"] = "error: " + err.Error()
+			} else {
+				ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
+				defer cancel()
+				if err := sqlDB.PingContext(ctx); err != nil {
+					ready = false
+					checks["database"] = "error: " + err.Error()
+				} else {
+					checks["database"] = "ready"
+				}
+			}
 		}
-		c.JSON(status, result)
-	})
 
-	// Kubernetes-style liveness probe
-	router.GET("/health/live", func(c *gin.Context) {
-		result := checker.CheckLiveness(c.Request.Context())
-		status := http.StatusOK
-		if result.Status != apperrors.HealthStatusUp {
-			status = http.StatusServiceUnavailable
+		statusCode := http.StatusOK
+		if !ready {
+			statusCode = http.StatusServiceUnavailable
 		}
-		c.JSON(status, result)
-	})
 
-	// Kubernetes-style readiness probe
-	router.GET("/health/ready", func(c *gin.Context) {
-		result := checker.CheckReadiness(c.Request.Context())
-		status := http.StatusOK
-		if result.Status != apperrors.HealthStatusUp {
-			status = http.StatusServiceUnavailable
-		}
-		c.JSON(status, result)
-	})
-}
-
-// ============================================================================
-// Service Setup Helper
-// ============================================================================
-
-// ServiceSetup holds all the components needed for service lifecycle management.
-type ServiceSetup struct {
-	HealthChecker   *apperrors.HealthChecker
-	ShutdownManager *apperrors.ShutdownManager
-}
-
-// NewServiceSetup creates a complete service setup with health checking and
-// shutdown management.
-func NewServiceSetup(db *gorm.DB) *ServiceSetup {
-	shutdownMgr := ShutdownManagerSetup()
-	healthChecker := HealthCheckerSetup(db, shutdownMgr)
-
-	return &ServiceSetup{
-		HealthChecker:   healthChecker,
-		ShutdownManager: shutdownMgr,
+		c.JSON(statusCode, gin.H{
+			"ready":     ready,
+			"checks":    checks,
+			"timestamp": time.Now(),
+		})
 	}
 }

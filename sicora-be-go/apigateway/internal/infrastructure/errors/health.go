@@ -1,5 +1,4 @@
-// Package errors provides health check and shutdown management using the
-// centralized error handling package.
+// Package errors provides health check for apigateway.
 package errors
 
 import (
@@ -9,135 +8,180 @@ import (
 
 	"apigateway/internal/infrastructure/cache"
 
-	apperrors "sicora-be-go/pkg/errors"
-
 	"github.com/gin-gonic/gin"
 )
 
-// ============================================================================
-// Health Checker Setup
-// ============================================================================
+// HealthResponse represents health check response
+type HealthResponse struct {
+	Status    string    `json:"status"`
+	Service   string    `json:"service"`
+	Version   string    `json:"version"`
+	Timestamp time.Time `json:"timestamp"`
+	Redis     string    `json:"redis,omitempty"`
+}
 
-// HealthCheckerSetup creates and configures a health checker with standard
-// checks for apigateway.
-func HealthCheckerSetup(gatewayCache *cache.APIGatewayCache, shutdownMgr *apperrors.ShutdownManager) *apperrors.HealthChecker {
-	config := &apperrors.HealthCheckerConfig{
-		ServiceName:    ServiceName,
-		ServiceVersion: ServiceVersion,
-		CheckTimeout:   5 * time.Second,
-	}
+// HealthHandler returns health check endpoint handler
+func HealthHandler(gatewayCache *cache.APIGatewayCache) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		response := HealthResponse{
+			Status:    "up",
+			Service:   ServiceName,
+			Version:   ServiceVersion,
+			Timestamp: time.Now(),
+		}
 
-	checker := apperrors.NewHealthChecker(config)
-
-	// Register Redis health check (if cache is available)
-	if gatewayCache != nil {
-		checker.RegisterCheck("redis", func(ctx context.Context) apperrors.HealthCheckResult {
+		// Check Redis if available
+		if gatewayCache != nil {
+			ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
+			defer cancel()
 			if err := gatewayCache.Ping(ctx); err != nil {
-				return apperrors.HealthCheckResult{
-					Status: apperrors.HealthStatusDown,
-					Error:  "redis ping failed: " + err.Error(),
-				}
+				response.Redis = "error: " + err.Error()
+				response.Status = "degraded"
+			} else {
+				response.Redis = "connected"
 			}
-			return apperrors.HealthCheckResult{
-				Status: apperrors.HealthStatusUp,
-			}
-		})
+		}
 
-		// Redis readiness check
-		checker.RegisterReadinessCheck("redis", func(ctx context.Context) apperrors.HealthCheckResult {
+		statusCode := http.StatusOK
+		if response.Status != "up" {
+			statusCode = http.StatusServiceUnavailable
+		}
+
+		c.JSON(statusCode, response)
+	}
+}
+
+// LiveHandler returns liveness check handler
+func LiveHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"alive":     true,
+			"timestamp": time.Now(),
+		})
+	}
+}
+
+// ReadyHandler returns readiness check handler
+func ReadyHandler(gatewayCache *cache.APIGatewayCache) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ready := true
+		checks := make(map[string]string)
+
+		if gatewayCache != nil {
+			ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
+			defer cancel()
 			if err := gatewayCache.Ping(ctx); err != nil {
-				return apperrors.HealthCheckResult{
-					Status: apperrors.HealthStatusDown,
-					Error:  "redis not ready: " + err.Error(),
-				}
+				ready = false
+				checks["redis"] = "error: " + err.Error()
+			} else {
+				checks["redis"] = "ready"
 			}
-			return apperrors.HealthCheckResult{
-				Status: apperrors.HealthStatusUp,
-			}
+		}
+
+		statusCode := http.StatusOK
+		if !ready {
+			statusCode = http.StatusServiceUnavailable
+		}
+
+		c.JSON(statusCode, gin.H{
+			"ready":     ready,
+			"checks":    checks,
+			"timestamp": time.Now(),
 		})
 	}
-
-	// Register liveness check (basic service alive check)
-	checker.RegisterLivenessCheck("service", func(ctx context.Context) apperrors.HealthCheckResult {
-		return apperrors.HealthCheckResult{
-			Status: apperrors.HealthStatusUp,
-		}
-	})
-
-	return checker
 }
 
 // ============================================================================
-// Shutdown Manager Setup
+// Service Setup (Health Checker + Shutdown Manager)
 // ============================================================================
 
-// ShutdownManagerSetup creates and configures a shutdown manager for
-// graceful shutdown of apigateway.
-func ShutdownManagerSetup() *apperrors.ShutdownManager {
-	config := &apperrors.ShutdownConfig{
-		Timeout:         30 * time.Second,
-		GracePeriod:     5 * time.Second,
-		ShutdownSignals: true,
+// HealthChecker provides health checking capabilities
+type HealthChecker struct {
+	cache *cache.APIGatewayCache
+}
+
+// NewHealthChecker creates a new health checker
+func NewHealthChecker(gatewayCache *cache.APIGatewayCache) *HealthChecker {
+	return &HealthChecker{cache: gatewayCache}
+}
+
+// Check performs health check
+func (h *HealthChecker) Check(ctx context.Context) error {
+	if h.cache == nil {
+		return nil
+	}
+	return h.cache.Ping(ctx)
+}
+
+// ShutdownFunc is a function that shuts down a component
+type ShutdownFunc func(ctx context.Context) error
+
+// ShutdownItem represents a component to shutdown
+type ShutdownItem struct {
+	Name     string
+	Priority int
+	Fn       ShutdownFunc
+}
+
+// ShutdownManager manages graceful shutdown of services
+type ShutdownManager struct {
+	items []ShutdownItem
+}
+
+// NewShutdownManager creates a new shutdown manager
+func NewShutdownManager() *ShutdownManager {
+	return &ShutdownManager{
+		items: make([]ShutdownItem, 0),
+	}
+}
+
+// Register adds a component to the shutdown manager
+func (sm *ShutdownManager) Register(name string, priority int, fn ShutdownFunc) {
+	sm.items = append(sm.items, ShutdownItem{
+		Name:     name,
+		Priority: priority,
+		Fn:       fn,
+	})
+}
+
+// Shutdown performs graceful shutdown of all registered components
+func (sm *ShutdownManager) Shutdown(ctx context.Context) error {
+	// Sort by priority (lower = shutdown first)
+	for i := 0; i < len(sm.items); i++ {
+		for j := i + 1; j < len(sm.items); j++ {
+			if sm.items[j].Priority < sm.items[i].Priority {
+				sm.items[i], sm.items[j] = sm.items[j], sm.items[i]
+			}
+		}
 	}
 
-	return apperrors.NewShutdownManager(config)
+	// Shutdown each component
+	for _, item := range sm.items {
+		if err := item.Fn(ctx); err != nil {
+			// Log but continue shutting down other components
+			continue
+		}
+	}
+	return nil
 }
 
-// ============================================================================
-// Health Routes Registration
-// ============================================================================
-
-// RegisterHealthRoutes registers health check endpoints on the router.
-func RegisterHealthRoutes(router *gin.Engine, checker *apperrors.HealthChecker) {
-	// Main health endpoint
-	router.GET("/health", func(c *gin.Context) {
-		result := checker.Check(c.Request.Context())
-		status := http.StatusOK
-		if result.Status != apperrors.HealthStatusUp {
-			status = http.StatusServiceUnavailable
-		}
-		c.JSON(status, result)
-	})
-
-	// Kubernetes-style liveness probe
-	router.GET("/health/live", func(c *gin.Context) {
-		result := checker.CheckLiveness(c.Request.Context())
-		status := http.StatusOK
-		if result.Status != apperrors.HealthStatusUp {
-			status = http.StatusServiceUnavailable
-		}
-		c.JSON(status, result)
-	})
-
-	// Kubernetes-style readiness probe
-	router.GET("/health/ready", func(c *gin.Context) {
-		result := checker.CheckReadiness(c.Request.Context())
-		status := http.StatusOK
-		if result.Status != apperrors.HealthStatusUp {
-			status = http.StatusServiceUnavailable
-		}
-		c.JSON(status, result)
-	})
-}
-
-// ============================================================================
-// Service Setup Helper
-// ============================================================================
-
-// ServiceSetup holds all the components needed for service lifecycle management.
+// ServiceSetup provides unified health checker and shutdown manager
 type ServiceSetup struct {
-	HealthChecker   *apperrors.HealthChecker
-	ShutdownManager *apperrors.ShutdownManager
+	HealthChecker   *HealthChecker
+	ShutdownManager *ShutdownManager
 }
 
-// NewServiceSetup creates a complete service setup with health checking and
-// shutdown management. gatewayCache can be nil if Redis is not available.
+// NewServiceSetup creates a new service setup with health checker and shutdown manager
 func NewServiceSetup(gatewayCache *cache.APIGatewayCache) *ServiceSetup {
-	shutdownMgr := ShutdownManagerSetup()
-	healthChecker := HealthCheckerSetup(gatewayCache, shutdownMgr)
-
 	return &ServiceSetup{
-		HealthChecker:   healthChecker,
-		ShutdownManager: shutdownMgr,
+		HealthChecker:   NewHealthChecker(gatewayCache),
+		ShutdownManager: NewShutdownManager(),
 	}
+}
+
+// RegisterHealthRoutes registers health check routes on a Gin router
+func RegisterHealthRoutes(router *gin.Engine, healthChecker *HealthChecker) {
+	router.GET("/health", HealthHandler(healthChecker.cache))
+	router.GET("/health/live", LiveHandler())
+	router.GET("/health/ready", ReadyHandler(healthChecker.cache))
 }

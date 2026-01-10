@@ -133,10 +133,8 @@ func main() {
 	proxyHandler := handlers.NewProxyHandler(cfg, zapLogger)
 
 	// Setup routes with middleware manager for Redis-based auth
+	// NOTE: Health routes are already registered in SetupRoutes via healthHandler
 	routes.SetupRoutes(router, cfg, zapLogger, healthHandler, proxyHandler, middlewareManager)
-
-	// Health check endpoints (V2 with centralized error handling)
-	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
 
 	// Create HTTP server
 	srv := &http.Server{

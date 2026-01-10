@@ -1,127 +1,108 @@
-// Package errors provides middleware implementations using the centralized
-// error handling package.
+// Package errors provides middleware implementations for the projectevalservice.
 package errors
 
 import (
+	"fmt"
+	"net/http"
+	"runtime/debug"
 	"time"
 
-	apperrors "sicora-be-go/pkg/errors"
-
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
-// ============================================================================
-// V2 Middlewares using pkg/errors
-// ============================================================================
+// HTTP Header constants
+const (
+	HeaderRequestID     = "X-Request-ID"
+	HeaderCorrelationID = "X-Correlation-ID"
+)
 
-// RecoveryMiddlewareV2 creates a panic recovery middleware using the centralized
-// error handling package with proper error wrapping and logging.
+// RecoveryMiddlewareV2 creates a panic recovery middleware
 func RecoveryMiddlewareV2() gin.HandlerFunc {
-	return apperrors.GinRecoveryMiddleware()
-}
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				stack := string(debug.Stack())
+				fmt.Printf("[PANIC RECOVERED] %v\n%s\n", err, stack)
 
-// RequestContextMiddleware creates a middleware that adds request context
-// (request ID, correlation ID) to all requests.
-func RequestContextMiddleware() gin.HandlerFunc {
-	return apperrors.GinRequestContextMiddleware()
-}
-
-// LoggingMiddlewareV2 creates a structured logging middleware using the
-// centralized error handling package.
-func LoggingMiddlewareV2() gin.HandlerFunc {
-	config := apperrors.LoggingMiddlewareConfig{
-		SlowRequestThreshold: 500 * time.Millisecond,
-		LogRequestBody:       false,
-		LogResponseBody:      false,
-		SkipPaths:            []string{"/health", "/health/live", "/health/ready", "/metrics"},
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"error": gin.H{
+						"code":    "SYS_INTERNAL_001",
+						"message": "Ocurrió un error inesperado. Intenta nuevamente",
+					},
+				})
+			}
+		}()
+		c.Next()
 	}
-	return apperrors.GinLoggingMiddleware(config)
 }
 
-// ============================================================================
-// Legacy Middleware Adapter
-// ============================================================================
+// RequestContextMiddleware adds request context (request ID, correlation ID)
+func RequestContextMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		requestID := c.GetHeader(HeaderRequestID)
+		if requestID == "" {
+			requestID = uuid.New().String()
+		}
 
-// legacyLoggerAdapter provides an adapter for legacy middleware that expects
-// a logger interface. This allows gradual migration to the new error system.
-type legacyLoggerAdapter struct{}
+		correlationID := c.GetHeader(HeaderCorrelationID)
+		if correlationID == "" {
+			correlationID = requestID
+		}
 
-// newLegacyLoggerAdapter creates a new legacy logger adapter
-func newLegacyLoggerAdapter() *legacyLoggerAdapter {
-	return &legacyLoggerAdapter{}
+		c.Set("request_id", requestID)
+		c.Set("correlation_id", correlationID)
+		c.Header(HeaderRequestID, requestID)
+		c.Header(HeaderCorrelationID, correlationID)
+
+		c.Next()
+	}
 }
 
-// Info logs an info message using the centralized logger
-func (l *legacyLoggerAdapter) Info(msg string, keysAndValues ...interface{}) {
-	logger := apperrors.NewLogger(apperrors.LoggerConfig{
-		ServiceName: ServiceName,
-		Environment: "development",
-	})
-	logger.Info(msg, keysAndValues...)
+// LoggingMiddlewareV2 creates a structured logging middleware
+func LoggingMiddlewareV2() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+		path := c.Request.URL.Path
+
+		c.Next()
+
+		latency := time.Since(start)
+		status := c.Writer.Status()
+
+		if path != "/health" && path != "/health/live" && path != "/health/ready" {
+			fmt.Printf("[%s] %s %s %d %v\n",
+				time.Now().Format("2006-01-02 15:04:05"),
+				c.Request.Method,
+				path,
+				status,
+				latency,
+			)
+		}
+	}
 }
 
-// Error logs an error message using the centralized logger
-func (l *legacyLoggerAdapter) Error(msg string, keysAndValues ...interface{}) {
-	logger := apperrors.NewLogger(apperrors.LoggerConfig{
-		ServiceName: ServiceName,
-		Environment: "development",
-	})
-	logger.Error(msg, keysAndValues...)
-}
-
-// Warn logs a warning message using the centralized logger
-func (l *legacyLoggerAdapter) Warn(msg string, keysAndValues ...interface{}) {
-	logger := apperrors.NewLogger(apperrors.LoggerConfig{
-		ServiceName: ServiceName,
-		Environment: "development",
-	})
-	logger.Warn(msg, keysAndValues...)
-}
-
-// Debug logs a debug message using the centralized logger
-func (l *legacyLoggerAdapter) Debug(msg string, keysAndValues ...interface{}) {
-	logger := apperrors.NewLogger(apperrors.LoggerConfig{
-		ServiceName: ServiceName,
-		Environment: "development",
-	})
-	logger.Debug(msg, keysAndValues...)
-}
-
-// ============================================================================
-// Error Response Middleware
-// ============================================================================
-
-// LegacyErrorMiddleware provides backwards compatibility for handlers that
-// still return errors in the old format. It intercepts error responses and
-// converts them to the standardized format.
+// LegacyErrorMiddleware handles error responses
 func LegacyErrorMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 
-		// Check if there were any errors set in the context
 		if len(c.Errors) > 0 {
 			lastError := c.Errors.Last()
 			if lastError != nil {
 				appErr := ToAppError(lastError.Err)
-				response := apperrors.ToErrorResponse(appErr)
-				c.JSON(appErr.HTTPStatus, response)
-				return
+				c.JSON(appErr.HTTPStatus, appErr.ToResponse())
 			}
 		}
 	}
 }
 
-// ============================================================================
-// Middleware Chain Helper
-// ============================================================================
-
-// SetupV2Middlewares configures the router with V2 middlewares in the correct order.
-// Returns the middleware functions to be applied.
+// SetupV2Middlewares configures the router with V2 middlewares
 func SetupV2Middlewares() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		RequestContextMiddleware(), // First: adds request ID and correlation ID
-		RecoveryMiddlewareV2(),     // Second: catches panics
-		LoggingMiddlewareV2(),      // Third: logs requests
-		LegacyErrorMiddleware(),    // Last: handles error responses
+		RequestContextMiddleware(),
+		RecoveryMiddlewareV2(),
+		LoggingMiddlewareV2(),
+		LegacyErrorMiddleware(),
 	}
 }

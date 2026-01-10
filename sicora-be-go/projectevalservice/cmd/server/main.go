@@ -11,7 +11,7 @@ package main
 //	@license.name	MIT
 //	@license.url	https://opensource.org/licenses/MIT
 
-//	@host		localhost:8007
+//	@host		localhost:8008
 //	@BasePath	/api/v1
 
 //	@securityDefinitions.apikey	BearerAuth
@@ -20,7 +20,6 @@ package main
 //	@description				Type "Bearer" followed by a space and JWT token.
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"os"
@@ -57,9 +56,6 @@ func main() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
-
-	// Initialize service setup (health checker + shutdown manager)
-	serviceSetup := infraerrors.NewServiceSetup(db.GetDB())
 
 	// Run migrations
 	if err := db.Migrate(); err != nil {
@@ -125,12 +121,14 @@ func main() {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Health check endpoints
-	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
+	router.GET("/health", infraerrors.HealthHandler(db.GetDB()))
+	router.GET("/health/live", infraerrors.LiveHandler())
+	router.GET("/health/ready", infraerrors.ReadyHandler(db.GetDB()))
 
 	// Server configuration
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8007"
+		port = "8008"
 	}
 
 	srv := &http.Server{
@@ -138,15 +136,9 @@ func main() {
 		Handler: router,
 	}
 
-	// Register HTTP server with shutdown manager (priority 100 = shutdown last)
-	serviceSetup.ShutdownManager.Register("http-server", 100, func(ctx context.Context) error {
-		return srv.Shutdown(ctx)
-	})
-
 	// Start server
-	log.Printf("Server starting on port %s", port)
-	log.Printf("Swagger documentation available at http://localhost:%s/swagger/index.html", port)
-	log.Printf("Health check available at http://localhost:%s/health", port)
+	log.Printf("ProjectEvalService starting on port %s", port)
+	log.Printf("Swagger: http://localhost:%s/swagger/index.html", port)
 
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Failed to start server: %v", err)

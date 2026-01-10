@@ -216,15 +216,25 @@ func (uc *ListUsersUseCase) Execute(ctx context.Context, request dtos.ListUsersR
 
 // AuthenticateUserUseCase maneja la lógica de autenticación de usuarios
 type AuthenticateUserUseCase struct {
-	userRepo repositories.UserRepository
-	logger   *log.Logger
+	userRepo   repositories.UserRepository
+	jwtService JWTService
+	logger     *log.Logger
+}
+
+// JWTService interface for JWT operations
+type JWTService interface {
+	GenerateToken(userID uuid.UUID, email, role string, isActive, mustChangePassword bool) (string, error)
+	GenerateRefreshToken(userID uuid.UUID, email string) (string, error)
+	ValidateRefreshToken(tokenString string) (uuid.UUID, error)
+	GetExpiration() int
 }
 
 // NewAuthenticateUserUseCase crea una nueva instancia del caso de uso
-func NewAuthenticateUserUseCase(userRepo repositories.UserRepository, logger *log.Logger) *AuthenticateUserUseCase {
+func NewAuthenticateUserUseCase(userRepo repositories.UserRepository, jwtService JWTService, logger *log.Logger) *AuthenticateUserUseCase {
 	return &AuthenticateUserUseCase{
-		userRepo: userRepo,
-		logger:   logger,
+		userRepo:   userRepo,
+		jwtService: jwtService,
+		logger:     logger,
 	}
 }
 
@@ -262,12 +272,26 @@ func (uc *AuthenticateUserUseCase) Execute(ctx context.Context, request dtos.Aut
 		// No retornamos error aquí, continuamos con la generación de tokens
 	}
 
-	// 5. Generar tokens JWT
-	// Aquí se implementaría la generación de tokens JWT
-	// Por simplicidad, usamos valores de ejemplo
-	token := "jwt_token_example"
-	refreshToken := "refresh_token_example"
-	expiresIn := 3600 // 1 hora en segundos
+	// 5. Generar tokens JWT reales
+	token, err := uc.jwtService.GenerateToken(
+		user.ID,
+		user.Email,
+		string(user.Rol),
+		user.IsActive,
+		user.MustChangePassword,
+	)
+	if err != nil {
+		uc.logger.Printf("Error generating JWT token for user %s: %v", user.ID, err)
+		return nil, entities.NewDomainError("error generando token de acceso")
+	}
+
+	refreshToken, err := uc.jwtService.GenerateRefreshToken(user.ID, user.Email)
+	if err != nil {
+		uc.logger.Printf("Error generating refresh token for user %s: %v", user.ID, err)
+		return nil, entities.NewDomainError("error generando token de refresco")
+	}
+
+	expiresIn := uc.jwtService.GetExpiration()
 
 	return &dtos.AuthResponseDTO{
 		User:         dtos.NewUserDTOFromEntity(user),
@@ -279,24 +303,28 @@ func (uc *AuthenticateUserUseCase) Execute(ctx context.Context, request dtos.Aut
 
 // RefreshTokenUseCase maneja la lógica de renovación de tokens JWT
 type RefreshTokenUseCase struct {
-	userRepo repositories.UserRepository
-	logger   *log.Logger
+	userRepo   repositories.UserRepository
+	jwtService JWTService
+	logger     *log.Logger
 }
 
 // NewRefreshTokenUseCase crea una nueva instancia del caso de uso
-func NewRefreshTokenUseCase(userRepo repositories.UserRepository, logger *log.Logger) *RefreshTokenUseCase {
+func NewRefreshTokenUseCase(userRepo repositories.UserRepository, jwtService JWTService, logger *log.Logger) *RefreshTokenUseCase {
 	return &RefreshTokenUseCase{
-		userRepo: userRepo,
-		logger:   logger,
+		userRepo:   userRepo,
+		jwtService: jwtService,
+		logger:     logger,
 	}
 }
 
 // Execute renueva un token JWT utilizando un refresh token
 func (uc *RefreshTokenUseCase) Execute(ctx context.Context, refreshToken string) (*dtos.AuthResponseDTO, error) {
-	// 1. Validar el refresh token
-	// Aquí se implementaría la validación del refresh token
-	// Por simplicidad, asumimos que el token es válido y obtenemos el user_id
-	userID := uuid.New() // En una implementación real, se extraería del token
+	// 1. Validar el refresh token y extraer userID
+	userID, err := uc.jwtService.ValidateRefreshToken(refreshToken)
+	if err != nil {
+		uc.logger.Printf("Invalid refresh token: %v", err)
+		return nil, entities.NewDomainError("token de refresco inválido o expirado")
+	}
 
 	// 2. Buscar usuario por ID
 	user, err := uc.userRepo.GetByID(ctx, userID)
@@ -323,10 +351,19 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, refreshToken string)
 	}
 
 	// 5. Generar nuevo token JWT
-	// Aquí se implementaría la generación del nuevo token JWT
-	// Por simplicidad, usamos valores de ejemplo
-	token := "new_jwt_token_example"
-	expiresIn := 3600 // 1 hora en segundos
+	token, err := uc.jwtService.GenerateToken(
+		user.ID,
+		user.Email,
+		string(user.Rol),
+		user.IsActive,
+		user.MustChangePassword,
+	)
+	if err != nil {
+		uc.logger.Printf("Error generating JWT token for user %s: %v", user.ID, err)
+		return nil, entities.NewDomainError("error generando token de acceso")
+	}
+
+	expiresIn := uc.jwtService.GetExpiration()
 
 	return &dtos.AuthResponseDTO{
 		User:         dtos.NewUserDTOFromEntity(user),

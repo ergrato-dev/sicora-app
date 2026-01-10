@@ -86,6 +86,21 @@ func main() {
 	// Setup repository
 	userRepo := repositories.NewPostgreSQLUserRepository(db.Connection)
 
+	// Setup JWT service - SECURITY FIX
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		if os.Getenv("GIN_MODE") == "release" {
+			log.Fatal("SECURITY ERROR: JWT_SECRET es OBLIGATORIO en producción")
+		}
+		log.Println("⚠️  WARNING: Usando JWT_SECRET por defecto - NO usar en producción")
+		jwtSecret = "dev-only-unsafe-secret-key-32chars!"
+	}
+	if len(jwtSecret) < 32 {
+		log.Fatal("SECURITY ERROR: JWT_SECRET debe tener mínimo 32 caracteres")
+	}
+
+	jwtService := auth.NewJWTService(jwtSecret, "sicora-userservice", 24*time.Hour)
+
 	// Setup validator
 	validate := validator.New()
 	// Setup use cases
@@ -94,8 +109,8 @@ func main() {
 	listUsersUseCase := usecases.NewListUsersUseCase(userRepo, logger)
 	getProfileUseCase := usecases.NewGetProfileUseCase(userRepo, logger)
 	updateProfileUseCase := usecases.NewUpdateProfileUseCase(userRepo, logger)
-	authenticateUserUseCase := usecases.NewAuthenticateUserUseCase(userRepo, logger)
-	refreshTokenUseCase := usecases.NewRefreshTokenUseCase(userRepo, logger)
+	authenticateUserUseCase := usecases.NewAuthenticateUserUseCase(userRepo, jwtService, logger)
+	refreshTokenUseCase := usecases.NewRefreshTokenUseCase(userRepo, jwtService, logger)
 	logoutUseCase := usecases.NewLogoutUseCase(userRepo, logger)
 	forgotPasswordUseCase := usecases.NewForgotPasswordUseCase(userRepo, logger)
 	resetPasswordUseCase := usecases.NewResetPasswordUseCase(userRepo, logger)
@@ -111,21 +126,6 @@ func main() {
 
 	// Bulk use cases
 	bulkUserUseCases := usecases.NewBulkUserUseCases(userRepo, validate)
-
-	// Setup JWT service - SECURITY FIX
-	jwtSecret := os.Getenv("JWT_SECRET")
-	if jwtSecret == "" {
-		if os.Getenv("GIN_MODE") == "release" {
-			log.Fatal("SECURITY ERROR: JWT_SECRET es OBLIGATORIO en producción")
-		}
-		log.Println("⚠️  WARNING: Usando JWT_SECRET por defecto - NO usar en producción")
-		jwtSecret = "dev-only-unsafe-secret-key-32chars!"
-	}
-	if len(jwtSecret) < 32 {
-		log.Fatal("SECURITY ERROR: JWT_SECRET debe tener mínimo 32 caracteres")
-	}
-
-	jwtService := auth.NewJWTService(jwtSecret, "sicora-userservice", 24*time.Hour)
 
 	// Setup handlers
 	userHandler := handlers.NewUserHandler(

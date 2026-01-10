@@ -159,6 +159,6 @@ func ExecuteWithTimeout(ctx context.Context, timeout time.Duration, fn func(ctx 
 	case err := <-done:
 		return err
 	case <-timeoutCtx.Done():
-		return apperrors.NewTimeoutError(DomainProjectEval, "operation", timeout)
+		return apperrors.NewTimeoutError("operation").WithDetail("timeout", timeout.String())
 	}
 }

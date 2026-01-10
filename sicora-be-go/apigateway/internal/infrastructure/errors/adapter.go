@@ -16,7 +16,7 @@ const (
 	// ServiceVersion current version of the service
 	ServiceVersion = "2.0.0"
 	// DomainGateway is the domain identifier for gateway errors
-	DomainGateway = "GATEWAY"
+	DomainGateway apperrors.ErrorDomain = "GATEWAY"
 )
 
 // InitServiceContext initializes the global service context for error handling.
@@ -41,25 +41,17 @@ func ToAppError(err error) *apperrors.AppError {
 		return appErr
 	}
 
-	return apperrors.NewInternalError(DomainGateway, err)
+	return apperrors.NewInternalError("gateway error", err)
 }
-
-// ============================================================================
-// Gateway-specific errors
-// ============================================================================
 
 // NewServiceUnavailableError creates an error when a backend service is unavailable
 func NewServiceUnavailableError(serviceName string) *apperrors.AppError {
-	return apperrors.NewServiceUnavailableError(
-		DomainGateway,
-		serviceName+" service is unavailable",
-		"El servicio no está disponible temporalmente",
-	)
+	return apperrors.NewServiceUnavailableError(serviceName)
 }
 
 // NewUpstreamTimeoutError creates an error when upstream service times out
 func NewUpstreamTimeoutError(serviceName string, timeout time.Duration) *apperrors.AppError {
-	return apperrors.NewTimeoutError(DomainGateway, serviceName, timeout)
+	return apperrors.NewTimeoutError(serviceName).WithDetail("timeout", timeout.String())
 }
 
 // NewRateLimitExceededError creates an error when rate limit is exceeded
@@ -78,29 +70,18 @@ func NewInvalidRouteError(path string) *apperrors.AppError {
 
 // NewAuthenticationRequiredError creates an error when authentication is required
 func NewAuthenticationRequiredError() *apperrors.AppError {
-	return apperrors.NewUnauthorizedError(
-		DomainGateway,
-		"authentication required",
-		"Se requiere autenticación para acceder a este recurso",
-	)
+	return apperrors.NewTokenMissingError()
 }
 
 // NewInvalidTokenError creates an error for invalid JWT tokens
 func NewInvalidTokenError(reason string) *apperrors.AppError {
-	return apperrors.NewUnauthorizedError(
-		DomainGateway,
-		"invalid token: "+reason,
-		"Token de autenticación inválido",
-	)
+	return apperrors.NewTokenInvalidError().WithDetail("reason", reason)
 }
 
 // NewCircuitBreakerOpenError creates an error when circuit breaker is open
 func NewCircuitBreakerOpenError(serviceName string) *apperrors.AppError {
-	return apperrors.NewServiceUnavailableError(
-		DomainGateway,
-		"circuit breaker open for service: "+serviceName,
-		"El servicio está temporalmente no disponible. Intenta de nuevo más tarde.",
-	)
+	return apperrors.NewServiceUnavailableError(serviceName).
+		WithDetail("reason", "circuit breaker open")
 }
 
 // ============================================================================
@@ -154,6 +135,21 @@ func ExecuteWithTimeout(ctx context.Context, timeout time.Duration, fn func(ctx 
 	case err := <-done:
 		return err
 	case <-timeoutCtx.Done():
-		return apperrors.NewTimeoutError(DomainGateway, "operation", timeout)
+		return apperrors.NewTimeoutError("operation").WithDetail("timeout", timeout.String())
+	}
+}
+
+// WithTimeout executes a function with a timeout (simplified version without context)
+func WithTimeout(timeout time.Duration, fn func() error) error {
+	done := make(chan error, 1)
+	go func() {
+		done <- fn()
+	}()
+
+	select {
+	case err := <-done:
+		return err
+	case <-time.After(timeout):
+		return apperrors.NewTimeoutError("operation").WithDetail("timeout", timeout.String())
 	}
 }

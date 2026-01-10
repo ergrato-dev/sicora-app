@@ -6,6 +6,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
+	"time"
 
 	"apigateway/internal/infrastructure/config"
 	"apigateway/internal/infrastructure/logger"
@@ -15,8 +16,9 @@ import (
 
 // ProxyHandler handles reverse proxy to backend services
 type ProxyHandler struct {
-	cfg    *config.Config
-	logger *logger.Logger
+	cfg       *config.Config
+	logger    *logger.Logger
+	transport *http.Transport
 }
 
 // NewProxyHandler creates a new proxy handler
@@ -24,6 +26,12 @@ func NewProxyHandler(cfg *config.Config, logger *logger.Logger) *ProxyHandler {
 	return &ProxyHandler{
 		cfg:    cfg,
 		logger: logger,
+		transport: &http.Transport{
+			MaxIdleConns:        100,
+			MaxIdleConnsPerHost: 10,
+			IdleConnTimeout:     90 * time.Second,
+			DisableCompression:  true, // Let backend handle compression
+		},
 	}
 }
 
@@ -54,6 +62,7 @@ func (h *ProxyHandler) ProxyToService(serviceName string) gin.HandlerFunc {
 		}
 
 		proxy := httputil.NewSingleHostReverseProxy(target)
+		proxy.Transport = h.transport
 
 		// Modify the request
 		proxy.Director = func(req *http.Request) {
@@ -68,6 +77,9 @@ func (h *ProxyHandler) ProxyToService(serviceName string) gin.HandlerFunc {
 
 			// Forward headers
 			req.Header = c.Request.Header.Clone()
+
+			// Remove Accept-Encoding to avoid gzip issues with proxy
+			req.Header.Del("Accept-Encoding")
 
 			// Add gateway headers
 			req.Header.Set("X-Forwarded-Host", c.Request.Host)

@@ -128,3 +128,48 @@ func (j *JWTService) IsTokenExpired(tokenString string) bool {
 
 	return true
 }
+
+// GenerateRefreshToken genera un refresh token con mayor duración (7 días)
+func (j *JWTService) GenerateRefreshToken(userID uuid.UUID, email string) (string, error) {
+	now := time.Now()
+	claims := jwt.RegisteredClaims{
+		Issuer:    j.issuer,
+		Subject:   userID.String(),
+		IssuedAt:  jwt.NewNumericDate(now),
+		ExpiresAt: jwt.NewNumericDate(now.Add(7 * 24 * time.Hour)), // 7 días
+		NotBefore: jwt.NewNumericDate(now),
+		ID:        uuid.New().String(), // Unique ID for this refresh token
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(j.secret)
+}
+
+// ValidateRefreshToken valida un refresh token y retorna el userID
+func (j *JWTService) ValidateRefreshToken(tokenString string) (uuid.UUID, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return j.secret, nil
+	})
+
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok && token.Valid {
+		userID, err := uuid.Parse(claims.Subject)
+		if err != nil {
+			return uuid.Nil, errors.New("invalid user ID in token")
+		}
+		return userID, nil
+	}
+
+	return uuid.Nil, errors.New("invalid refresh token")
+}
+
+// GetExpiration returns the token expiration duration in seconds
+func (j *JWTService) GetExpiration() int {
+	return int(j.expiration.Seconds())
+}
