@@ -120,10 +120,7 @@ func main() {
 	// Swagger documentation
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// Health check endpoints
-	router.GET("/health", infraerrors.HealthHandler(db.GetDB()))
-	router.GET("/health/live", infraerrors.LiveHandler())
-	router.GET("/health/ready", infraerrors.ReadyHandler(db.GetDB()))
+	// Health routes already registered in routes.SetupRoutes()
 
 	// Server configuration
 	port := os.Getenv("PORT")

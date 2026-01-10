@@ -212,7 +212,7 @@ func (r *studentCaseRepository) GenerateCaseNumber(ctx context.Context, caseType
 
 	// Count cases for this year and type
 	if err := r.db.WithContext(ctx).Model(&database.StudentCaseModel{}).
-		Where("case_number LIKE ? AND EXTRACT(year FROM created_at) = ?", 
+		Where("case_number LIKE ? AND EXTRACT(year FROM created_at) = ?",
 			fmt.Sprintf("%s-%d-%%", prefix, year), year).
 		Count(&count).Error; err != nil {
 		return "", err
@@ -340,15 +340,15 @@ func (r *studentCaseRepository) GetManualCases(ctx context.Context) ([]*entities
 }
 
 func (r *studentCaseRepository) GetRecognitionCases(ctx context.Context) ([]*entities.StudentCase, error) {
-	return r.GetByType(ctx, entities.CaseTypeRecognition)
+	return r.GetByType(ctx, entities.CaseTypeFelicitacion)
 }
 
 func (r *studentCaseRepository) GetSanctionCases(ctx context.Context) ([]*entities.StudentCase, error) {
-	return r.GetByType(ctx, entities.CaseTypeSanction)
+	return r.GetByType(ctx, entities.CaseTypeDisciplinario)
 }
 
 func (r *studentCaseRepository) GetAppealCases(ctx context.Context) ([]*entities.StudentCase, error) {
-	return r.GetByType(ctx, entities.CaseTypeAppeal)
+	return r.GetByType(ctx, entities.CaseTypeAcademico)
 }
 
 func (r *studentCaseRepository) GetCaseCount(ctx context.Context) (int64, error) {

@@ -123,8 +123,7 @@ func main() {
 	// Configurar rutas
 	handlers.SetupRoutes(router, routerConfig, handlerContainer)
 
-	// Register health routes
-	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
+	// Health routes already registered in handlers.SetupRoutes()
 
 	// Obtener puerto
 	port := os.Getenv("PORT")

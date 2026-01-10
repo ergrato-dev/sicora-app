@@ -49,7 +49,7 @@ func createTestStudentCase(id, studentID, committeeID uuid.UUID, caseType entiti
 		StudentID:          studentID,
 		CommitteeID:        committeeID,
 		CaseType:           caseType,
-		CaseStatus:         entities.CaseStatusPending,
+		CaseStatus:         entities.CaseStatusRegistrado,
 		AutomaticDetection: true,
 		CaseDescription:    "Test case description",
 		CreatedAt:          now,
@@ -65,11 +65,11 @@ func createTestSanction(id, studentID, caseID uuid.UUID, sanctionType entities.S
 		StudentID:          studentID,
 		StudentCaseID:      caseID,
 		SanctionType:       sanctionType,
-		SeverityLevel:      1,
+		SeverityLevel:      entities.SeverityLevelLeve,
 		Description:        "Test sanction",
 		StartDate:          now,
 		ComplianceRequired: true,
-		ComplianceStatus:   entities.ComplianceStatusPending,
+		ComplianceStatus:   entities.ComplianceStatusPendiente,
 		CreatedAt:          now,
 		UpdatedAt:          now,
 	}
@@ -87,7 +87,7 @@ func createTestImprovementPlan(id, studentID uuid.UUID, planType entities.PlanTy
 		Objectives:           []entities.Objective{},
 		Activities:           []entities.Activity{},
 		SuccessCriteria:      []entities.SuccessCriteria{},
-		CurrentStatus:        entities.PlanStatusActive,
+		CurrentStatus:        entities.PlanStatusActivo,
 		CompliancePercentage: 0,
 		CreatedAt:            now,
 		UpdatedAt:            now,
@@ -99,7 +99,7 @@ func TestMevalServiceCache_Committee(t *testing.T) {
 	ctx := context.Background()
 
 	cID := uuid.New()
-	committee := createTestCommittee(cID, entities.CommitteeTypeMonthly, entities.CommitteeStatusScheduled)
+	committee := createTestCommittee(cID, entities.CommitteeTypeSeguimientoEvaluacion, entities.CommitteeStatusProgramado)
 
 	// Test SetCommittee
 	err := mevalCache.SetCommittee(ctx, committee)
@@ -127,8 +127,8 @@ func TestMevalServiceCache_ScheduledCommittees(t *testing.T) {
 	ctx := context.Background()
 
 	committees := []*entities.Committee{
-		createTestCommittee(uuid.New(), entities.CommitteeTypeMonthly, entities.CommitteeStatusScheduled),
-		createTestCommittee(uuid.New(), entities.CommitteeTypeExtraordinary, entities.CommitteeStatusScheduled),
+		createTestCommittee(uuid.New(), entities.CommitteeTypeSeguimientoEvaluacion, entities.CommitteeStatusProgramado),
+		createTestCommittee(uuid.New(), entities.CommitteeTypeSeguimientoEvaluacion, entities.CommitteeStatusProgramado),
 	}
 
 	// Test SetScheduledCommittees
@@ -146,7 +146,7 @@ func TestMevalServiceCache_ActiveCommittees(t *testing.T) {
 	ctx := context.Background()
 
 	committees := []*entities.Committee{
-		createTestCommittee(uuid.New(), entities.CommitteeTypeMonthly, entities.CommitteeStatusInSession),
+		createTestCommittee(uuid.New(), entities.CommitteeTypeSeguimientoEvaluacion, entities.CommitteeStatusEnSesion),
 	}
 
 	// Test SetActiveCommittees
@@ -367,7 +367,7 @@ func TestMevalServiceCache_InvalidateCommittee(t *testing.T) {
 	ctx := context.Background()
 
 	cID := uuid.New()
-	committee := createTestCommittee(cID, entities.CommitteeTypeMonthly, entities.CommitteeStatusScheduled)
+	committee := createTestCommittee(cID, entities.CommitteeTypeSeguimientoEvaluacion, entities.CommitteeStatusProgramado)
 
 	err := mevalCache.SetCommittee(ctx, committee)
 	require.NoError(t, err)
@@ -401,8 +401,8 @@ func TestMevalServiceCache_WarmupCommittees(t *testing.T) {
 	ctx := context.Background()
 
 	committees := []*entities.Committee{
-		createTestCommittee(uuid.New(), entities.CommitteeTypeMonthly, entities.CommitteeStatusScheduled),
-		createTestCommittee(uuid.New(), entities.CommitteeTypeExtraordinary, entities.CommitteeStatusScheduled),
+		createTestCommittee(uuid.New(), entities.CommitteeTypeSeguimientoEvaluacion, entities.CommitteeStatusProgramado),
+		createTestCommittee(uuid.New(), entities.CommitteeTypeSeguimientoEvaluacion, entities.CommitteeStatusProgramado),
 	}
 
 	err := mevalCache.WarmupCommittees(ctx, committees)

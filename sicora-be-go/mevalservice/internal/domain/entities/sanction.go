@@ -7,36 +7,44 @@ import (
 	"gorm.io/gorm"
 )
 
-// SanctionType represents the types of sanctions according to SENA Agreement 009 of 2024
+// SanctionType represents the types of sanctions according to OneVision Agreement 009 of 2024
 type SanctionType string
 
 const (
-	SanctionTypeVerbalWarning        SanctionType = "VERBAL_WARNING"
-	SanctionTypeWrittenWarning       SanctionType = "WRITTEN_WARNING"
-	SanctionTypeAcademicCommitment   SanctionType = "ACADEMIC_COMMITMENT"
-	SanctionTypeImprovementPlan      SanctionType = "IMPROVEMENT_PLAN"
-	SanctionTypeConditionalEnrollment SanctionType = "CONDITIONAL_ENROLLMENT"
-	SanctionTypeTemporarySuspension  SanctionType = "TEMPORARY_SUSPENSION"
-	SanctionTypeDefinitiveCancellation SanctionType = "DEFINITIVE_CANCELLATION"
+	SanctionTypeLlamadoAtencionVerbal  SanctionType = "LLAMADO_ATENCION_VERBAL"
+	SanctionTypeLlamadoAtencionEscrito SanctionType = "LLAMADO_ATENCION_ESCRITO"
+	SanctionTypePlanMejoramiento       SanctionType = "PLAN_MEJORAMIENTO"
+	SanctionTypeCondicionamiento       SanctionType = "CONDICIONAMIENTO_MATRICULA"
+	SanctionTypeCancelacion            SanctionType = "CANCELACION_MATRICULA"
+)
+
+// SeverityLevel represents the severity of a fault according to Agreement 009
+type SeverityLevel string
+
+const (
+	SeverityLevelLeve     SeverityLevel = "LEVE"
+	SeverityLevelModerada SeverityLevel = "MODERADA"
+	SeverityLevelGrave    SeverityLevel = "GRAVE"
+	SeverityLevelMuyGrave SeverityLevel = "MUY_GRAVE"
 )
 
 // ComplianceStatus represents the compliance status of a sanction
 type ComplianceStatus string
 
 const (
-	ComplianceStatusPending    ComplianceStatus = "PENDING"
-	ComplianceStatusInProgress ComplianceStatus = "IN_PROGRESS"
-	ComplianceStatusCompleted  ComplianceStatus = "COMPLETED"
-	ComplianceStatusViolated   ComplianceStatus = "VIOLATED"
+	ComplianceStatusPendiente  ComplianceStatus = "PENDIENTE"
+	ComplianceStatusEnProgreso ComplianceStatus = "EN_PROGRESO"
+	ComplianceStatusCumplido   ComplianceStatus = "CUMPLIDO"
+	ComplianceStatusIncumplido ComplianceStatus = "INCUMPLIDO"
 )
 
 // AppealResult represents the result of an appeal
 type AppealResult string
 
 const (
-	AppealResultConfirmed AppealResult = "CONFIRMED"
-	AppealResultModified  AppealResult = "MODIFIED"
-	AppealResultRevoked   AppealResult = "REVOKED"
+	AppealResultConfirmada AppealResult = "CONFIRMADA"
+	AppealResultModificada AppealResult = "MODIFICADA"
+	AppealResultRevocada   AppealResult = "REVOCADA"
 )
 
 // Sanction represents a sanction applied to a student
@@ -44,16 +52,16 @@ type Sanction struct {
 	ID                 uuid.UUID        `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	StudentID          uuid.UUID        `json:"student_id" gorm:"type:uuid;not null"`
 	StudentCaseID      uuid.UUID        `json:"student_case_id" gorm:"type:uuid;not null"`
-	SanctionType       SanctionType     `json:"sanction_type" gorm:"type:varchar(100);not null"`
-	SeverityLevel      int              `json:"severity_level" gorm:"not null"`
+	SanctionType       SanctionType     `json:"sanction_type" gorm:"type:varchar(30);not null;check:sanction_type IN ('LLAMADO_ATENCION_VERBAL','LLAMADO_ATENCION_ESCRITO','PLAN_MEJORAMIENTO','CONDICIONAMIENTO_MATRICULA','CANCELACION_MATRICULA')"`
+	SeverityLevel      SeverityLevel    `json:"severity_level" gorm:"type:varchar(20);not null;check:severity_level IN ('LEVE','MODERADA','GRAVE','MUY_GRAVE')"`
 	Description        string           `json:"description" gorm:"type:text;not null"`
 	StartDate          time.Time        `json:"start_date" gorm:"not null"`
 	EndDate            *time.Time       `json:"end_date,omitempty"`
 	ComplianceRequired bool             `json:"compliance_required" gorm:"default:false"`
-	ComplianceStatus   ComplianceStatus `json:"compliance_status" gorm:"type:varchar(50);default:'PENDING'"`
+	ComplianceStatus   ComplianceStatus `json:"compliance_status" gorm:"type:varchar(20);default:'PENDIENTE';check:compliance_status IN ('PENDIENTE','EN_PROGRESO','CUMPLIDO','INCUMPLIDO')"`
 	AppealDeadline     *time.Time       `json:"appeal_deadline,omitempty"`
 	Appealed           bool             `json:"appealed" gorm:"default:false"`
-	AppealResult       *AppealResult    `json:"appeal_result,omitempty" gorm:"type:varchar(50)"`
+	AppealResult       *AppealResult    `json:"appeal_result,omitempty" gorm:"type:varchar(20);check:appeal_result IN ('CONFIRMADA','MODIFICADA','REVOCADA')"`
 	CreatedAt          time.Time        `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt          time.Time        `json:"updated_at" gorm:"autoUpdateTime"`
 
@@ -67,13 +75,13 @@ func (s *Sanction) BeforeCreate(tx *gorm.DB) error {
 	if s.ID == uuid.Nil {
 		s.ID = uuid.New()
 	}
-	
+
 	// Set appeal deadline (5 business days after start date)
 	if s.AppealDeadline == nil {
 		deadline := s.StartDate.AddDate(0, 0, 7) // 7 days to account for weekends
 		s.AppealDeadline = &deadline
 	}
-	
+
 	return nil
 }
 
@@ -84,18 +92,7 @@ func (Sanction) TableName() string {
 
 // GetSeverityDescription returns a description based on severity level
 func (s *Sanction) GetSeverityDescription() string {
-	switch s.SeverityLevel {
-	case 1:
-		return "Leve"
-	case 2, 3:
-		return "Moderada"
-	case 4, 5:
-		return "Grave"
-	case 6, 7:
-		return "Muy Grave"
-	default:
-		return "No Clasificada"
-	}
+	return string(s.SeverityLevel)
 }
 
 // IsAppealable checks if the sanction can be appealed
@@ -122,7 +119,7 @@ func (s *Sanction) IsTemporary() bool {
 
 // IsPermanent checks if the sanction is permanent
 func (s *Sanction) IsPermanent() bool {
-	return s.SanctionType == SanctionTypeDefinitiveCancellation
+	return s.SanctionType == SanctionTypeCancelacion
 }
 
 // RequiresCompliance checks if the sanction requires active compliance

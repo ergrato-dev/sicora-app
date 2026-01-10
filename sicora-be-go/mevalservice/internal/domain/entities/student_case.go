@@ -8,25 +8,25 @@ import (
 	"gorm.io/gorm"
 )
 
-// CaseType represents the type of student case
+// CaseType represents the type of student case according to Agreement 009
 type CaseType string
 
 const (
-	CaseTypeRecognition     CaseType = "RECOGNITION"
-	CaseTypeImprovementPlan CaseType = "IMPROVEMENT_PLAN"
-	CaseTypeSanction        CaseType = "SANCTION"
-	CaseTypeAppeal          CaseType = "APPEAL"
-	CaseTypeFollowUp        CaseType = "FOLLOW_UP"
+	CaseTypeAcademico     CaseType = "ACADEMICO"
+	CaseTypeDisciplinario CaseType = "DISCIPLINARIO"
+	CaseTypeInasistencia  CaseType = "INASISTENCIA"
+	CaseTypeFelicitacion  CaseType = "FELICITACION"
 )
 
 // CaseStatus represents the current status of a student case
 type CaseStatus string
 
 const (
-	CaseStatusDetected CaseStatus = "DETECTED"
-	CaseStatusPending  CaseStatus = "PENDING"
-	CaseStatusInReview CaseStatus = "IN_REVIEW"
-	CaseStatusResolved CaseStatus = "RESOLVED"
+	CaseStatusRegistrado          CaseStatus = "REGISTRADO"
+	CaseStatusEnRevision          CaseStatus = "EN_REVISION"
+	CaseStatusPendienteResolucion CaseStatus = "PENDIENTE_RESOLUCION"
+	CaseStatusResuelto            CaseStatus = "RESUELTO"
+	CaseStatusArchivado           CaseStatus = "ARCHIVADO"
 )
 
 // DetectionCriteria represents the criteria used for automatic detection
@@ -52,8 +52,8 @@ type StudentCase struct {
 	ID                 uuid.UUID          `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	StudentID          uuid.UUID          `json:"student_id" gorm:"type:uuid;not null"`
 	CommitteeID        uuid.UUID          `json:"committee_id" gorm:"type:uuid;not null"`
-	CaseType           CaseType           `json:"case_type" gorm:"type:varchar(50);not null"`
-	CaseStatus         CaseStatus         `json:"case_status" gorm:"type:varchar(50);not null;default:'DETECTED'"`
+	CaseType           CaseType           `json:"case_type" gorm:"type:varchar(20);not null;check:case_type IN ('ACADEMICO','DISCIPLINARIO','INASISTENCIA','FELICITACION')"`
+	CaseStatus         CaseStatus         `json:"case_status" gorm:"type:varchar(25);not null;default:'REGISTRADO';check:case_status IN ('REGISTRADO','EN_REVISION','PENDIENTE_RESOLUCION','RESUELTO','ARCHIVADO')"`
 	AutomaticDetection bool               `json:"automatic_detection" gorm:"default:true"`
 	DetectionCriteria  DetectionCriteria  `json:"detection_criteria" gorm:"type:jsonb"`
 	CaseDescription    string             `json:"case_description" gorm:"type:text"`
@@ -63,9 +63,9 @@ type StudentCase struct {
 	UpdatedAt          time.Time          `json:"updated_at" gorm:"autoUpdateTime"`
 
 	// Relationships
-	Committee        Committee        `json:"-" gorm:"foreignKey:CommitteeID"`
-	ImprovementPlans []ImprovementPlan `json:"improvement_plans,omitempty" gorm:"foreignKey:StudentCaseID"`
-	Sanctions        []Sanction       `json:"sanctions,omitempty" gorm:"foreignKey:StudentCaseID"`
+	Committee        Committee           `json:"-" gorm:"foreignKey:CommitteeID"`
+	ImprovementPlans []ImprovementPlan   `json:"improvement_plans,omitempty" gorm:"foreignKey:StudentCaseID"`
+	Sanctions        []Sanction          `json:"sanctions,omitempty" gorm:"foreignKey:StudentCaseID"`
 	Decisions        []CommitteeDecision `json:"decisions,omitempty" gorm:"foreignKey:StudentCaseID"`
 }
 
@@ -82,24 +82,24 @@ func (StudentCase) TableName() string {
 	return "mevalservice_schema.student_cases"
 }
 
-// IsRecognitionCase checks if this is a recognition case
-func (sc *StudentCase) IsRecognitionCase() bool {
-	return sc.CaseType == CaseTypeRecognition
+// IsFelicitacion checks if this is a recognition/felicitacion case
+func (sc *StudentCase) IsFelicitacion() bool {
+	return sc.CaseType == CaseTypeFelicitacion
 }
 
-// IsSanctionCase checks if this is a sanction case
-func (sc *StudentCase) IsSanctionCase() bool {
-	return sc.CaseType == CaseTypeSanction
+// IsDisciplinario checks if this is a disciplinary case
+func (sc *StudentCase) IsDisciplinario() bool {
+	return sc.CaseType == CaseTypeDisciplinario
 }
 
-// IsAppealCase checks if this is an appeal case
-func (sc *StudentCase) IsAppealCase() bool {
-	return sc.CaseType == CaseTypeAppeal
+// IsAcademico checks if this is an academic case
+func (sc *StudentCase) IsAcademico() bool {
+	return sc.CaseType == CaseTypeAcademico
 }
 
-// IsResolved checks if the case is resolved
-func (sc *StudentCase) IsResolved() bool {
-	return sc.CaseStatus == CaseStatusResolved
+// IsResuelto checks if the case is resolved
+func (sc *StudentCase) IsResuelto() bool {
+	return sc.CaseStatus == CaseStatusResuelto
 }
 
 // AddEvidenceDocument adds a new evidence document to the case

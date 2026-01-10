@@ -180,13 +180,13 @@ func (r *improvementPlanRepository) GetByInstructor(ctx context.Context, instruc
 }
 
 func (r *improvementPlanRepository) GetActivePlans(ctx context.Context) ([]*entities.ImprovementPlan, error) {
-	return r.GetByStatus(ctx, entities.PlanStatusActive)
+	return r.GetByStatus(ctx, entities.PlanStatusActivo)
 }
 
 func (r *improvementPlanRepository) GetOverduePlans(ctx context.Context) ([]*entities.ImprovementPlan, error) {
 	var models []database.ImprovementPlanModel
 	now := time.Now()
-	if err := r.db.WithContext(ctx).Where("end_date < ? AND current_status = ?", now, string(entities.PlanStatusActive)).Find(&models).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("end_date < ? AND current_status = ?", now, string(entities.PlanStatusActivo)).Find(&models).Error; err != nil {
 		return nil, err
 	}
 
@@ -201,7 +201,7 @@ func (r *improvementPlanRepository) GetPlansEndingSoon(ctx context.Context, days
 	var models []database.ImprovementPlanModel
 	now := time.Now()
 	endDate := now.AddDate(0, 0, days)
-	if err := r.db.WithContext(ctx).Where("end_date BETWEEN ? AND ? AND current_status = ?", now, endDate, string(entities.PlanStatusActive)).Find(&models).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("end_date BETWEEN ? AND ? AND current_status = ?", now, endDate, string(entities.PlanStatusActivo)).Find(&models).Error; err != nil {
 		return nil, err
 	}
 
@@ -213,7 +213,7 @@ func (r *improvementPlanRepository) GetPlansEndingSoon(ctx context.Context, days
 }
 
 func (r *improvementPlanRepository) GetCompletedPlans(ctx context.Context) ([]*entities.ImprovementPlan, error) {
-	return r.GetByStatus(ctx, entities.PlanStatusCompleted)
+	return r.GetByStatus(ctx, entities.PlanStatusCompletado)
 }
 
 func (r *improvementPlanRepository) GetPlansByComplianceRange(ctx context.Context, minCompliance, maxCompliance float64) ([]*entities.ImprovementPlan, error) {
@@ -231,7 +231,7 @@ func (r *improvementPlanRepository) GetPlansByComplianceRange(ctx context.Contex
 
 func (r *improvementPlanRepository) GetSuccessfulPlans(ctx context.Context, minCompliance float64) ([]*entities.ImprovementPlan, error) {
 	var models []database.ImprovementPlanModel
-	if err := r.db.WithContext(ctx).Where("compliance_percentage >= ? AND current_status = ?", minCompliance, string(entities.PlanStatusCompleted)).Find(&models).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("compliance_percentage >= ? AND current_status = ?", minCompliance, string(entities.PlanStatusCompletado)).Find(&models).Error; err != nil {
 		return nil, err
 	}
 
@@ -370,13 +370,13 @@ func (r *committeeMemberRepository) Delete(ctx context.Context, id uuid.UUID) er
 
 func (r *committeeMemberRepository) toModel(member *entities.CommitteeMember) *database.CommitteeMemberModel {
 	return &database.CommitteeMemberModel{
-		ID:          member.ID,
-		CommitteeID: member.CommitteeID,
-		UserID:      member.UserID,
-		MemberRole:  string(member.MemberRole),
-		Attended:    member.IsPresent,
+		ID:           member.ID,
+		CommitteeID:  member.CommitteeID,
+		UserID:       member.UserID,
+		MemberRole:   string(member.MemberRole),
+		Attended:     member.IsPresent,
 		VotingRights: member.VotePower > 0,
-		CreatedAt:   member.CreatedAt,
+		CreatedAt:    member.CreatedAt,
 	}
 }
 
@@ -694,7 +694,7 @@ func (r *sanctionRepository) toModel(sanction *entities.Sanction) *database.Sanc
 		StudentID:          sanction.StudentID,
 		StudentCaseID:      sanction.StudentCaseID,
 		SanctionType:       string(sanction.SanctionType),
-		SeverityLevel:      sanction.SeverityLevel,
+		SeverityLevel:      string(sanction.SeverityLevel),
 		Description:        sanction.Description,
 		StartDate:          sanction.StartDate,
 		EndDate:            sanction.EndDate,
@@ -719,7 +719,7 @@ func (r *sanctionRepository) toEntity(model *database.SanctionModel) *entities.S
 		StudentID:          model.StudentID,
 		StudentCaseID:      model.StudentCaseID,
 		SanctionType:       entities.SanctionType(model.SanctionType),
-		SeverityLevel:      model.SeverityLevel,
+		SeverityLevel:      entities.SeverityLevel(model.SeverityLevel),
 		Description:        model.Description,
 		StartDate:          model.StartDate,
 		EndDate:            model.EndDate,

@@ -1,0 +1,29 @@
+# =============================================================================
+# Dockerfile.dev - SICORA Frontend Next.js (Desarrollo)
+# =============================================================================
+
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Instalar pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copiar archivos de dependencias
+COPY package.json pnpm-lock.yaml ./
+
+# Instalar dependencias
+RUN pnpm install
+
+# Copiar resto del código
+COPY . .
+
+# Variables de entorno
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=development
+
+# Puerto
+EXPOSE 3000
+
+# Comando de desarrollo
+CMD ["pnpm", "dev"]

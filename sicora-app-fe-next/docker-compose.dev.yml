@@ -1,0 +1,30 @@
+# =============================================================================
+# Docker Compose - SICORA Frontend Next.js (Desarrollo)
+# =============================================================================
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: sicora-frontend-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://host.docker.internal:8000
+      - NEXT_PUBLIC_AI_SERVICE_URL=http://host.docker.internal:8007
+      - NEXT_PUBLIC_APP_ENV=development
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - sicora-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  sicora-network:
+    external: true
+    name: docker_sicora_network

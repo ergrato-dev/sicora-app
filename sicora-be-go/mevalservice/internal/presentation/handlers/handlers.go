@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -531,10 +532,16 @@ func NewHealthHandler() *HealthHandler {
 // @Success 200 {object} map[string]string
 // @Router /health [get]
 func (h *HealthHandler) Health(c *gin.Context) {
+	timestamp := time.Now().Unix()
+	if ts := c.Request.Context().Value("timestamp"); ts != nil {
+		if tsInt, ok := ts.(int64); ok {
+			timestamp = tsInt
+		}
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":    "ok",
 		"service":   "mevalservice",
-		"timestamp": strconv.FormatInt(c.Request.Context().Value("timestamp").(int64), 10),
+		"timestamp": strconv.FormatInt(timestamp, 10),
 	})
 }
 

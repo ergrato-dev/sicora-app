@@ -82,17 +82,13 @@ func AutoMigrate() error {
 		return fmt.Errorf("database connection not established")
 	}
 
-	// Enable pgvector extension
+	// Try to enable pgvector extension (optional - may not be available)
 	if err := DB.Exec("CREATE EXTENSION IF NOT EXISTS vector").Error; err != nil {
-		return fmt.Errorf("failed to create vector extension: %w", err)
+		log.Printf("Warning: pgvector extension not available: %v. Vector search will be disabled.", err)
+		// Continue without vector extension - it's optional for basic functionality
 	}
 
-	// Create custom indexes and functions before migration
-	if err := createCustomIndexes(); err != nil {
-		return fmt.Errorf("failed to create custom indexes: %w", err)
-	}
-
-	// Auto-migrate all models
+	// Auto-migrate all models FIRST (creates the tables)
 	err := DB.AutoMigrate(
 		&entities.Document{},
 		&entities.DocumentVersion{},
@@ -108,6 +104,11 @@ func AutoMigrate() error {
 	)
 	if err != nil {
 		return fmt.Errorf("failed to auto-migrate: %w", err)
+	}
+
+	// Create custom indexes AFTER tables exist
+	if err := createCustomIndexes(); err != nil {
+		return fmt.Errorf("failed to create custom indexes: %w", err)
 	}
 
 	// Create additional indexes after migration
@@ -135,7 +136,7 @@ func createCustomIndexes() error {
 		"CREATE INDEX IF NOT EXISTS idx_documents_published_at ON kb_documents(published_at)",
 		"CREATE INDEX IF NOT EXISTS idx_documents_view_count ON kb_documents(view_count)",
 		"CREATE INDEX IF NOT EXISTS idx_documents_slug ON kb_documents(slug) WHERE deleted_at IS NULL",
-		
+
 		// FAQ indexes
 		"CREATE INDEX IF NOT EXISTS idx_faqs_status ON kb_faqs(status)",
 		"CREATE INDEX IF NOT EXISTS idx_faqs_category ON kb_faqs(category)",
@@ -145,7 +146,7 @@ func createCustomIndexes() error {
 		"CREATE INDEX IF NOT EXISTS idx_faqs_overall_score ON kb_faqs(overall_score)",
 		"CREATE INDEX IF NOT EXISTS idx_faqs_created_at ON kb_faqs(created_at)",
 		"CREATE INDEX IF NOT EXISTS idx_faqs_published_at ON kb_faqs(published_at)",
-		
+
 		// Analytics indexes
 		"CREATE INDEX IF NOT EXISTS idx_doc_analytics_document_id ON kb_document_analytics(document_id)",
 		"CREATE INDEX IF NOT EXISTS idx_doc_analytics_created_at ON kb_document_analytics(created_at)",
@@ -153,13 +154,13 @@ func createCustomIndexes() error {
 		"CREATE INDEX IF NOT EXISTS idx_faq_analytics_faq_id ON kb_faq_analytics(faq_id)",
 		"CREATE INDEX IF NOT EXISTS idx_faq_analytics_created_at ON kb_faq_analytics(created_at)",
 		"CREATE INDEX IF NOT EXISTS idx_faq_analytics_action ON kb_faq_analytics(action)",
-		
+
 		// Rating indexes
 		"CREATE INDEX IF NOT EXISTS idx_doc_ratings_document_id ON kb_document_ratings(document_id)",
 		"CREATE INDEX IF NOT EXISTS idx_doc_ratings_user_id ON kb_document_ratings(user_id)",
 		"CREATE INDEX IF NOT EXISTS idx_faq_ratings_faq_id ON kb_faq_ratings(faq_id)",
 		"CREATE INDEX IF NOT EXISTS idx_faq_ratings_session_id ON kb_faq_ratings(session_id)",
-		
+
 		// Unique constraints
 		"CREATE UNIQUE INDEX IF NOT EXISTS idx_doc_ratings_unique ON kb_document_ratings(document_id, user_id) WHERE deleted_at IS NULL",
 		"CREATE UNIQUE INDEX IF NOT EXISTS idx_faq_ratings_unique ON kb_faq_ratings(faq_id, session_id)",
@@ -184,15 +185,15 @@ func createAdditionalIndexes() error {
 		"CREATE INDEX IF NOT EXISTS idx_faqs_keywords ON kb_faqs USING GIN (keywords)",
 		"CREATE INDEX IF NOT EXISTS idx_faqs_related_faqs ON kb_faqs USING GIN (related_faqs)",
 		"CREATE INDEX IF NOT EXISTS idx_faqs_related_documents ON kb_faqs USING GIN (related_documents)",
-		
+
 		// Vector indexes for semantic search (using HNSW for better performance)
 		"CREATE INDEX IF NOT EXISTS idx_documents_embedding ON kb_documents USING hnsw (embedding vector_cosine_ops)",
 		"CREATE INDEX IF NOT EXISTS idx_faqs_embedding ON kb_faqs USING hnsw (embedding vector_cosine_ops)",
-		
+
 		// Full-text search indexes
 		"CREATE INDEX IF NOT EXISTS idx_documents_search_vector ON kb_documents USING GIN (search_vector)",
 		"CREATE INDEX IF NOT EXISTS idx_faqs_search_vector ON kb_faqs USING GIN (search_vector)",
-		
+
 		// Composite indexes for common queries
 		"CREATE INDEX IF NOT EXISTS idx_documents_status_category ON kb_documents(status, category) WHERE deleted_at IS NULL",
 		"CREATE INDEX IF NOT EXISTS idx_documents_status_audience ON kb_documents(status, audience) WHERE deleted_at IS NULL",

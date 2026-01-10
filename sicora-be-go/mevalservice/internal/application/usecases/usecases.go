@@ -119,7 +119,7 @@ func (uc *committeeUseCases) CreateCommittee(ctx context.Context, req *dto.Creat
 		ID:             uuid.New(),
 		CommitteeDate:  req.CommitteeDate,
 		CommitteeType:  committeeType,
-		Status:         entities.CommitteeStatusScheduled,
+		Status:         entities.CommitteeStatusProgramado,
 		ProgramID:      req.ProgramID,
 		AcademicPeriod: req.AcademicPeriod,
 		CreatedAt:      time.Now(),
@@ -272,7 +272,7 @@ func (uc *committeeUseCases) toCommitteeResponse(committee *entities.Committee) 
 				UserID:      member.UserID,
 				MemberRole:  string(member.MemberRole),
 				IsPresent:   member.IsPresent,
-				VotePower:   member.VotePower,
+				VotePower:   int16(member.VotePower),
 				CreatedAt:   member.CreatedAt,
 			}
 		}
@@ -337,7 +337,7 @@ func (uc *studentCaseUseCases) CreateStudentCase(ctx context.Context, req *dto.C
 		StudentID:          req.StudentID,
 		CommitteeID:        req.CommitteeID,
 		CaseType:           entities.CaseType(req.CaseType),
-		CaseStatus:         entities.CaseStatusDetected,
+		CaseStatus:         entities.CaseStatusRegistrado,
 		AutomaticDetection: req.AutomaticDetection,
 		DetectionCriteria:  detectionCriteria,
 		CaseDescription:    req.CaseDescription,
@@ -621,7 +621,7 @@ func (uc *improvementPlanUseCases) CreateImprovementPlan(ctx context.Context, re
 		Activities:              activities,
 		SuccessCriteria:         successCriteria,
 		ResponsibleInstructorID: req.ResponsibleInstructorID,
-		CurrentStatus:           entities.PlanStatusActive,
+		CurrentStatus:           entities.PlanStatusActivo,
 		CompliancePercentage:    0,
 		CreatedAt:               time.Now(),
 		UpdatedAt:               time.Now(),
@@ -816,7 +816,7 @@ func (uc *improvementPlanUseCases) UpdateProgress(ctx context.Context, id uuid.U
 		return fmt.Errorf("progress must be between 0 and 100")
 	}
 
-	plan.CompliancePercentage = float64(progress)
+	plan.CompliancePercentage = int16(progress)
 	if notes != "" {
 		plan.FinalEvaluation = &notes
 	}
@@ -824,7 +824,7 @@ func (uc *improvementPlanUseCases) UpdateProgress(ctx context.Context, id uuid.U
 
 	// Update status based on progress
 	if progress == 100 {
-		plan.CurrentStatus = entities.PlanStatusCompleted
+		plan.CurrentStatus = entities.PlanStatusCompletado
 	}
 
 	return uc.improvementPlanRepo.Update(ctx, plan)
@@ -880,7 +880,7 @@ func (uc *improvementPlanUseCases) toImprovementPlanResponse(plan *entities.Impr
 		SuccessCriteria:         successCriteria,
 		ResponsibleInstructorID: plan.ResponsibleInstructorID,
 		CurrentStatus:           string(plan.CurrentStatus),
-		CompliancePercentage:    plan.CompliancePercentage,
+		CompliancePercentage:    float64(plan.CompliancePercentage),
 		FinalEvaluation:         plan.FinalEvaluation,
 		CreatedAt:               plan.CreatedAt,
 		UpdatedAt:               plan.UpdatedAt,
@@ -918,12 +918,12 @@ func (uc *sanctionUseCases) CreateSanction(ctx context.Context, req *dto.CreateS
 		StudentID:          req.StudentID,
 		StudentCaseID:      req.StudentCaseID,
 		SanctionType:       entities.SanctionType(req.SanctionType),
-		SeverityLevel:      req.SeverityLevel,
+		SeverityLevel:      entities.SeverityLevel(req.SeverityLevel),
 		Description:        req.Description,
 		StartDate:          req.StartDate,
 		EndDate:            req.EndDate,
 		ComplianceRequired: req.ComplianceRequired,
-		ComplianceStatus:   entities.ComplianceStatusPending,
+		ComplianceStatus:   entities.ComplianceStatusPendiente,
 		Appealed:           false,
 		CreatedAt:          time.Now(),
 		UpdatedAt:          time.Now(),
@@ -1095,25 +1095,24 @@ func (uc *sanctionUseCases) toSanctionResponse(sanction *entities.Sanction) *dto
 	}
 
 	return &dto.SanctionResponse{
-		ID:                  sanction.ID,
-		StudentID:           sanction.StudentID,
-		StudentCaseID:       sanction.StudentCaseID,
-		SanctionType:        string(sanction.SanctionType),
-		SeverityLevel:       sanction.SeverityLevel,
-		SeverityDescription: sanction.GetSeverityDescription(),
-		Description:         sanction.Description,
-		StartDate:           sanction.StartDate,
-		EndDate:             sanction.EndDate,
-		ComplianceRequired:  sanction.ComplianceRequired,
-		ComplianceStatus:    string(sanction.ComplianceStatus),
-		AppealDeadline:      sanction.AppealDeadline,
-		Appealed:            sanction.Appealed,
-		AppealResult:        appealResult,
-		IsActive:            sanction.IsActive(),
-		IsAppealable:        sanction.IsAppealable(),
-		DurationDays:        sanction.GetDurationDays(),
-		CreatedAt:           sanction.CreatedAt,
-		UpdatedAt:           sanction.UpdatedAt,
+		ID:                 sanction.ID,
+		StudentID:          sanction.StudentID,
+		StudentCaseID:      sanction.StudentCaseID,
+		SanctionType:       string(sanction.SanctionType),
+		SeverityLevel:      string(sanction.SeverityLevel),
+		Description:        sanction.Description,
+		StartDate:          sanction.StartDate,
+		EndDate:            sanction.EndDate,
+		ComplianceRequired: sanction.ComplianceRequired,
+		ComplianceStatus:   string(sanction.ComplianceStatus),
+		AppealDeadline:     sanction.AppealDeadline,
+		Appealed:           sanction.Appealed,
+		AppealResult:       appealResult,
+		IsActive:           sanction.IsActive(),
+		IsAppealable:       sanction.IsAppealable(),
+		DurationDays:       sanction.GetDurationDays(),
+		CreatedAt:          sanction.CreatedAt,
+		UpdatedAt:          sanction.UpdatedAt,
 	}
 }
 
@@ -1165,7 +1164,7 @@ func (uc *appealUseCases) CreateAppeal(ctx context.Context, req *dto.CreateAppea
 		DeadlineDate:        *sanction.AppealDeadline,
 		AppealGrounds:       req.AppealGrounds,
 		SupportingDocuments: supportingDocs,
-		AdmissibilityStatus: entities.AdmissibilityStatusPending,
+		AdmissibilityStatus: entities.AdmissibilityStatusPendiente,
 		CreatedAt:           time.Now(),
 		UpdatedAt:           time.Now(),
 	}
@@ -1308,7 +1307,7 @@ func (uc *appealUseCases) AdmitAppeal(ctx context.Context, id uuid.UUID, rationa
 		return fmt.Errorf("appeal not found")
 	}
 
-	appeal.Admit(rationale)
+	appeal.Admitir(rationale)
 	appeal.UpdatedAt = time.Now()
 
 	return uc.appealRepo.Update(ctx, appeal)
@@ -1323,7 +1322,7 @@ func (uc *appealUseCases) RejectAppeal(ctx context.Context, id uuid.UUID, ration
 		return fmt.Errorf("appeal not found")
 	}
 
-	appeal.Reject(rationale)
+	appeal.Rechazar(rationale)
 	appeal.UpdatedAt = time.Now()
 
 	return uc.appealRepo.Update(ctx, appeal)
@@ -1383,9 +1382,9 @@ func (uc *appealUseCases) toAppealResponse(appeal *entities.Appeal) *dto.AppealR
 		FinalDecision:             finalDecision,
 		FinalRationale:            appeal.FinalRationale,
 		IsWithinDeadline:          appeal.IsWithinDeadline(),
-		IsAdmitted:                appeal.IsAdmitted(),
+		IsAdmitted:                appeal.IsAdmitida(),
 		HasFinalDecision:          appeal.HasFinalDecision(),
-		IsSuccessful:              appeal.IsSuccessful(),
+		IsSuccessful:              appeal.IsExitosa(),
 		CreatedAt:                 appeal.CreatedAt,
 		UpdatedAt:                 appeal.UpdatedAt,
 	}

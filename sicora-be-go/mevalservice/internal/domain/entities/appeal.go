@@ -8,52 +8,67 @@ import (
 	"gorm.io/gorm"
 )
 
-// AdmissibilityStatus represents the admissibility status of an appeal
+// AdmissibilityStatus representa el estado de admisibilidad de una apelación
 type AdmissibilityStatus string
 
 const (
-	AdmissibilityStatusPending  AdmissibilityStatus = "PENDING"
-	AdmissibilityStatusAdmitted AdmissibilityStatus = "ADMITTED"
-	AdmissibilityStatusRejected AdmissibilityStatus = "REJECTED"
+	AdmissibilityStatusPendiente AdmissibilityStatus = "PENDIENTE" // En espera de revisión
+	AdmissibilityStatusAdmitida  AdmissibilityStatus = "ADMITIDA"  // Apelación admitida para revisión
+	AdmissibilityStatusRechazada AdmissibilityStatus = "RECHAZADA" // Apelación rechazada por inadmisible
 )
 
-// FinalDecision represents the final decision on an appeal
+// FinalDecision representa la decisión final sobre una apelación
 type FinalDecision string
 
 const (
-	FinalDecisionConfirmed FinalDecision = "CONFIRMED"
-	FinalDecisionModified  FinalDecision = "MODIFIED"
-	FinalDecisionRevoked   FinalDecision = "REVOKED"
+	FinalDecisionConfirmada FinalDecision = "CONFIRMADA" // Se confirma la sanción original
+	FinalDecisionModificada FinalDecision = "MODIFICADA" // Se modifica la sanción
+	FinalDecisionRevocada   FinalDecision = "REVOCADA"   // Se revoca la sanción
 )
 
-// SupportingDocument represents a supporting document for an appeal
+// SupportingDocument representa un documento de soporte para la apelación
 type SupportingDocument struct {
-	URL         string    `json:"url"`
-	Type        string    `json:"type"`
-	Description string    `json:"description"`
-	UploadedAt  time.Time `json:"uploaded_at"`
+	URL         string    `json:"url"`         // URL del documento
+	Type        string    `json:"type"`        // Tipo: PDF, imagen, etc.
+	Description string    `json:"description"` // Descripción del contenido
+	UploadedAt  time.Time `json:"uploaded_at"` // Fecha de carga
 }
 
-// Appeal represents an appeal process for a sanction
+// Appeal representa un proceso de apelación a una sanción
 type Appeal struct {
-	ID                         uuid.UUID             `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	SanctionID                 uuid.UUID             `json:"sanction_id" gorm:"type:uuid;not null"`
-	StudentID                  uuid.UUID             `json:"student_id" gorm:"type:uuid;not null"`
-	SubmissionDate             time.Time             `json:"submission_date" gorm:"not null"`
-	DeadlineDate               time.Time             `json:"deadline_date" gorm:"not null"`
-	AppealGrounds              string                `json:"appeal_grounds" gorm:"type:text;not null"`
-	SupportingDocuments        []SupportingDocument  `json:"supporting_documents" gorm:"type:jsonb"`
-	AdmissibilityStatus        AdmissibilityStatus   `json:"admissibility_status" gorm:"type:varchar(50);default:'PENDING'"`
-	AdmissibilityRationale     *string               `json:"admissibility_rationale,omitempty" gorm:"type:text"`
-	SecondInstanceCommitteeID  *uuid.UUID            `json:"second_instance_committee_id,omitempty" gorm:"type:uuid"`
-	FinalDecision              *FinalDecision        `json:"final_decision,omitempty" gorm:"type:varchar(50)"`
-	FinalRationale             *string               `json:"final_rationale,omitempty" gorm:"type:text"`
-	CreatedAt                  time.Time             `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt                  time.Time             `json:"updated_at" gorm:"autoUpdateTime"`
+	// ID único de la apelación (UUID v4)
+	ID uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	// ID de la sanción que se apela
+	SanctionID uuid.UUID `json:"sanction_id" gorm:"type:uuid;not null"`
+	// ID del aprendiz que presenta la apelación
+	StudentID uuid.UUID `json:"student_id" gorm:"type:uuid;not null"`
+	// Fecha de presentación de la apelación
+	SubmissionDate time.Time `json:"submission_date" gorm:"not null"`
+	// Fecha límite legal para presentar (5 días hábiles)
+	DeadlineDate time.Time `json:"deadline_date" gorm:"not null"`
+	// Argumentos y fundamentos de la apelación
+	AppealGrounds string `json:"appeal_grounds" gorm:"type:text;not null"`
+	// Documentos de soporte (evidencias, certificados, etc.)
+	SupportingDocuments []SupportingDocument `json:"supporting_documents" gorm:"type:jsonb"`
+	// Estado de admisibilidad de la apelación
+	AdmissibilityStatus AdmissibilityStatus `json:"admissibility_status" gorm:"type:varchar(20);not null;default:'PENDIENTE';check:admissibility_status IN ('PENDIENTE','ADMITIDA','RECHAZADA')"`
+	// Justificación de la decisión de admisibilidad
+	AdmissibilityRationale *string `json:"admissibility_rationale,omitempty" gorm:"type:text"`
+	// Comité de segunda instancia (si aplica)
+	SecondInstanceCommitteeID *uuid.UUID `json:"second_instance_committee_id,omitempty" gorm:"type:uuid"`
+	// Decisión final sobre la apelación
+	FinalDecision *FinalDecision `json:"final_decision,omitempty" gorm:"type:varchar(20);check:final_decision IN ('CONFIRMADA','MODIFICADA','REVOCADA')"`
+	// Justificación de la decisión final
+	FinalRationale *string `json:"final_rationale,omitempty" gorm:"type:text"`
 
-	// Relationships
-	Sanction                   Sanction              `json:"-" gorm:"foreignKey:SanctionID"`
-	SecondInstanceCommittee    *Committee            `json:"second_instance_committee,omitempty" gorm:"foreignKey:SecondInstanceCommitteeID"`
+	// --- Campos de Auditoría ---
+	CreatedAt time.Time      `json:"created_at" gorm:"autoCreateTime;not null"`
+	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime;not null"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"` // Soft delete
+
+	// --- Relaciones ---
+	Sanction                Sanction   `json:"-" gorm:"foreignKey:SanctionID"`
+	SecondInstanceCommittee *Committee `json:"second_instance_committee,omitempty" gorm:"foreignKey:SecondInstanceCommitteeID"`
 }
 
 // BeforeCreate sets the ID before creating a new appeal
@@ -69,50 +84,50 @@ func (Appeal) TableName() string {
 	return "mevalservice_schema.appeals"
 }
 
-// IsWithinDeadline checks if the appeal was submitted within the legal deadline
+// IsWithinDeadline verifica si la apelación se presentó dentro del plazo legal
 func (a *Appeal) IsWithinDeadline() bool {
 	return a.SubmissionDate.Before(a.DeadlineDate) || a.SubmissionDate.Equal(a.DeadlineDate)
 }
 
-// IsAdmitted checks if the appeal has been admitted
-func (a *Appeal) IsAdmitted() bool {
-	return a.AdmissibilityStatus == AdmissibilityStatusAdmitted
+// IsAdmitida verifica si la apelación ha sido admitida
+func (a *Appeal) IsAdmitida() bool {
+	return a.AdmissibilityStatus == AdmissibilityStatusAdmitida
 }
 
-// IsRejected checks if the appeal has been rejected
-func (a *Appeal) IsRejected() bool {
-	return a.AdmissibilityStatus == AdmissibilityStatusRejected
+// IsRechazada verifica si la apelación ha sido rechazada
+func (a *Appeal) IsRechazada() bool {
+	return a.AdmissibilityStatus == AdmissibilityStatusRechazada
 }
 
-// IsPending checks if the appeal is still pending review
-func (a *Appeal) IsPending() bool {
-	return a.AdmissibilityStatus == AdmissibilityStatusPending
+// IsPendiente verifica si la apelación está pendiente de revisión
+func (a *Appeal) IsPendiente() bool {
+	return a.AdmissibilityStatus == AdmissibilityStatusPendiente
 }
 
-// HasFinalDecision checks if a final decision has been made
+// HasFinalDecision verifica si se ha tomado una decisión final
 func (a *Appeal) HasFinalDecision() bool {
 	return a.FinalDecision != nil
 }
 
-// IsSuccessful checks if the appeal was successful (modified or revoked)
-func (a *Appeal) IsSuccessful() bool {
-	return a.FinalDecision != nil && 
-		(*a.FinalDecision == FinalDecisionModified || *a.FinalDecision == FinalDecisionRevoked)
+// IsExitosa verifica si la apelación fue exitosa (modificada o revocada)
+func (a *Appeal) IsExitosa() bool {
+	return a.FinalDecision != nil &&
+		(*a.FinalDecision == FinalDecisionModificada || *a.FinalDecision == FinalDecisionRevocada)
 }
 
-// Admit admits the appeal for review
-func (a *Appeal) Admit(rationale string) {
-	a.AdmissibilityStatus = AdmissibilityStatusAdmitted
+// Admitir admite la apelación para revisión
+func (a *Appeal) Admitir(rationale string) {
+	a.AdmissibilityStatus = AdmissibilityStatusAdmitida
 	a.AdmissibilityRationale = &rationale
 }
 
-// Reject rejects the appeal
-func (a *Appeal) Reject(rationale string) {
-	a.AdmissibilityStatus = AdmissibilityStatusRejected
+// Rechazar rechaza la apelación
+func (a *Appeal) Rechazar(rationale string) {
+	a.AdmissibilityStatus = AdmissibilityStatusRechazada
 	a.AdmissibilityRationale = &rationale
 }
 
-// SetFinalDecision sets the final decision of the appeal
+// SetFinalDecision establece la decisión final de la apelación
 func (a *Appeal) SetFinalDecision(decision FinalDecision, rationale string) {
 	a.FinalDecision = &decision
 	a.FinalRationale = &rationale

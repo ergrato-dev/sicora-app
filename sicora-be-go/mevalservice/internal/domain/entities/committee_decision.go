@@ -7,36 +7,50 @@ import (
 	"gorm.io/gorm"
 )
 
-// DecisionType represents the type of committee decision
+// DecisionType representa el tipo de decisión del comité
 type DecisionType string
 
 const (
-	DecisionTypeRecognition  DecisionType = "RECOGNITION"
-	DecisionTypeSanction     DecisionType = "SANCTION"
-	DecisionTypePlanRenewal  DecisionType = "PLAN_RENEWAL"
-	DecisionTypeAppealResult DecisionType = "APPEAL_RESULT"
+	DecisionTypeReconocimiento DecisionType = "RECONOCIMIENTO"  // Estímulo o felicitación
+	DecisionTypeSancion        DecisionType = "SANCION"         // Sanción disciplinaria
+	DecisionTypeRenovacionPlan DecisionType = "RENOVACION_PLAN" // Renovación de plan de mejoramiento
+	DecisionTypeApelacion      DecisionType = "APELACION"       // Resultado de apelación
 )
 
-// CommitteeDecision represents a decision made by a committee
+// CommitteeDecision representa una decisión tomada por un comité
 type CommitteeDecision struct {
-	ID                  uuid.UUID    `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	CommitteeID         uuid.UUID    `json:"committee_id" gorm:"type:uuid;not null"`
-	StudentCaseID       uuid.UUID    `json:"student_case_id" gorm:"type:uuid;not null"`
-	DecisionType        DecisionType `json:"decision_type" gorm:"type:varchar(50);not null"`
-	DecisionDescription string       `json:"decision_description" gorm:"type:text;not null"`
-	VotesFor            int          `json:"votes_for" gorm:"default:0"`
-	VotesAgainst        int          `json:"votes_against" gorm:"default:0"`
-	VotesAbstain        int          `json:"votes_abstain" gorm:"default:0"`
-	Unanimous           bool         `json:"unanimous" gorm:"default:false"`
-	DecisionRationale   *string      `json:"decision_rationale,omitempty" gorm:"type:text"`
-	CreatedAt           time.Time    `json:"created_at" gorm:"autoCreateTime"`
+	// ID único de la decisión (UUID v4)
+	ID uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	// ID del comité que tomó la decisión
+	CommitteeID uuid.UUID `json:"committee_id" gorm:"type:uuid;not null"`
+	// ID del caso del aprendiz
+	StudentCaseID uuid.UUID `json:"student_case_id" gorm:"type:uuid;not null"`
+	// Tipo de decisión tomada
+	DecisionType DecisionType `json:"decision_type" gorm:"type:varchar(20);not null;check:decision_type IN ('RECONOCIMIENTO','SANCION','RENOVACION_PLAN','APELACION')"`
+	// Descripción detallada de la decisión
+	DecisionDescription string `json:"decision_description" gorm:"type:text;not null"`
+	// Votos a favor
+	VotesFor int16 `json:"votes_for" gorm:"type:smallint;default:0;check:votes_for >= 0"`
+	// Votos en contra
+	VotesAgainst int16 `json:"votes_against" gorm:"type:smallint;default:0;check:votes_against >= 0"`
+	// Abstenciones
+	VotesAbstain int16 `json:"votes_abstain" gorm:"type:smallint;default:0;check:votes_abstain >= 0"`
+	// Indica si la decisión fue unánime
+	Unanimous bool `json:"unanimous" gorm:"default:false"`
+	// Justificación de la decisión
+	DecisionRationale *string `json:"decision_rationale,omitempty" gorm:"type:text"`
 
-	// Relationships
+	// --- Campos de Auditoría ---
+	CreatedAt time.Time      `json:"created_at" gorm:"autoCreateTime;not null"`
+	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime;not null"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"` // Soft delete
+
+	// --- Relaciones ---
 	Committee   Committee   `json:"-" gorm:"foreignKey:CommitteeID"`
 	StudentCase StudentCase `json:"-" gorm:"foreignKey:StudentCaseID"`
 }
 
-// BeforeCreate sets the ID before creating a new committee decision
+// BeforeCreate establece el ID antes de crear una nueva decisión
 func (cd *CommitteeDecision) BeforeCreate(tx *gorm.DB) error {
 	if cd.ID == uuid.Nil {
 		cd.ID = uuid.New()
@@ -44,27 +58,27 @@ func (cd *CommitteeDecision) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-// TableName specifies the table name for CommitteeDecision
+// TableName especifica el nombre de la tabla
 func (CommitteeDecision) TableName() string {
 	return "mevalservice_schema.committee_decisions"
 }
 
-// GetTotalVotes returns the total number of votes cast
-func (cd *CommitteeDecision) GetTotalVotes() int {
+// GetTotalVotes retorna el total de votos emitidos
+func (cd *CommitteeDecision) GetTotalVotes() int16 {
 	return cd.VotesFor + cd.VotesAgainst + cd.VotesAbstain
 }
 
-// IsApproved checks if the decision was approved
-func (cd *CommitteeDecision) IsApproved() bool {
+// IsAprobada verifica si la decisión fue aprobada
+func (cd *CommitteeDecision) IsAprobada() bool {
 	return cd.VotesFor > cd.VotesAgainst
 }
 
-// IsUnanimous checks if the decision was unanimous
-func (cd *CommitteeDecision) IsUnanimous() bool {
+// IsUnanime verifica si la decisión fue unánime
+func (cd *CommitteeDecision) IsUnanime() bool {
 	return cd.Unanimous || (cd.VotesAgainst == 0 && cd.VotesAbstain == 0)
 }
 
-// GetApprovalPercentage returns the percentage of approval votes
+// GetApprovalPercentage retorna el porcentaje de votos de aprobación
 func (cd *CommitteeDecision) GetApprovalPercentage() float64 {
 	total := cd.GetTotalVotes()
 	if total == 0 {

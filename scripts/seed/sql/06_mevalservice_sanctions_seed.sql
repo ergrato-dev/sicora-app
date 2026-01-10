@@ -1,0 +1,13 @@
+-- SICORA - MEvalService Sanctions Seed (Schema real)
+-- severity_level es bigint (1-5), no varchar
+
+INSERT INTO sanctions (id, student_id, student_case_id, sanction_type, severity_level, description, start_date, end_date, created_at, updated_at)
+VALUES
+('sn000001-0001-0001-0001-000000000001', '00000000-0000-0000-0004-000000000001', 'sc000001-0001-0001-0001-000000000001', 'WRITTEN_WARNING', 1, 'Llamado de atención por bajo rendimiento', '2024-03-16 10:00:00-05', NULL, NOW(), NOW()),
+('sn000001-0001-0001-0001-000000000002', '00000000-0000-0000-0004-000000000002', 'sc000001-0001-0001-0001-000000000002', 'ACADEMIC_COMMITMENT', 2, 'Compromiso de mejora de asistencia', '2024-03-16 11:00:00-05', '2024-06-16 11:00:00-05', NOW(), NOW()),
+('sn000001-0001-0001-0001-000000000003', '00000000-0000-0000-0004-000000000003', 'sc000001-0001-0001-0001-000000000003', 'SUSPENSION', 3, 'Suspensión de 3 días por conducta', '2024-04-11 08:00:00-05', '2024-04-14 08:00:00-05', NOW(), NOW()),
+('sn000001-0001-0001-0001-000000000004', '00000000-0000-0000-0004-000000000003', 'sc000001-0001-0001-0001-000000000003', 'PROBATION', 4, 'Condicionamiento de matrícula', '2024-04-15 09:00:00-05', '2024-12-15 09:00:00-05', NOW(), NOW()),
+('sn000001-0001-0001-0001-000000000005', '00000000-0000-0000-0004-000000000004', 'sc000001-0001-0001-0001-000000000004', 'WRITTEN_WARNING', 1, 'Llamado por no entrega de evidencias', '2024-05-21 14:00:00-05', NULL, NOW(), NOW())
+ON CONFLICT (id) DO NOTHING;
+
+SELECT 'Sanctions: ' || COUNT(*) FROM sanctions WHERE id::text LIKE 'sn000001%';

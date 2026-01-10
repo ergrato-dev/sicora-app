@@ -12,28 +12,28 @@ import (
 func TestCommitteeCreation(t *testing.T) {
 	committee := &entities.Committee{
 		CommitteeDate: time.Now(),
-		CommitteeType: entities.CommitteeTypeMonthly,
-		Status:        entities.CommitteeStatusScheduled,
+		CommitteeType: entities.CommitteeTypeSeguimientoEvaluacion,
+		Status:        entities.CommitteeStatusProgramado,
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
 
 	assert.NotNil(t, committee)
-	assert.Equal(t, entities.CommitteeTypeMonthly, committee.CommitteeType)
-	assert.Equal(t, entities.CommitteeStatusScheduled, committee.Status)
+	assert.Equal(t, entities.CommitteeTypeSeguimientoEvaluacion, committee.CommitteeType)
+	assert.Equal(t, entities.CommitteeStatusProgramado, committee.Status)
 	assert.False(t, committee.AgendaGenerated)
 	assert.False(t, committee.QuorumAchieved)
 }
 
 func TestStudentCaseCreation(t *testing.T) {
 	studentCase := &entities.StudentCase{
-		CaseType:   entities.CaseTypeImprovementPlan,
-		CaseStatus: entities.CaseStatusPending,
+		CaseType:   entities.CaseTypeAcademico,
+		CaseStatus: entities.CaseStatusRegistrado,
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
 
 	assert.NotNil(t, studentCase)
-	assert.Equal(t, entities.CaseTypeImprovementPlan, studentCase.CaseType)
-	assert.Equal(t, entities.CaseStatusPending, studentCase.CaseStatus)
+	assert.Equal(t, entities.CaseTypeAcademico, studentCase.CaseType)
+	assert.Equal(t, entities.CaseStatusRegistrado, studentCase.CaseStatus)
 }

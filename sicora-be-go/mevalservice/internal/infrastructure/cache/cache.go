@@ -378,13 +378,11 @@ func (c *MevalServiceCache) WarmupCommittees(ctx context.Context, committees []*
 // WarmupSanctionTypes preloads sanction types into cache.
 func (c *MevalServiceCache) WarmupSanctionTypes(ctx context.Context) error {
 	types := []entities.SanctionType{
-		entities.SanctionTypeVerbalWarning,
-		entities.SanctionTypeWrittenWarning,
-		entities.SanctionTypeAcademicCommitment,
-		entities.SanctionTypeImprovementPlan,
-		entities.SanctionTypeConditionalEnrollment,
-		entities.SanctionTypeTemporarySuspension,
-		entities.SanctionTypeDefinitiveCancellation,
+		entities.SanctionTypeLlamadoAtencionVerbal,
+		entities.SanctionTypeLlamadoAtencionEscrito,
+		entities.SanctionTypePlanMejoramiento,
+		entities.SanctionTypeCondicionamiento,
+		entities.SanctionTypeCancelacion,
 	}
 	if err := c.SetSanctionTypes(ctx, types); err != nil {
 		return fmt.Errorf("failed to warmup sanction types: %w", err)

@@ -122,8 +122,7 @@ func main() {
 	// Setup routes
 	routes.SetupRoutes(router, committeeHandler, studentCaseHandler, improvementPlanHandler, sanctionHandler, appealHandler, healthHandler)
 
-	// Register health routes
-	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
+	// Health routes already registered in routes.SetupRoutes()
 
 	// Initialize notification service
 	notificationService := services.NewMockNotificationService()

@@ -146,7 +146,7 @@ func (r *committeeRepository) GetScheduledCommittees(ctx context.Context) ([]*en
 	var models []database.CommitteeModel
 	if err := r.db.WithContext(ctx).
 		Preload("Members").
-		Where("status = ?", string(entities.CommitteeStatusScheduled)).
+		Where("status = ?", string(entities.CommitteeStatusProgramado)).
 		Find(&models).Error; err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func (r *committeeRepository) GetCompletedCommittees(ctx context.Context) ([]*en
 	var models []database.CommitteeModel
 	if err := r.db.WithContext(ctx).
 		Preload("Members").
-		Where("status = ?", string(entities.CommitteeStatusCompleted)).
+		Where("status = ?", string(entities.CommitteeStatusCompletado)).
 		Find(&models).Error; err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func (r *committeeRepository) GetNextScheduledCommittee(ctx context.Context) (*e
 	var model database.CommitteeModel
 	if err := r.db.WithContext(ctx).
 		Preload("Members").
-		Where("status = ? AND committee_date > ?", string(entities.CommitteeStatusScheduled), time.Now()).
+		Where("status = ? AND committee_date > ?", string(entities.CommitteeStatusProgramado), time.Now()).
 		Order("committee_date ASC").
 		First(&model).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

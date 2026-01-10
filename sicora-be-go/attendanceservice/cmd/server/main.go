@@ -128,8 +128,7 @@ func main() {
 	router.Use(infraerrors.RecoveryMiddlewareV2(serviceSetup.Logger))
 	router.Use(infraerrors.LoggingMiddlewareV2(serviceSetup.Logger))
 
-	// Register health routes
-	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
+	// Health routes already registered in routes.SetupRoutes()
 
 	// Crear contexto para el servicio programador
 	ctx, cancel := context.WithCancel(context.Background())

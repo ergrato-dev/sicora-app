@@ -1,5 +1,5 @@
 # Utilizar una imagen base ligera de Python
-FROM python:3.14-slim
+FROM python:3.11-slim
 
 # Establecer variables de entorno
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -19,8 +19,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./app /app/app
 COPY ./main.py /app/main.py
 
-# Exponer el puerto en el que correrá la aplicación (consistente con main.py y docker-compose.yml)
-EXPOSE 8004
+# Exponer el puerto en el que correrá la aplicación (consistente con docker-compose)
+EXPOSE 8007
 
 # Corregido: Apuntar a main.py en el WORKDIR (/app/main.py)
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8004", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8007", "--reload"]

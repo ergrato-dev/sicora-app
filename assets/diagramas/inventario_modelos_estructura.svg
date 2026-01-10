@@ -1,0 +1,222 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <defs>
+    <style>
+      .title { font: bold 24px sans-serif; fill: #e0e0e0; }
+      .subtitle { font: 14px sans-serif; fill: #a0a0a0; }
+      .service-name { font: bold 14px sans-serif; fill: #ffffff; }
+      .file-name { font: 11px monospace; fill: #b0b0b0; }
+      .struct-name { font: 10px sans-serif; fill: #e0e0e0; }
+      .count { font: bold 12px sans-serif; fill: #4fc3f7; }
+      .header-text { font: bold 12px sans-serif; fill: #1a1a2e; }
+      .legend-text { font: 12px sans-serif; fill: #b0b0b0; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#1a1a2e"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" class="title">📊 Inventario de Modelos de Datos - SICORA</text>
+  <text x="600" y="65" text-anchor="middle" class="subtitle">Backend Go (7 servicios) + Backend Python (1 servicio) | Total: 61 estructuras</text>
+  
+  <!-- Legend -->
+  <g transform="translate(50, 80)">
+    <rect x="0" y="0" width="15" height="15" fill="#4caf50" rx="2"/>
+    <text x="22" y="12" class="legend-text">Modelos de Infraestructura</text>
+    <rect x="180" y="0" width="15" height="15" fill="#2196f3" rx="2"/>
+    <text x="202" y="12" class="legend-text">Entidades de Dominio</text>
+    <rect x="360" y="0" width="15" height="15" fill="#ff9800" rx="2"/>
+    <text x="382" y="12" class="legend-text">Python SQLAlchemy</text>
+  </g>
+
+  <!-- BACKEND GO SECTION -->
+  <g transform="translate(30, 120)">
+    <text x="0" y="0" class="service-name" fill="#4fc3f7">🔷 BACKEND GO</text>
+    
+    <!-- MevalService -->
+    <g transform="translate(0, 20)">
+      <rect x="0" y="0" width="340" height="150" fill="#252540" rx="8" stroke="#4caf50" stroke-width="2"/>
+      <rect x="0" y="0" width="340" height="25" fill="#4caf50" rx="8"/>
+      <rect x="0" y="15" width="340" height="10" fill="#4caf50"/>
+      <text x="10" y="17" class="header-text">📁 MevalService</text>
+      <text x="300" y="17" class="header-text">7</text>
+      
+      <text x="10" y="45" class="file-name">models.go</text>
+      <text x="15" y="62" class="struct-name">• CommitteeModel (14 campos)</text>
+      <text x="15" y="76" class="struct-name">• CommitteeMemberModel (10)</text>
+      <text x="15" y="90" class="struct-name">• StudentCaseModel (17)</text>
+      <text x="15" y="104" class="struct-name">• ImprovementPlanModel (15)</text>
+      <text x="15" y="118" class="struct-name">• SanctionModel (16)</text>
+      <text x="15" y="132" class="struct-name">• CommitteeDecisionModel (18)</text>
+      <text x="15" y="146" class="struct-name">• AppealModel (15)</text>
+    </g>
+    
+    <!-- ScheduleService -->
+    <g transform="translate(360, 20)">
+      <rect x="0" y="0" width="340" height="150" fill="#252540" rx="8" stroke="#4caf50" stroke-width="2"/>
+      <rect x="0" y="0" width="340" height="25" fill="#4caf50" rx="8"/>
+      <rect x="0" y="15" width="340" height="10" fill="#4caf50"/>
+      <text x="10" y="17" class="header-text">📅 ScheduleService</text>
+      <text x="300" y="17" class="header-text">10</text>
+      
+      <text x="10" y="45" class="file-name">schedule_models.go (5)</text>
+      <text x="15" y="62" class="struct-name">• CampusModel, AcademicProgramModel</text>
+      <text x="15" y="76" class="struct-name">• AcademicGroupModel, VenueModel</text>
+      <text x="15" y="90" class="struct-name">• ScheduleModel</text>
+      
+      <text x="10" y="110" class="file-name" fill="#64b5f6">schedule_entities.go (5)</text>
+      <text x="15" y="127" class="struct-name">• Campus, AcademicProgram</text>
+      <text x="15" y="141" class="struct-name">• AcademicGroup, Venue, Schedule</text>
+    </g>
+    
+    <!-- AttendanceService -->
+    <g transform="translate(720, 20)">
+      <rect x="0" y="0" width="340" height="150" fill="#252540" rx="8" stroke="#4caf50" stroke-width="2"/>
+      <rect x="0" y="0" width="340" height="25" fill="#4caf50" rx="8"/>
+      <rect x="0" y="15" width="340" height="10" fill="#4caf50"/>
+      <text x="10" y="17" class="header-text">✅ AttendanceService</text>
+      <text x="300" y="17" class="header-text">9</text>
+      
+      <text x="10" y="45" class="file-name">attendance_models.go (4)</text>
+      <text x="15" y="62" class="struct-name">• AttendanceRecord (15 campos)</text>
+      <text x="15" y="76" class="struct-name">• Justification, AttendanceAlert</text>
+      <text x="15" y="90" class="struct-name">• AttendanceQRCode</text>
+      
+      <text x="10" y="110" class="file-name" fill="#64b5f6">attendance_entities.go (5)</text>
+      <text x="15" y="127" class="struct-name">• AttendanceQRCode, AttendanceRecord</text>
+      <text x="15" y="141" class="struct-name">• Justification, AttendanceAlert, Summary</text>
+    </g>
+    
+    <!-- EvalinService -->
+    <g transform="translate(0, 190)">
+      <rect x="0" y="0" width="340" height="170" fill="#252540" rx="8" stroke="#4caf50" stroke-width="2"/>
+      <rect x="0" y="0" width="340" height="25" fill="#4caf50" rx="8"/>
+      <rect x="0" y="15" width="340" height="10" fill="#4caf50"/>
+      <text x="10" y="17" class="header-text">📝 EvalinService</text>
+      <text x="300" y="17" class="header-text">9</text>
+      
+      <text x="10" y="45" class="file-name">models.go</text>
+      <text x="15" y="62" class="struct-name">• Question (12 campos)</text>
+      <text x="15" y="76" class="struct-name">• Questionnaire (8)</text>
+      <text x="15" y="90" class="struct-name">• QuestionnaireQuestion (5)</text>
+      <text x="15" y="104" class="struct-name">• EvaluationPeriod (12)</text>
+      <text x="15" y="118" class="struct-name">• Evaluation (13)</text>
+      <text x="15" y="132" class="struct-name">• Comment (10), Report (15)</text>
+      <text x="15" y="146" class="struct-name">• Configuration (12)</text>
+      <text x="15" y="160" class="struct-name">• Notification (14)</text>
+    </g>
+    
+    <!-- UserService -->
+    <g transform="translate(360, 190)">
+      <rect x="0" y="0" width="170" height="90" fill="#252540" rx="8" stroke="#4caf50" stroke-width="2"/>
+      <rect x="0" y="0" width="170" height="25" fill="#4caf50" rx="8"/>
+      <rect x="0" y="15" width="170" height="10" fill="#4caf50"/>
+      <text x="10" y="17" class="header-text">👤 UserService</text>
+      <text x="140" y="17" class="header-text">1</text>
+      
+      <text x="10" y="45" class="file-name">user_model.go</text>
+      <text x="15" y="65" class="struct-name">• UserModel</text>
+      <text x="15" y="80" class="struct-name">  (14 campos)</text>
+    </g>
+    
+    <!-- KBService -->
+    <g transform="translate(550, 190)">
+      <rect x="0" y="0" width="250" height="170" fill="#252540" rx="8" stroke="#2196f3" stroke-width="2"/>
+      <rect x="0" y="0" width="250" height="25" fill="#2196f3" rx="8"/>
+      <rect x="0" y="15" width="250" height="10" fill="#2196f3"/>
+      <text x="10" y="17" class="header-text">📚 KBService</text>
+      <text x="210" y="17" class="header-text">12</text>
+      
+      <text x="10" y="45" class="file-name" fill="#64b5f6">document.go (6)</text>
+      <text x="15" y="62" class="struct-name">• Document, User, DocumentVersion</text>
+      <text x="15" y="76" class="struct-name">• DocumentComment, DocumentAnalytic</text>
+      <text x="15" y="90" class="struct-name">• DocumentRating</text>
+      
+      <text x="10" y="110" class="file-name" fill="#64b5f6">faq.go (4)</text>
+      <text x="15" y="127" class="struct-name">• FAQ, FAQRating, FAQAnalytic</text>
+      <text x="15" y="141" class="struct-name">• FAQSuggestion</text>
+      
+      <text x="10" y="158" class="file-name" fill="#64b5f6">analytics.go (2)</text>
+    </g>
+    
+    <!-- ProjectEvalService -->
+    <g transform="translate(820, 190)">
+      <rect x="0" y="0" width="310" height="170" fill="#252540" rx="8" stroke="#4caf50" stroke-width="2"/>
+      <rect x="0" y="0" width="310" height="25" fill="#4caf50" rx="8"/>
+      <rect x="0" y="15" width="310" height="10" fill="#4caf50"/>
+      <text x="10" y="17" class="header-text">🎯 ProjectEvalService</text>
+      <text x="260" y="17" class="header-text">20</text>
+      
+      <text x="10" y="45" class="file-name">models/ (5 archivos)</text>
+      <text x="15" y="62" class="struct-name">• Project, Evaluation, Stakeholder</text>
+      <text x="15" y="76" class="struct-name">• ProjectDocument, Submission</text>
+      
+      <text x="10" y="96" class="file-name" fill="#64b5f6">entities/ (9 archivos, 15 struct)</text>
+      <text x="15" y="113" class="struct-name">• Project, ProjectIdea, WorkGroup</text>
+      <text x="15" y="127" class="struct-name">• Evaluation, EvaluationSession</text>
+      <text x="15" y="141" class="struct-name">• Checklist, ChecklistCriterion</text>
+      <text x="15" y="155" class="struct-name">• Stakeholder, ProjectDocument, etc.</text>
+    </g>
+  </g>
+  
+  <!-- BACKEND PYTHON SECTION -->
+  <g transform="translate(30, 530)">
+    <text x="0" y="0" class="service-name" fill="#ff9800">🐍 BACKEND PYTHON</text>
+    
+    <!-- AIService -->
+    <g transform="translate(0, 20)">
+      <rect x="0" y="0" width="550" height="200" fill="#252540" rx="8" stroke="#ff9800" stroke-width="2"/>
+      <rect x="0" y="0" width="550" height="25" fill="#ff9800" rx="8"/>
+      <rect x="0" y="15" width="550" height="10" fill="#ff9800"/>
+      <text x="10" y="17" class="header-text">🤖 AIService (sicora-be-python)</text>
+      <text x="490" y="17" class="header-text">10+</text>
+      
+      <g transform="translate(10, 35)">
+        <text x="0" y="15" class="file-name">infrastructure/models/</text>
+        <text x="5" y="35" class="struct-name">• BaseModel (base_model.py) - 4 campos base</text>
+        <text x="5" y="50" class="struct-name">• KnowledgeEntryModel (knowledge_model.py) - 9 campos</text>
+        <text x="5" y="65" class="struct-name">• ConversationModel, MessageModel (conversation_model.py)</text>
+        <text x="5" y="80" class="struct-name">• AIModelModel (ai_model_model.py) - 16 campos</text>
+      </g>
+      
+      <g transform="translate(280, 35)">
+        <text x="0" y="15" class="file-name" fill="#64b5f6">domain/entities/</text>
+        <text x="5" y="35" class="struct-name">• KnowledgeEntry</text>
+        <text x="5" y="50" class="struct-name">• Conversation</text>
+        <text x="5" y="65" class="struct-name">• PredictionResult + 3 Enums</text>
+        <text x="5" y="80" class="struct-name">• Alert + 3 Enums</text>
+        <text x="5" y="95" class="struct-name">• AIModel + 2 Enums</text>
+      </g>
+      
+      <text x="10" y="180" class="count">Tablas SQLAlchemy: knowledge_entries, conversations, messages, ai_models</text>
+    </g>
+  </g>
+  
+  <!-- Summary Stats -->
+  <g transform="translate(620, 550)">
+    <rect x="0" y="0" width="520" height="200" fill="#2a2a4a" rx="10" stroke="#4fc3f7" stroke-width="1"/>
+    <text x="260" y="30" text-anchor="middle" class="service-name">📈 Resumen de Estructuras</text>
+    
+    <g transform="translate(20, 50)">
+      <text x="0" y="20" class="struct-name">Backend Go - Modelos Infraestructura:</text>
+      <text x="350" y="20" class="count">38</text>
+      
+      <text x="0" y="45" class="struct-name">Backend Go - Entidades Dominio:</text>
+      <text x="350" y="45" class="count">19</text>
+      
+      <text x="0" y="70" class="struct-name">Backend Python - Modelos SQLAlchemy:</text>
+      <text x="350" y="70" class="count">5</text>
+      
+      <text x="0" y="95" class="struct-name">Backend Python - Entidades Dominio:</text>
+      <text x="350" y="95" class="count">5 + 8 Enums</text>
+      
+      <line x1="0" y1="110" x2="480" y2="110" stroke="#4fc3f7" stroke-width="1"/>
+      
+      <text x="0" y="135" class="service-name">TOTAL ESTRUCTURAS:</text>
+      <text x="350" y="135" class="count" style="font-size:18px">61+</text>
+    </g>
+  </g>
+  
+  <!-- Footer -->
+  <text x="600" y="880" text-anchor="middle" class="subtitle">SICORA - Sistema de Control y Seguimiento de Aprendices | Generado: 2026-01-10</text>
+</svg>

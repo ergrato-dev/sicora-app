@@ -114,12 +114,10 @@ func main() {
 
 	// Setup router with V2 middlewares
 	router := setupRouter(serviceSetup.Logger)
+	routes.SetupHealthRoutes(router)
 	routes.SetupDocumentRoutes(router, documentHandler)
 	routes.SetupFAQRoutes(router, faqHandler)
 	routes.SetupAnalyticsRoutes(router, analyticsHandler)
-
-	// Register health routes (replaces old /health endpoint)
-	infraerrors.RegisterHealthRoutes(router, serviceSetup.HealthChecker)
 
 	// Server configuration
 	port := getEnv("PORT", "8080")

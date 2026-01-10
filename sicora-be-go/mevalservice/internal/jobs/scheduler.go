@@ -15,18 +15,18 @@ import (
 
 // JobScheduler handles automatic jobs for MEvalService
 type JobScheduler struct {
-	cron                   *cron.Cron
-	committeeUC            usecases.CommitteeUseCases
-	studentCaseUC          usecases.StudentCaseUseCases
-	improvementPlanUC      usecases.ImprovementPlanUseCases
-	sanctionUC             usecases.SanctionUseCases
-	appealUC               usecases.AppealUseCases
-	committeeRepo          repositories.CommitteeRepository
-	studentCaseRepo        repositories.StudentCaseRepository
-	improvementPlanRepo    repositories.ImprovementPlanRepository
-	sanctionRepo           repositories.SanctionRepository
-	appealRepo             repositories.AppealRepository
-	notificationService    NotificationService
+	cron                *cron.Cron
+	committeeUC         usecases.CommitteeUseCases
+	studentCaseUC       usecases.StudentCaseUseCases
+	improvementPlanUC   usecases.ImprovementPlanUseCases
+	sanctionUC          usecases.SanctionUseCases
+	appealUC            usecases.AppealUseCases
+	committeeRepo       repositories.CommitteeRepository
+	studentCaseRepo     repositories.StudentCaseRepository
+	improvementPlanRepo repositories.ImprovementPlanRepository
+	sanctionRepo        repositories.SanctionRepository
+	appealRepo          repositories.AppealRepository
+	notificationService NotificationService
 }
 
 // NotificationService interface for sending notifications
@@ -50,18 +50,18 @@ func NewJobScheduler(
 	notificationService NotificationService,
 ) *JobScheduler {
 	return &JobScheduler{
-		cron:                   cron.New(cron.WithLocation(time.UTC)),
-		committeeUC:            committeeUC,
-		studentCaseUC:          studentCaseUC,
-		improvementPlanUC:      improvementPlanUC,
-		sanctionUC:             sanctionUC,
-		appealUC:               appealUC,
-		committeeRepo:          committeeRepo,
-		studentCaseRepo:        studentCaseRepo,
-		improvementPlanRepo:    improvementPlanRepo,
-		sanctionRepo:           sanctionRepo,
-		appealRepo:             appealRepo,
-		notificationService:    notificationService,
+		cron:                cron.New(cron.WithLocation(time.UTC)),
+		committeeUC:         committeeUC,
+		studentCaseUC:       studentCaseUC,
+		improvementPlanUC:   improvementPlanUC,
+		sanctionUC:          sanctionUC,
+		appealUC:            appealUC,
+		committeeRepo:       committeeRepo,
+		studentCaseRepo:     studentCaseRepo,
+		improvementPlanRepo: improvementPlanRepo,
+		sanctionRepo:        sanctionRepo,
+		appealRepo:          appealRepo,
+		notificationService: notificationService,
 	}
 }
 
@@ -118,7 +118,7 @@ func (js *JobScheduler) Stop() {
 func (js *JobScheduler) createMonthlyCommittees() {
 	ctx := context.Background()
 	currentDate := time.Now()
-	
+
 	log.Printf("Creating monthly committees for %s %d", currentDate.Month(), currentDate.Year())
 
 	// Get all existing committees to identify programs
@@ -153,7 +153,7 @@ func (js *JobScheduler) createCommitteeForProgram(ctx context.Context, programID
 	committee := &entities.Committee{
 		CommitteeDate:  currentDate,
 		CommitteeType:  entities.CommitteeType(committeeType),
-		Status:         entities.CommitteeStatusScheduled,
+		Status:         entities.CommitteeStatusProgramado,
 		AcademicPeriod: fmt.Sprintf("%d-%02d", currentDate.Year(), currentDate.Month()),
 		CreatedAt:      currentDate,
 		UpdatedAt:      currentDate,
@@ -170,7 +170,7 @@ func (js *JobScheduler) createCommitteeForProgram(ctx context.Context, programID
 // checkOverdueCases checks for overdue student cases and sends alerts
 func (js *JobScheduler) checkOverdueCases() {
 	ctx := context.Background()
-	
+
 	log.Println("Checking for overdue student cases")
 
 	// Get pending cases
@@ -197,9 +197,9 @@ func (js *JobScheduler) checkOverdueCases() {
 // sendOverdueCaseAlert sends alert for overdue cases
 func (js *JobScheduler) sendOverdueCaseAlert(ctx context.Context, committeeID string, cases []*entities.StudentCase) {
 	body := fmt.Sprintf("ALERT: %d cases require immediate attention for committee %s", len(cases), committeeID)
-	
+
 	for _, studentCase := range cases {
-		body += fmt.Sprintf("\n- Case ID: %s, Type: %s, Status: %s", 
+		body += fmt.Sprintf("\n- Case ID: %s, Type: %s, Status: %s",
 			studentCase.ID.String(), studentCase.CaseType, studentCase.CaseStatus)
 	}
 
@@ -211,7 +211,7 @@ func (js *JobScheduler) sendOverdueCaseAlert(ctx context.Context, committeeID st
 // checkImprovementPlanProgress checks improvement plan progress and sends reminders
 func (js *JobScheduler) checkImprovementPlanProgress() {
 	ctx := context.Background()
-	
+
 	log.Println("Checking improvement plan progress")
 
 	// Get all active improvement plans
@@ -244,17 +244,17 @@ func (js *JobScheduler) checkImprovementPlanProgress() {
 		js.sendNearDeadlinePlanAlert(nearDeadlinePlans)
 	}
 
-	log.Printf("Checked %d improvement plans: %d stagnant, %d near deadline", 
+	log.Printf("Checked %d improvement plans: %d stagnant, %d near deadline",
 		len(plans), len(stagnantPlans), len(nearDeadlinePlans))
 }
 
 // sendStagnantPlanAlert sends alert for stagnant improvement plans
 func (js *JobScheduler) sendStagnantPlanAlert(plans []*entities.ImprovementPlan) {
 	body := fmt.Sprintf("ALERT: %d improvement plans have not been updated in over 7 days", len(plans))
-	
+
 	for _, plan := range plans {
 		daysStagnant := int(time.Since(plan.UpdatedAt).Hours() / 24)
-		body += fmt.Sprintf("\n- Plan ID: %s, Type: %s (Last updated %d days ago)", 
+		body += fmt.Sprintf("\n- Plan ID: %s, Type: %s (Last updated %d days ago)",
 			plan.ID.String(), plan.PlanType, daysStagnant)
 	}
 
@@ -266,10 +266,10 @@ func (js *JobScheduler) sendStagnantPlanAlert(plans []*entities.ImprovementPlan)
 // sendNearDeadlinePlanAlert sends alert for plans nearing deadline
 func (js *JobScheduler) sendNearDeadlinePlanAlert(plans []*entities.ImprovementPlan) {
 	body := fmt.Sprintf("REMINDER: %d improvement plans are nearing their deadline", len(plans))
-	
+
 	for _, plan := range plans {
 		daysRemaining := int(plan.EndDate.Sub(time.Now()).Hours() / 24)
-		body += fmt.Sprintf("\n- Plan ID: %s, Type: %s (%d days remaining)", 
+		body += fmt.Sprintf("\n- Plan ID: %s, Type: %s (%d days remaining)",
 			plan.ID.String(), plan.PlanType, daysRemaining)
 	}
 
@@ -281,7 +281,7 @@ func (js *JobScheduler) sendNearDeadlinePlanAlert(plans []*entities.ImprovementP
 // checkSanctionExpirations checks for sanctions that are expiring or have expired
 func (js *JobScheduler) checkSanctionExpirations() {
 	ctx := context.Background()
-	
+
 	log.Println("Checking sanction expirations")
 
 	// Get all active sanctions
@@ -296,13 +296,13 @@ func (js *JobScheduler) checkSanctionExpirations() {
 
 	for _, sanction := range sanctions {
 		now := time.Now()
-		
+
 		// Check for expired sanctions
 		if sanction.EndDate != nil && sanction.EndDate.Before(now) {
 			expiredSanctions = append(expiredSanctions, sanction)
-			
+
 			// Auto-complete expired sanctions
-			sanction.ComplianceStatus = entities.ComplianceStatusCompleted
+			sanction.ComplianceStatus = entities.ComplianceStatusCumplido
 			sanction.UpdatedAt = now
 			if err := js.sanctionRepo.Update(ctx, sanction); err != nil {
 				log.Printf("Error auto-completing expired sanction %s: %v", sanction.ID.String(), err)
@@ -320,20 +320,20 @@ func (js *JobScheduler) checkSanctionExpirations() {
 		js.sendExpiringSanctionAlert(expiringSanctions)
 	}
 
-	log.Printf("Processed sanctions: %d expired (auto-completed), %d expiring soon", 
+	log.Printf("Processed sanctions: %d expired (auto-completed), %d expiring soon",
 		len(expiredSanctions), len(expiringSanctions))
 }
 
 // sendExpiredSanctionAlert sends alert for expired sanctions
 func (js *JobScheduler) sendExpiredSanctionAlert(sanctions []*entities.Sanction) {
 	body := fmt.Sprintf("INFO: %d sanctions have expired and were automatically completed", len(sanctions))
-	
+
 	for _, sanction := range sanctions {
 		endDate := "N/A"
 		if sanction.EndDate != nil {
 			endDate = sanction.EndDate.Format("2006-01-02")
 		}
-		body += fmt.Sprintf("\n- Sanction ID: %s, Type: %s (Expired on %s)", 
+		body += fmt.Sprintf("\n- Sanction ID: %s, Type: %s (Expired on %s)",
 			sanction.ID.String(), sanction.SanctionType, endDate)
 	}
 
@@ -345,13 +345,13 @@ func (js *JobScheduler) sendExpiredSanctionAlert(sanctions []*entities.Sanction)
 // sendExpiringSanctionAlert sends alert for sanctions expiring soon
 func (js *JobScheduler) sendExpiringSanctionAlert(sanctions []*entities.Sanction) {
 	body := fmt.Sprintf("REMINDER: %d sanctions will expire within 3 days", len(sanctions))
-	
+
 	for _, sanction := range sanctions {
 		daysRemaining := 0
 		if sanction.EndDate != nil {
 			daysRemaining = int(sanction.EndDate.Sub(time.Now()).Hours() / 24)
 		}
-		body += fmt.Sprintf("\n- Sanction ID: %s, Type: %s (%d days remaining)", 
+		body += fmt.Sprintf("\n- Sanction ID: %s, Type: %s (%d days remaining)",
 			sanction.ID.String(), sanction.SanctionType, daysRemaining)
 	}
 
@@ -363,7 +363,7 @@ func (js *JobScheduler) sendExpiringSanctionAlert(sanctions []*entities.Sanction
 // checkAppealDeadlines checks for appeals approaching deadline
 func (js *JobScheduler) checkAppealDeadlines() {
 	ctx := context.Background()
-	
+
 	log.Println("Checking appeal deadlines")
 
 	// Get all pending appeals
@@ -378,7 +378,7 @@ func (js *JobScheduler) checkAppealDeadlines() {
 	for _, appeal := range appeals {
 		// Appeals should be reviewed within 15 days of submission
 		daysSinceSubmission := int(time.Since(appeal.SubmissionDate).Hours() / 24)
-		
+
 		if daysSinceSubmission >= 12 { // 3 days before deadline
 			urgentAppeals = append(urgentAppeals, appeal)
 		}
@@ -394,7 +394,7 @@ func (js *JobScheduler) checkAppealDeadlines() {
 // sendUrgentAppealAlert sends alert for urgent appeals
 func (js *JobScheduler) sendUrgentAppealAlert(appeals []*entities.Appeal) {
 	body := fmt.Sprintf("URGENT: %d appeals require immediate review", len(appeals))
-	
+
 	for _, appeal := range appeals {
 		daysSinceSubmission := int(time.Since(appeal.SubmissionDate).Hours() / 24)
 		daysRemaining := 15 - daysSinceSubmission
@@ -402,7 +402,7 @@ func (js *JobScheduler) sendUrgentAppealAlert(appeals []*entities.Appeal) {
 		if len(groundsPreview) > 50 {
 			groundsPreview = groundsPreview[:50] + "..."
 		}
-		body += fmt.Sprintf("\n- Appeal ID: %s, Grounds: %s (%d days remaining)", 
+		body += fmt.Sprintf("\n- Appeal ID: %s, Grounds: %s (%d days remaining)",
 			appeal.ID.String(), groundsPreview, daysRemaining)
 	}
 
@@ -414,7 +414,7 @@ func (js *JobScheduler) sendUrgentAppealAlert(appeals []*entities.Appeal) {
 // generateMonthlyReports generates performance reports for committees
 func (js *JobScheduler) generateMonthlyReports() {
 	ctx := context.Background()
-	
+
 	log.Println("Generating monthly performance reports")
 
 	// Check if it's actually the last day of the month
@@ -455,11 +455,11 @@ func (js *JobScheduler) generateCommitteeReport(ctx context.Context, committee *
 	totalCases := len(cases)
 	resolvedCases := 0
 	pendingCases := 0
-	
+
 	for _, studentCase := range cases {
-		if studentCase.CaseStatus == entities.CaseStatusResolved {
+		if studentCase.CaseStatus == entities.CaseStatusResuelto {
 			resolvedCases++
-		} else if studentCase.CaseStatus == entities.CaseStatusPending || studentCase.CaseStatus == entities.CaseStatusInReview {
+		} else if studentCase.CaseStatus == entities.CaseStatusRegistrado || studentCase.CaseStatus == entities.CaseStatusEnRevision {
 			pendingCases++
 		}
 	}
@@ -470,9 +470,9 @@ func (js *JobScheduler) generateCommitteeReport(ctx context.Context, committee *
 	}
 
 	// Generate report
-	subject := fmt.Sprintf("Monthly Report - Committee %s (%s %d)", 
+	subject := fmt.Sprintf("Monthly Report - Committee %s (%s %d)",
 		committee.ID.String()[:8], endDate.Month(), endDate.Year())
-	
+
 	body := fmt.Sprintf(`Monthly Performance Report
 
 Committee ID: %s
@@ -485,8 +485,8 @@ METRICS:
 - Cases Pending: %d
 - Resolution Rate: %.1f%%
 
-`, committee.ID.String(), committee.CommitteeType, 
-		startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), 
+`, committee.ID.String(), committee.CommitteeType,
+		startDate.Format("2006-01-02"), endDate.Format("2006-01-02"),
 		totalCases, resolvedCases, pendingCases, resolutionRate)
 
 	// Add case status breakdown

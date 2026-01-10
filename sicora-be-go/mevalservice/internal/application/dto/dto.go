@@ -6,21 +6,33 @@ import (
 	"github.com/google/uuid"
 )
 
-// Committee DTOs - Aligned with SENA Agreement 009/2024
+// Committee DTOs - Alineado con Acuerdo OneVision 009/2024
+
+// CreateCommitteeRequest solicitud para crear un comité
 type CreateCommitteeRequest struct {
-	CommitteeDate  time.Time  `json:"committee_date" validate:"required"`
-	CommitteeType  string     `json:"committee_type" validate:"required,oneof=MONTHLY EXTRAORDINARY APPEALS SPECIAL"`
-	ProgramID      *uuid.UUID `json:"program_id,omitempty"`
-	AcademicPeriod string     `json:"academic_period" validate:"required,min=3,max=20"`
+	// Fecha programada del comité
+	CommitteeDate time.Time `json:"committee_date" validate:"required"`
+	// Tipo de comité (único valor: SEGUIMIENTO_EVALUACION)
+	CommitteeType string `json:"committee_type" validate:"required,oneof=SEGUIMIENTO_EVALUACION"`
+	// ID del programa de formación (opcional)
+	ProgramID *uuid.UUID `json:"program_id,omitempty"`
+	// Periodo académico (ej: 2024-2)
+	AcademicPeriod string `json:"academic_period" validate:"required,min=3,max=20"`
 }
 
+// UpdateCommitteeRequest solicitud para actualizar un comité
 type UpdateCommitteeRequest struct {
-	CommitteeDate  *time.Time `json:"committee_date,omitempty"`
-	Status         string     `json:"status,omitempty" validate:"omitempty,oneof=SCHEDULED IN_SESSION COMPLETED CANCELLED POSTPONED"`
-	AcademicPeriod string     `json:"academic_period,omitempty" validate:"omitempty,min=3,max=20"`
-	SessionMinutes *string    `json:"session_minutes,omitempty"`
+	// Nueva fecha del comité
+	CommitteeDate *time.Time `json:"committee_date,omitempty"`
+	// Estado del comité
+	Status string `json:"status,omitempty" validate:"omitempty,oneof=PROGRAMADO EN_SESION COMPLETADO CANCELADO APLAZADO"`
+	// Periodo académico
+	AcademicPeriod string `json:"academic_period,omitempty" validate:"omitempty,min=3,max=20"`
+	// Acta de la sesión
+	SessionMinutes *string `json:"session_minutes,omitempty"`
 }
 
+// CommitteeResponse respuesta con datos del comité
 type CommitteeResponse struct {
 	ID              uuid.UUID                 `json:"id"`
 	CommitteeDate   time.Time                 `json:"committee_date"`
@@ -36,42 +48,64 @@ type CommitteeResponse struct {
 	UpdatedAt       time.Time                 `json:"updated_at"`
 }
 
-// Committee Member DTOs - Aligned with SENA Agreement 009/2024
+// Committee Member DTOs - Alineado con Acuerdo OneVision 009/2024
+
+// CreateCommitteeMemberRequest solicitud para agregar miembro al comité
 type CreateCommitteeMemberRequest struct {
+	// ID del comité
 	CommitteeID uuid.UUID `json:"committee_id" validate:"required"`
-	UserID      uuid.UUID `json:"user_id" validate:"required"`
-	MemberRole  string    `json:"member_role" validate:"required,oneof=COORDINATOR INSTRUCTOR REPRESENTATIVE SECRETARY PRESIDENT"`
-	VotePower   int       `json:"vote_power,omitempty" validate:"omitempty,min=0,max=3"`
+	// ID del usuario
+	UserID uuid.UUID `json:"user_id" validate:"required"`
+	// Rol del miembro
+	MemberRole string `json:"member_role" validate:"required,oneof=COORDINADOR INSTRUCTOR ASISTENTE APRENDIZ APOYO BIENESTAR REPRESENTANTE_APRENDICES ABOGADO DIRECCION"`
+	// Peso del voto (0=sin voto, 1=normal, 2=doble, 3=veto)
+	VotePower int16 `json:"vote_power,omitempty" validate:"omitempty,min=0,max=3"`
 }
 
+// UpdateCommitteeMemberRequest solicitud para actualizar miembro
 type UpdateCommitteeMemberRequest struct {
-	MemberRole string `json:"member_role,omitempty" validate:"omitempty,oneof=COORDINATOR INSTRUCTOR REPRESENTATIVE SECRETARY PRESIDENT"`
-	IsPresent  *bool  `json:"is_present,omitempty"`
-	VotePower  *int   `json:"vote_power,omitempty" validate:"omitempty,min=0,max=3"`
+	// Nuevo rol
+	MemberRole string `json:"member_role,omitempty" validate:"omitempty,oneof=COORDINADOR INSTRUCTOR ASISTENTE APRENDIZ APOYO BIENESTAR REPRESENTANTE_APRENDICES ABOGADO DIRECCION"`
+	// Indica si está presente
+	IsPresent *bool `json:"is_present,omitempty"`
+	// Peso del voto
+	VotePower *int16 `json:"vote_power,omitempty" validate:"omitempty,min=0,max=3"`
 }
 
+// CommitteeMemberResponse respuesta con datos del miembro
 type CommitteeMemberResponse struct {
 	ID          uuid.UUID `json:"id"`
 	CommitteeID uuid.UUID `json:"committee_id"`
 	UserID      uuid.UUID `json:"user_id"`
 	MemberRole  string    `json:"member_role"`
 	IsPresent   bool      `json:"is_present"`
-	VotePower   int       `json:"vote_power"`
+	VotePower   int16     `json:"vote_power"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-// Student Case DTOs - Aligned with SENA Agreement 009/2024
+// Student Case DTOs - Alineado con Acuerdo OneVision 009/2024
+
+// CreateStudentCaseRequest solicitud para crear caso de aprendiz
 type CreateStudentCaseRequest struct {
-	StudentID          uuid.UUID             `json:"student_id" validate:"required"`
-	CommitteeID        uuid.UUID             `json:"committee_id" validate:"required"`
-	CaseType           string                `json:"case_type" validate:"required,oneof=RECOGNITION IMPROVEMENT_PLAN SANCTION APPEAL FOLLOW_UP"`
-	AutomaticDetection bool                  `json:"automatic_detection"`
-	DetectionCriteria  *DetectionCriteriaDTO `json:"detection_criteria,omitempty"`
-	CaseDescription    string                `json:"case_description" validate:"required,min=10"`
-	EvidenceDocuments  []EvidenceDocumentDTO `json:"evidence_documents,omitempty"`
-	InstructorComments *string               `json:"instructor_comments,omitempty"`
+	// ID del aprendiz
+	StudentID uuid.UUID `json:"student_id" validate:"required"`
+	// ID del comité
+	CommitteeID uuid.UUID `json:"committee_id" validate:"required"`
+	// Tipo de caso
+	CaseType string `json:"case_type" validate:"required,oneof=ACADEMICO DISCIPLINARIO INASISTENCIA FELICITACION"`
+	// Indica si fue detección automática
+	AutomaticDetection bool `json:"automatic_detection"`
+	// Criterios de detección
+	DetectionCriteria *DetectionCriteriaDTO `json:"detection_criteria,omitempty"`
+	// Descripción del caso
+	CaseDescription string `json:"case_description" validate:"required,min=10"`
+	// Documentos de evidencia
+	EvidenceDocuments []EvidenceDocumentDTO `json:"evidence_documents,omitempty"`
+	// Comentarios del instructor
+	InstructorComments *string `json:"instructor_comments,omitempty"`
 }
 
+// DetectionCriteriaDTO criterios de detección automática
 type DetectionCriteriaDTO struct {
 	AverageGrade        float64 `json:"average_grade,omitempty"`
 	DisciplinaryFaults  int     `json:"disciplinary_faults,omitempty"`
@@ -81,6 +115,7 @@ type DetectionCriteriaDTO struct {
 	DaysOverdue         int     `json:"days_overdue,omitempty"`
 }
 
+// EvidenceDocumentDTO documento de evidencia
 type EvidenceDocumentDTO struct {
 	URL         string    `json:"url"`
 	Type        string    `json:"type"`
@@ -88,13 +123,19 @@ type EvidenceDocumentDTO struct {
 	UploadedAt  time.Time `json:"uploaded_at,omitempty"`
 }
 
+// UpdateStudentCaseRequest solicitud para actualizar caso
 type UpdateStudentCaseRequest struct {
-	CaseStatus         string                `json:"case_status,omitempty" validate:"omitempty,oneof=DETECTED PENDING IN_REVIEW RESOLVED"`
-	CaseDescription    string                `json:"case_description,omitempty" validate:"omitempty,min=10"`
-	InstructorComments *string               `json:"instructor_comments,omitempty"`
-	EvidenceDocuments  []EvidenceDocumentDTO `json:"evidence_documents,omitempty"`
+	// Estado del caso
+	CaseStatus string `json:"case_status,omitempty" validate:"omitempty,oneof=REGISTRADO EN_REVISION PENDIENTE_RESOLUCION RESUELTO ARCHIVADO"`
+	// Descripción del caso
+	CaseDescription string `json:"case_description,omitempty" validate:"omitempty,min=10"`
+	// Comentarios del instructor
+	InstructorComments *string `json:"instructor_comments,omitempty"`
+	// Documentos de evidencia
+	EvidenceDocuments []EvidenceDocumentDTO `json:"evidence_documents,omitempty"`
 }
 
+// StudentCaseResponse respuesta con datos del caso
 type StudentCaseResponse struct {
 	ID                 uuid.UUID                   `json:"id"`
 	StudentID          uuid.UUID                   `json:"student_id"`
@@ -114,9 +155,9 @@ type StudentCaseResponse struct {
 	UpdatedAt          time.Time                   `json:"updated_at"`
 }
 
-// Improvement Plan DTOs - Aligned with SENA Agreement 009/2024
+// Improvement Plan DTOs - Alineado con Acuerdo OneVision 009/2024
 
-// ObjectiveDTO represents a specific objective in the improvement plan
+// ObjectiveDTO objetivo específico del plan de mejoramiento
 type ObjectiveDTO struct {
 	ID          string    `json:"id,omitempty"`
 	Description string    `json:"description" validate:"required,min=10"`
@@ -125,7 +166,7 @@ type ObjectiveDTO struct {
 	Completed   bool      `json:"completed,omitempty"`
 }
 
-// ActivityDTO represents an activity to be completed
+// ActivityDTO actividad a completar
 type ActivityDTO struct {
 	ID          string     `json:"id,omitempty"`
 	Name        string     `json:"name" validate:"required,min=3,max=100"`
@@ -135,7 +176,7 @@ type ActivityDTO struct {
 	CompletedAt *time.Time `json:"completed_at,omitempty"`
 }
 
-// SuccessCriteriaDTO represents criteria for success
+// SuccessCriteriaDTO criterios de éxito
 type SuccessCriteriaDTO struct {
 	ID          string  `json:"id,omitempty"`
 	Description string  `json:"description" validate:"required,min=10"`
@@ -144,10 +185,14 @@ type SuccessCriteriaDTO struct {
 	Achieved    bool    `json:"achieved,omitempty"`
 }
 
+// CreateImprovementPlanRequest solicitud para crear plan de mejoramiento
 type CreateImprovementPlanRequest struct {
-	StudentID               uuid.UUID            `json:"student_id" validate:"required"`
-	StudentCaseID           *uuid.UUID           `json:"student_case_id,omitempty"`
-	PlanType                string               `json:"plan_type" validate:"required,oneof=ACADEMIC DISCIPLINARY MIXED"`
+	// ID del aprendiz
+	StudentID uuid.UUID `json:"student_id" validate:"required"`
+	// ID del caso asociado (opcional)
+	StudentCaseID *uuid.UUID `json:"student_case_id,omitempty"`
+	// Tipo de plan
+	PlanType                string               `json:"plan_type" validate:"required,oneof=ACADEMICO DISCIPLINARIO ACTITUDINAL MIXTO"`
 	StartDate               time.Time            `json:"start_date" validate:"required"`
 	EndDate                 time.Time            `json:"end_date" validate:"required"`
 	Objectives              []ObjectiveDTO       `json:"objectives" validate:"required,min=1"`
@@ -157,8 +202,10 @@ type CreateImprovementPlanRequest struct {
 }
 
 type UpdateImprovementPlanRequest struct {
-	CurrentStatus        string               `json:"current_status,omitempty" validate:"omitempty,oneof=ACTIVE COMPLETED FAILED EXTENDED"`
-	CompliancePercentage *float64             `json:"compliance_percentage,omitempty" validate:"omitempty,min=0,max=100"`
+	// Estado actual del plan
+	CurrentStatus string `json:"current_status,omitempty" validate:"omitempty,oneof=BORRADOR ACTIVO COMPLETADO INCUMPLIDO CANCELADO"`
+	// Porcentaje de cumplimiento (0-100)
+	CompliancePercentage *int16               `json:"compliance_percentage,omitempty" validate:"omitempty,min=0,max=100"`
 	FinalEvaluation      *string              `json:"final_evaluation,omitempty"`
 	Objectives           []ObjectiveDTO       `json:"objectives,omitempty"`
 	Activities           []ActivityDTO        `json:"activities,omitempty"`
@@ -183,64 +230,80 @@ type ImprovementPlanResponse struct {
 	UpdatedAt               time.Time            `json:"updated_at"`
 }
 
-// Sanction DTOs - Aligned with SENA Agreement 009/2024
+// Sanction DTOs - Alineado con Acuerdo OneVision 009/2024
 type CreateSanctionRequest struct {
-	StudentID          uuid.UUID  `json:"student_id" validate:"required"`
-	StudentCaseID      uuid.UUID  `json:"student_case_id" validate:"required"`
-	SanctionType       string     `json:"sanction_type" validate:"required,oneof=VERBAL_WARNING WRITTEN_WARNING ACADEMIC_COMMITMENT IMPROVEMENT_PLAN CONDITIONAL_ENROLLMENT TEMPORARY_SUSPENSION DEFINITIVE_CANCELLATION"`
-	SeverityLevel      int        `json:"severity_level" validate:"required,min=1,max=7"`
-	Description        string     `json:"description" validate:"required,min=10"`
-	StartDate          time.Time  `json:"start_date" validate:"required"`
-	EndDate            *time.Time `json:"end_date,omitempty"`
-	ComplianceRequired bool       `json:"compliance_required"`
+	// ID del aprendiz
+	StudentID uuid.UUID `json:"student_id" validate:"required"`
+	// ID del caso asociado
+	StudentCaseID uuid.UUID `json:"student_case_id" validate:"required"`
+	// Tipo de sanción
+	SanctionType string `json:"sanction_type" validate:"required,oneof=LLAMADO_ATENCION_VERBAL LLAMADO_ATENCION_ESCRITO PLAN_MEJORAMIENTO CONDICIONAMIENTO_MATRICULA CANCELACION_MATRICULA"`
+	// Nivel de gravedad
+	SeverityLevel string `json:"severity_level" validate:"required,oneof=LEVE MODERADA GRAVE MUY_GRAVE"`
+	// Descripción de la sanción
+	Description string `json:"description" validate:"required,min=10"`
+	// Fecha de inicio
+	StartDate time.Time `json:"start_date" validate:"required"`
+	// Fecha de fin (opcional)
+	EndDate *time.Time `json:"end_date,omitempty"`
+	// Indica si requiere cumplimiento
+	ComplianceRequired bool `json:"compliance_required"`
 }
 
 type UpdateSanctionRequest struct {
-	ComplianceStatus string     `json:"compliance_status,omitempty" validate:"omitempty,oneof=PENDING IN_PROGRESS COMPLETED VIOLATED"`
-	EndDate          *time.Time `json:"end_date,omitempty"`
+	// Estado de cumplimiento
+	ComplianceStatus string `json:"compliance_status,omitempty" validate:"omitempty,oneof=PENDIENTE EN_PROGRESO CUMPLIDO INCUMPLIDO"`
+	// Fecha de fin
+	EndDate *time.Time `json:"end_date,omitempty"`
 }
 
 type SanctionResponse struct {
-	ID                  uuid.UUID  `json:"id"`
-	StudentID           uuid.UUID  `json:"student_id"`
-	StudentCaseID       uuid.UUID  `json:"student_case_id"`
-	SanctionType        string     `json:"sanction_type"`
-	SeverityLevel       int        `json:"severity_level"`
-	SeverityDescription string     `json:"severity_description"`
-	Description         string     `json:"description"`
-	StartDate           time.Time  `json:"start_date"`
-	EndDate             *time.Time `json:"end_date,omitempty"`
-	ComplianceRequired  bool       `json:"compliance_required"`
-	ComplianceStatus    string     `json:"compliance_status"`
-	AppealDeadline      *time.Time `json:"appeal_deadline,omitempty"`
-	Appealed            bool       `json:"appealed"`
-	AppealResult        *string    `json:"appeal_result,omitempty"`
-	IsActive            bool       `json:"is_active"`
-	IsAppealable        bool       `json:"is_appealable"`
-	DurationDays        int        `json:"duration_days"`
-	CreatedAt           time.Time  `json:"created_at"`
-	UpdatedAt           time.Time  `json:"updated_at"`
+	ID                 uuid.UUID  `json:"id"`
+	StudentID          uuid.UUID  `json:"student_id"`
+	StudentCaseID      uuid.UUID  `json:"student_case_id"`
+	SanctionType       string     `json:"sanction_type"`
+	SeverityLevel      string     `json:"severity_level"`
+	Description        string     `json:"description"`
+	StartDate          time.Time  `json:"start_date"`
+	EndDate            *time.Time `json:"end_date,omitempty"`
+	ComplianceRequired bool       `json:"compliance_required"`
+	ComplianceStatus   string     `json:"compliance_status"`
+	AppealDeadline     *time.Time `json:"appeal_deadline,omitempty"`
+	Appealed           bool       `json:"appealed"`
+	AppealResult       *string    `json:"appeal_result,omitempty"`
+	IsActive           bool       `json:"is_active"`
+	IsAppealable       bool       `json:"is_appealable"`
+	DurationDays       int        `json:"duration_days"`
+	CreatedAt          time.Time  `json:"created_at"`
+	UpdatedAt          time.Time  `json:"updated_at"`
 }
 
-// Committee Decision DTOs
+// Committee Decision DTOs - Alineado con Acuerdo OneVision 009/2024
 type CreateCommitteeDecisionRequest struct {
-	CommitteeID   uuid.UUID  `json:"committee_id" validate:"required"`
+	// ID del comité
+	CommitteeID uuid.UUID `json:"committee_id" validate:"required"`
+	// ID del caso (opcional)
 	StudentCaseID *uuid.UUID `json:"student_case_id,omitempty"`
-	Type          string     `json:"type" validate:"required,oneof=CASE_RESOLUTION SANCTION_APPROVAL APPEAL_RESOLUTION POLICY_DECISION"`
-	Title         string     `json:"title" validate:"required,min=5,max=200"`
-	Description   string     `json:"description" validate:"required,min=10"`
-	Resolution    string     `json:"resolution" validate:"required,min=10"`
-	Justification string     `json:"justification" validate:"required,min=10"`
-	VotingResult  string     `json:"voting_result,omitempty"`
-	AttendeesList string     `json:"attendees_list,omitempty"`
-	DecisionDate  time.Time  `json:"decision_date" validate:"required"`
+	// Tipo de decisión
+	Type          string    `json:"type" validate:"required,oneof=RECONOCIMIENTO SANCION RENOVACION_PLAN APELACION"`
+	Title         string    `json:"title" validate:"required,min=5,max=200"`
+	Description   string    `json:"description" validate:"required,min=10"`
+	Resolution    string    `json:"resolution" validate:"required,min=10"`
+	Justification string    `json:"justification" validate:"required,min=10"`
+	VotingResult  string    `json:"voting_result,omitempty"`
+	AttendeesList string    `json:"attendees_list,omitempty"`
+	DecisionDate  time.Time `json:"decision_date" validate:"required"`
 }
 
 type UpdateCommitteeDecisionRequest struct {
-	Status             string     `json:"status,omitempty" validate:"omitempty,oneof=DRAFT APPROVED EXECUTED APPEALED"`
-	ExecutionDate      *time.Time `json:"execution_date,omitempty"`
-	PresidentSignature bool       `json:"president_signature,omitempty"`
-	SecretarySignature bool       `json:"secretary_signature,omitempty"`
+	// Estado de la decisión
+	Status string `json:"status,omitempty" validate:"omitempty,oneof=BORRADOR APROBADO EJECUTADO APELADO"`
+	// Fecha de ejecución
+	ExecutionDate *time.Time `json:"execution_date,omitempty"`
+	// Firma del presidente
+	PresidentSignature bool `json:"president_signature,omitempty"`
+	// Firma del secretario
+	SecretarySignature bool `json:"secretary_signature,omitempty"`
 }
 
 type CommitteeDecisionResponse struct {
@@ -264,7 +327,9 @@ type CommitteeDecisionResponse struct {
 	UpdatedAt          time.Time  `json:"updated_at"`
 }
 
-// Appeal DTOs - Aligned with SENA Agreement 009/2024
+// Appeal DTOs - Alineado con Acuerdo OneVision 009/2024
+
+// SupportingDocumentDTO documento de soporte
 type SupportingDocumentDTO struct {
 	URL         string    `json:"url" validate:"required,url"`
 	Type        string    `json:"type" validate:"required"`
@@ -280,11 +345,16 @@ type CreateAppealRequest struct {
 }
 
 type UpdateAppealRequest struct {
-	AdmissibilityStatus       string     `json:"admissibility_status,omitempty" validate:"omitempty,oneof=PENDING ADMITTED REJECTED"`
-	AdmissibilityRationale    string     `json:"admissibility_rationale,omitempty"`
+	// Estado de admisibilidad
+	AdmissibilityStatus string `json:"admissibility_status,omitempty" validate:"omitempty,oneof=PENDIENTE ADMITIDA RECHAZADA"`
+	// Justificación de admisibilidad
+	AdmissibilityRationale string `json:"admissibility_rationale,omitempty"`
+	// ID del comité de segunda instancia
 	SecondInstanceCommitteeID *uuid.UUID `json:"second_instance_committee_id,omitempty"`
-	FinalDecision             string     `json:"final_decision,omitempty" validate:"omitempty,oneof=CONFIRMED MODIFIED REVOKED"`
-	FinalRationale            string     `json:"final_rationale,omitempty"`
+	// Decisión final
+	FinalDecision string `json:"final_decision,omitempty" validate:"omitempty,oneof=CONFIRMADA MODIFICADA REVOCADA"`
+	// Justificación de decisión final
+	FinalRationale string `json:"final_rationale,omitempty"`
 }
 
 type AppealResponse struct {
