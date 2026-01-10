@@ -2,7 +2,7 @@
  * SICORA - Componente Lista de Asistencia
  *
  * Muestra la lista de estudiantes para registro de asistencia.
- * Permite marcar presentes, ausentes, tardanzas de forma individual
+ * Permite marcar presentes, ausentes, retardos de forma individual
  * o masiva.
  *
  * @fileoverview Attendance List component
@@ -315,7 +315,7 @@ export function AttendanceList({
         { label: 'Total', value: stats.total, color: 'text-gray-600' },
         { label: 'Presentes', value: stats.present, color: 'text-green-600' },
         { label: 'Ausentes', value: stats.absent, color: 'text-red-600' },
-        { label: 'Tardanzas', value: stats.late, color: 'text-yellow-600' },
+        { label: 'Retardos', value: stats.late, color: 'text-yellow-600' },
         { label: 'Pendientes', value: stats.pending, color: 'text-gray-400' },
       ].map((stat) => (
         <div
@@ -377,7 +377,7 @@ export function AttendanceList({
         <option value="todos">Todos los estados</option>
         <option value="presente">✓ Presentes</option>
         <option value="ausente">✗ Ausentes</option>
-        <option value="tardanza">⏰ Tardanzas</option>
+        <option value="tardanza">⏰ Retardos</option>
         <option value="pendiente">○ Pendientes</option>
       </select>
     </div>

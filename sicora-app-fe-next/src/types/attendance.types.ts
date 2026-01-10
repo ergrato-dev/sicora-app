@@ -62,7 +62,7 @@ export type AlertSeverity = 'info' | 'warning' | 'critical';
  */
 export type AlertType = 
   | 'inasistencia_frecuente'      // Múltiples faltas
-  | 'tardanza_reiterada'          // Múltiples tardanzas
+  | 'tardanza_reiterada'          // Múltiples retardos
   | 'riesgo_desercion'            // En riesgo de abandonar
   | 'justificacion_pendiente'     // Tiene justificaciones sin revisar
   | 'porcentaje_bajo'             // % asistencia bajo

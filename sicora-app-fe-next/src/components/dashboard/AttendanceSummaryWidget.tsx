@@ -144,7 +144,7 @@ function StudentAttendanceWidget({ data, className }: StudentAttendanceWidgetPro
         <div className="p-3 bg-yellow-50 rounded-lg">
           <Clock className="w-5 h-5 text-yellow-600 mx-auto mb-1" />
           <p className="text-xl font-bold text-yellow-700">{data.late}</p>
-          <p className="text-xs text-yellow-600">Tardanzas</p>
+          <p className="text-xs text-yellow-600">Retardos</p>
         </div>
       </div>
 
