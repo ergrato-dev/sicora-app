@@ -76,6 +76,7 @@ const (
 type CriterionCategory string
 
 const (
+	// Categorías técnicas principales
 	CriterionCategoryTecnico       CriterionCategory = "TECNICO"
 	CriterionCategoryFuncional     CriterionCategory = "FUNCIONAL"
 	CriterionCategoryDocumentacion CriterionCategory = "DOCUMENTACION"
@@ -87,6 +88,16 @@ const (
 	CriterionCategorySeguridad     CriterionCategory = "SEGURIDAD"
 	CriterionCategoryRendimiento   CriterionCategory = "RENDIMIENTO"
 	CriterionCategoryUsabilidad    CriterionCategory = "USABILIDAD"
+
+	// Categorías DevOps/Cloud (desde T2-T3 según Lista Chequeo ADSO 2026)
+	CriterionCategoryDocker       CriterionCategory = "DOCKER"       // Contenedores, Dockerfile, docker-compose
+	CriterionCategoryCI_CD        CriterionCategory = "CI_CD"        // GitHub Actions, pipelines, automatización
+	CriterionCategoryCloud        CriterionCategory = "CLOUD"        // Deploy en Vercel/Railway/Render
+	CriterionCategoryMonitoreo    CriterionCategory = "MONITOREO"    // Logging, Sentry, health checks
+	CriterionCategoryVersionado   CriterionCategory = "VERSIONADO"   // Git, branches, PRs, code reviews
+	CriterionCategoryIA           CriterionCategory = "IA"           // Uso responsable de IA (Copilot, ChatGPT)
+	CriterionCategoryArquitectura CriterionCategory = "ARQUITECTURA" // C4, API-First, patrones
+	CriterionCategoryTesting      CriterionCategory = "TESTING"      // Unit, Integration, E2E
 )
 
 // Methods
@@ -109,7 +120,14 @@ func (cc CriterionCategory) String() string {
 
 func (cc CriterionCategory) IsValid() bool {
 	switch cc {
-	case CriterionCategoryTecnico, CriterionCategoryFuncional, CriterionCategoryDocumentacion, CriterionCategoryPresentacion, CriterionCategoryTrabajoEquipo, CriterionCategoryInnovacion, CriterionCategoryCalidad, CriterionCategoryDespliegue, CriterionCategorySeguridad, CriterionCategoryRendimiento, CriterionCategoryUsabilidad:
+	case CriterionCategoryTecnico, CriterionCategoryFuncional, CriterionCategoryDocumentacion,
+		CriterionCategoryPresentacion, CriterionCategoryTrabajoEquipo, CriterionCategoryInnovacion,
+		CriterionCategoryCalidad, CriterionCategoryDespliegue, CriterionCategorySeguridad,
+		CriterionCategoryRendimiento, CriterionCategoryUsabilidad,
+		// DevOps/Cloud categories
+		CriterionCategoryDocker, CriterionCategoryCI_CD, CriterionCategoryCloud,
+		CriterionCategoryMonitoreo, CriterionCategoryVersionado, CriterionCategoryIA,
+		CriterionCategoryArquitectura, CriterionCategoryTesting:
 		return true
 	default:
 		return false
