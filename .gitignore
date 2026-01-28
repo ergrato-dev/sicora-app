@@ -1,0 +1,193 @@
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+*.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.*
+*.env
+
+# Scripts de creación de usuarios (seguridad)
+_scripts/create-super-admin.sh
+_scripts/create-admin-*.sh
+**/create-super-admin.sh
+**/create-admin-*.sh
+
+# Backups de credenciales
+*.credentials.txt
+*-credentials-*.txt
+.env.local
+.env.development
+.env.development.local
+.env.test.local
+.env.production
+.env.production.local
+.env.unified
+**/.env
+**/.env.*
+
+# Archivos con secretos/credenciales
+**/secrets/
+**/*secret*.txt
+**/*password*.txt
+**/credentials.json
+apply-secure-secrets.sh
+
+# Documentación con información sensible (solo local)
+_docs/desarrollo/USUARIOS_VERIFICADOS_DB.md
+_docs/desarrollo/SECRETOS_SEGUROS_2026.md
+
+# Datos sensibles en formato markdown (información institucional)
+_docs/data/
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+out
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# VS Code directories
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+go.sum
+
+# Database
+*.db
+*.sqlite
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+build/
+dist/
+target/
+
+# Docker
+.dockerignore
+
+# Backup files
+*.bak
+*.backup
+
+# Test coverage
+coverage/
+*.coverprofile
+
+# SICORA specific exclusions
+# Documentación de seguimiento temporal (NO subir a GitHub)
+# Excepción: README.md de seguimiento sí se versiona
+_docs/seguimiento/*.md
+_docs/seguimiento/*.log
+!_docs/seguimiento/README.md
+
+# Archivos de proceso y reportes locales
+_scripts/*.log
+_scripts/*.backup
+
+# Postman collections locales (para desarrollo)
+postman-collections/environments/*.local.json
+
+# Performance reports (k6 outputs)
+performance-reports/*.json
+performance-reports/*.html
+
+# Security reports (.log files only)
+security-reports/*.log
+
+
+# Scripts con secretos (solo locales)
+_scripts/apply-secure-secrets.sh
+_scripts/apply-secure-secrets.sh.local
+*-secrets.sh
+
+# Archivos de desarrollo temporal
+*.local
+*.backup-*
+
+# Datos institucionales confidenciales
+_docs/data/
